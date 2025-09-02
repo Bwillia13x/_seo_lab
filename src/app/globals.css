@@ -120,16 +120,16 @@
 
 @layer components {
   .elevated-card {
-    @apply bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/70 border border-border/60 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.15)];
+    @apply bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80 border border-border/50 shadow-[0_8px_25px_-12px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_35px_-12px_rgba(0,0,0,0.2)] transition-shadow duration-300;
   }
   .soft-shadow {
-    box-shadow: 0 10px 20px -10px rgba(0,0,0,0.15), 0 8px 40px -16px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 12px -4px rgba(0,0,0,0.08), 0 2px 8px -2px rgba(0,0,0,0.04);
   }
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
   .page-header {
-    @apply mb-4 md:mb-6 flex items-start justify-between gap-3;
+    @apply mb-6 md:mb-8 flex items-start justify-between gap-4;
   }
 
   /* Loading animation */
@@ -143,16 +143,16 @@
   }
 
   .shimmer {
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
     background-size: 200px 100%;
     animation: shimmer 1.5s infinite;
   }
 
-  /* Fade in animation */
+  /* Enhanced fade in animation */
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(12px);
     }
     to {
       opacity: 1;
@@ -161,7 +161,7 @@
   }
 
   .fade-in {
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.4s ease-out;
   }
 
   /* Belmont branded accent */
@@ -176,8 +176,41 @@
     background-clip: text;
   }
 
+  /* Button hover effects */
+  .btn-hover-lift {
+    @apply transition-all duration-200 hover:scale-105 hover:shadow-lg active:scale-95;
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
   /* Simple Mode helpers */
   .simple .md\:grid-cols-3 { @apply md:grid-cols-2; }
   .simple .md\:grid-cols-4 { @apply md:grid-cols-3; }
   .simple .hidden.md\:block { display: none; }
+
+  /* Improved scrollbar */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground)) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground));
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--foreground));
+  }
 }

@@ -39,12 +39,14 @@ import {
   QrCode,
   Link,
   Filter,
+  CheckCircle2,
 } from "lucide-react";
 
 import { saveBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
 import { BELMONT_CONSTANTS, BELMONT_UTM_PRESETS } from "@/lib/constants";
+import { LoadingIndicator } from "@/components/ui/loading-indicator";
 
 // ---------------- UTM Building ----------------
 function buildUtmUrl(
@@ -148,6 +150,7 @@ function UTMDashboard() {
   const [builtUrl, setBuiltUrl] = useState<string>("");
   const [qrUrl, setQrUrl] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   // Batch state
   type Row = {
@@ -176,38 +179,51 @@ function UTMDashboard() {
 
   // Build link on demand
   async function build() {
-    const p = PRESETS[preset];
-    let utm_source = p.source;
-    let utm_medium = p.medium;
-    let utm_campaign = campaign;
-    let utm_term = term;
-    let utm_content = content;
-    if (forceLower) {
-      utm_source = utm_source.toLowerCase();
-      utm_medium = utm_medium.toLowerCase();
-      utm_campaign = utm_campaign.toLowerCase();
-      utm_term = utm_term.toLowerCase();
-      utm_content = utm_content.toLowerCase();
+    setIsGenerating(true);
+    try {
+      const p = PRESETS[preset];
+      let utm_source = p.source;
+      let utm_medium = p.medium;
+      let utm_campaign = campaign;
+      let utm_term = term;
+      let utm_content = content;
+      if (forceLower) {
+        utm_source = utm_source.toLowerCase();
+        utm_medium = utm_medium.toLowerCase();
+        utm_campaign = utm_campaign.toLowerCase();
+        utm_term = utm_term.toLowerCase();
+        utm_content = utm_content.toLowerCase();
+      }
+      if (hyphenate) {
+        utm_campaign = slugify(utm_campaign);
+        utm_term = slugify(utm_term);
+        utm_content = slugify(utm_content);
+      }
+      const { url } = buildUtmUrl(
+        baseUrl,
+        { utm_source, utm_medium, utm_campaign, utm_term, utm_content },
+        overwrite
+      );
+      setBuiltUrl(url);
+      const durl = await qrDataUrl(url, size, margin, ecLevel);
+      setQrUrl(durl);
+    } catch (error) {
+      console.error('Failed to generate UTM link:', error);
+      // Could add error state here
+    } finally {
+      setIsGenerating(false);
     }
-    if (hyphenate) {
-      utm_campaign = slugify(utm_campaign);
-      utm_term = slugify(utm_term);
-      utm_content = slugify(utm_content);
-    }
-    const { url } = buildUtmUrl(
-      baseUrl,
-      { utm_source, utm_medium, utm_campaign, utm_term, utm_content },
-      overwrite
-    );
-    setBuiltUrl(url);
-    const durl = await qrDataUrl(url, size, margin, ecLevel);
-    setQrUrl(durl);
   }
 
-  function copyUrl() {
-    navigator.clipboard.writeText(builtUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
+  async function copyUrl() {
+    try {
+      await navigator.clipboard.writeText(builtUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy URL:', error);
+      // Could show error toast here
+    }
   }
 
   function downloadQR() {
@@ -327,13 +343,21 @@ function UTMDashboard() {
         showLogo={true}
         actions={
           <div className="flex gap-2">
-            <Button onClick={build}>
-              <Wand2 className="h-4 w-4 mr-2" />
-              Generate UTM
+            <Button onClick={build} disabled={isGenerating}>
+              {isGenerating ? (
+                <LoadingIndicator size="sm" className="mr-2" />
+              ) : (
+                <Wand2 className="h-4 w-4 mr-2" />
+              )}
+              {isGenerating ? "Generating..." : "Generate UTM"}
             </Button>
-            <Button onClick={copyUrl} disabled={!builtUrl}>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Link
+            <Button onClick={copyUrl} disabled={!builtUrl} variant={copied ? "default" : "outline"}>
+              {copied ? (
+                <CheckCircle2 className="h-4 w-4 mr-2" />
+              ) : (
+                <Copy className="h-4 w-4 mr-2" />
+              )}
+              {copied ? "Copied!" : "Copy Link"}
             </Button>
           </div>
         }
@@ -537,13 +561,15 @@ function UTMDashboard() {
                   <Input
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
+                    placeholder="https://thebelmontbarber.ca/book"
+                    aria-label="Base URL for UTM tracking"
                   />
                 </div>
 
                 <div>
                   <Label>Platform Preset</Label>
                   <select
-                    className="w-full h-9 border rounded-md px-2"
+                    className="w-full h-9 border rounded-md px-2 focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     value={preset}
                     onChange={(e) => setPreset(e.target.value as PresetKey)}
                     aria-label="Select marketing platform preset"
@@ -594,6 +620,8 @@ function UTMDashboard() {
                   <Input
                     value={campaign}
                     onChange={(e) => setCampaign(e.target.value)}
+                    placeholder="belmont-skin-fade-bridgeland-202412"
+                    aria-label="UTM campaign name"
                   />
                 </div>
 

@@ -50,14 +50,14 @@ export default function AppShell({
     });
   }
   return (
-    <div className="min-h-screen grid md:grid-cols-[260px_1fr]">
+    <div className="min-h-screen grid lg:grid-cols-[280px_1fr]">
       <Sidebar simple={simple} />
       <div className="flex flex-col">
-        <header className="sticky top-0 z-40 border-b bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/50 bg-[linear-gradient(180deg,hsla(268,100%,97%,0.8)_0%,hsla(0,0%,100%,0)_100%)] dark:bg-[linear-gradient(180deg,rgba(35,31,57,0.6)_0%,rgba(0,0,0,0)_100%)]">
-          <div className="max-w-[1440px] mx-auto px-4 md:px-6 h-14 flex items-center gap-3">
+        <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70 shadow-sm">
+          <div className="max-w-[1440px] mx-auto px-4 md:px-6 h-16 flex items-center gap-3">
             <Link
               href="/"
-              className="flex items-center gap-2 font-semibold tracking-tight text-sm md:text-base"
+              className="flex items-center gap-2 font-semibold tracking-tight text-sm md:text-base hover:opacity-80 transition-opacity"
             >
               <Image
                 src="/images/PRAIRIESIGNALLOGO.png"
@@ -66,68 +66,78 @@ export default function AppShell({
                 height={24}
                 className="h-6 w-6"
               />
-              Belmont SEO Lab
+              <span className="hidden sm:inline">Belmont SEO Lab</span>
+              <span className="sm:hidden">SEO Lab</span>
             </Link>
-            <div className="ml-auto flex items-center gap-2 rounded-full bg-secondary/70 px-2 py-1">
-              {/* Belmont Quick Actions */}
-              <a
-                href={BELMONT_CONSTANTS.PHONE_TEL}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border hover:bg-accent transition-colors"
-                aria-label="Call for assistance"
-              >
-                <Phone className="h-3.5 w-3.5" />
-                Assistance
-              </a>
-              <a
-                href={BELMONT_CONSTANTS.MAP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border hover:bg-accent transition-colors"
-                aria-label="Find The Belmont Barbershop on map"
-              >
-                <MapPin className="h-3.5 w-3.5" />
-                Map
-              </a>
+
+            <div className="ml-auto flex items-center gap-1">
+              {/* Quick Actions - Only show on larger screens */}
+              <div className="hidden lg:flex items-center gap-1 rounded-full bg-secondary/50 px-1 py-1">
+                <a
+                  href={BELMONT_CONSTANTS.PHONE_TEL}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-full hover:bg-accent transition-colors"
+                  aria-label="Call for assistance"
+                >
+                  <Phone className="h-3.5 w-3.5" />
+                  <span className="hidden xl:inline">Assistance</span>
+                </a>
+                <a
+                  href={BELMONT_CONSTANTS.MAP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-full hover:bg-accent transition-colors"
+                  aria-label="Find The Belmont Barbershop on map"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  <span className="hidden xl:inline">Map</span>
+                </a>
+              </div>
+
+              {/* Search - Only show when not in simple mode */}
               {!simple && (
                 <div className="relative hidden md:block">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <input
                     placeholder="Search tools…"
-                    className="h-9 w-[200px] pl-8 pr-3 rounded-full border bg-background/60"
+                    className="h-10 w-[220px] pl-9 pr-3 rounded-full border bg-background/60 focus:bg-background transition-colors focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   />
                 </div>
               )}
-              <button
-                aria-label="Toggle Simple Mode"
-                className="h-9 px-3 inline-flex items-center justify-center rounded-md border hover:bg-accent text-xs"
-                onClick={toggleSimple}
-                title="Simple Mode"
-              >
-                {simple ? "Simple On" : "Simple Off"}
-              </button>
-              <button
-                aria-label="Toggle theme"
-                className="h-9 w-9 inline-flex items-center justify-center rounded-md border hover:bg-accent"
-                onClick={toggleTheme}
-              >
-                {dark ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <MoonStar className="h-4 w-4" />
-                )}
-              </button>
+
+              {/* Controls */}
+              <div className="flex items-center gap-1">
+                <button
+                  aria-label="Toggle Simple Mode"
+                  className="h-10 px-3 inline-flex items-center justify-center rounded-md border hover:bg-accent text-xs font-medium transition-colors focus-ring"
+                  onClick={toggleSimple}
+                  title="Simple Mode"
+                >
+                  {simple ? "Simple" : "Advanced"}
+                </button>
+                <button
+                  aria-label="Toggle theme"
+                  className="h-10 w-10 inline-flex items-center justify-center rounded-md border hover:bg-accent transition-colors focus-ring"
+                  onClick={toggleTheme}
+                >
+                  {dark ? (
+                    <Sun className="h-4 w-4" />
+                  ) : (
+                    <MoonStar className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </header>
         <main className="p-4 md:p-6 max-w-[1440px] mx-auto w-full">
           {children}
         </main>
-        {/* Floating Help Button */}
-        <div className="fixed bottom-4 right-4 z-50">
-          <div className="flex flex-col items-end gap-2">
+        {/* Floating Help Actions */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <div className="flex flex-col items-end gap-3">
             <a
               href="mailto:info@thebelmontbarber.ca"
-              className="hidden md:inline-flex items-center gap-2 px-3 py-2 rounded-md border bg-background/70 backdrop-blur hover:bg-accent transition-colors text-sm"
+              className="hidden lg:flex items-center gap-2 px-4 py-2.5 rounded-lg border bg-background/90 backdrop-blur shadow-lg hover:bg-accent transition-all duration-200 text-sm font-medium hover:shadow-xl"
               aria-label="Email support"
             >
               <Image
@@ -139,14 +149,26 @@ export default function AppShell({
               />
               Need help? Email support
             </a>
-            <a
-              href="tel:403-618-6113"
-              className="inline-flex items-center justify-center h-11 w-11 rounded-full belmont-accent text-white shadow-lg hover:opacity-90 focus-ring"
-              aria-label="Call for assistance"
-              title="Call for assistance"
-            >
-              <Phone className="h-5 w-5" />
-            </a>
+            <div className="flex gap-2">
+              <a
+                href="tel:403-618-6113"
+                className="inline-flex items-center justify-center h-12 w-12 rounded-full belmont-accent text-white shadow-lg hover:shadow-xl hover:scale-105 focus-ring transition-all duration-200"
+                aria-label="Call for assistance"
+                title="Call for assistance"
+              >
+                <Phone className="h-5 w-5" />
+              </a>
+              <a
+                href={BELMONT_CONSTANTS.MAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-600 text-white shadow-lg hover:shadow-xl hover:scale-105 focus-ring transition-all duration-200"
+                aria-label="Find The Belmont Barbershop on map"
+                title="Find us on map"
+              >
+                <MapPin className="h-5 w-5" />
+              </a>
+            </div>
           </div>
         </div>
       </div>

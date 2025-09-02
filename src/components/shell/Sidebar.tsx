@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import {
   Scissors,
   BarChart3,
@@ -18,67 +19,87 @@ import {
   QrCode,
   Link as LinkIcon,
   Users,
+  Menu,
+  X,
 } from "lucide-react";
 
-const items = [
-  { href: "/", label: "Home", icon: null },
+const navigationGroups = [
   {
-    href: "/apps/citation-tracker",
-    label: "Business Listings Check",
-    icon: Scissors,
+    title: "Getting Started",
+    items: [
+      { href: "/", label: "Home", icon: null },
+    ],
   },
-  { href: "/apps/gsc-ctr-miner", label: "Search Performance", icon: BarChart3 },
-  { href: "/apps/link-prospect-kit", label: "Partner Finder", icon: Link2 },
-  { href: "/apps/utm-dashboard", label: "Campaign Links", icon: Tags },
-  { href: "/apps/post-studio", label: "Social Media Studio", icon: Img },
-  { href: "/apps/gbp-composer", label: "Google Posts Writer", icon: FileText },
-  { href: "/apps/rank-grid", label: "Search Rankings", icon: MapPin },
-  { href: "/apps/seo-brief", label: "Website Guide", icon: FileText },
-  { href: "/apps/review-link", label: "Review Request Links", icon: QrCode },
-  { href: "/apps/utm-qr", label: "QR Code Maker", icon: LinkIcon },
-  { href: "/apps/rfm-crm", label: "Customer Analysis", icon: Users },
-  { href: "/apps/slot-yield", label: "Service Profits", icon: Clock },
-  { href: "/apps/queuetime", label: "Busy Times Predictor", icon: Clock },
   {
-    href: "/apps/meta-planner",
-    label: "Page Titles & Descriptions",
-    icon: FileText,
+    title: "Content Creation",
+    items: [
+      { href: "/apps/gbp-composer", label: "Google Posts Writer", icon: FileText },
+      { href: "/apps/post-studio", label: "Social Media Studio", icon: Img },
+      { href: "/apps/post-oracle", label: "Content Calendar", icon: MessageSquare },
+      { href: "/apps/neighbor-signal", label: "Local Content Ideas", icon: Radar },
+    ],
   },
-  { href: "/apps/post-oracle", label: "Content Calendar", icon: MessageSquare },
   {
-    href: "/apps/review-composer",
-    label: "Review Responses",
-    icon: MessageSquare,
+    title: "Marketing & Tracking",
+    items: [
+      { href: "/apps/utm-dashboard", label: "Campaign Links", icon: Tags },
+      { href: "/apps/utm-qr", label: "QR Code Maker", icon: LinkIcon },
+      { href: "/apps/referral-qr", label: "Staff Referral Codes", icon: QrCode },
+      { href: "/apps/review-link", label: "Review Request Links", icon: QrCode },
+    ],
   },
-  { href: "/apps/link-map", label: "Partnership Map", icon: MapPin },
   {
-    href: "/apps/noshow-shield",
-    label: "Appointment Reminders",
-    icon: AlertTriangle,
+    title: "Customer Management",
+    items: [
+      { href: "/apps/review-composer", label: "Review Responses", icon: MessageSquare },
+      { href: "/apps/rfm-crm", label: "Customer Analysis", icon: Users },
+      { href: "/apps/noshow-shield", label: "Appointment Reminders", icon: AlertTriangle },
+      { href: "/apps/addon-recommender", label: "Service Suggestions", icon: Plus },
+    ],
   },
-  { href: "/apps/addon-recommender", label: "Service Suggestions", icon: Plus },
   {
-    href: "/apps/rankgrid-watcher",
-    label: "Ranking Monitor",
-    icon: TrendingUp,
+    title: "Search Performance",
+    items: [
+      { href: "/apps/gsc-ctr-miner", label: "Search Performance", icon: BarChart3 },
+      { href: "/apps/rank-grid", label: "Search Rankings", icon: MapPin },
+      { href: "/apps/rankgrid-watcher", label: "Ranking Monitor", icon: TrendingUp },
+      { href: "/apps/slot-yield", label: "Service Profits", icon: Clock },
+      { href: "/apps/queuetime", label: "Busy Times Predictor", icon: Clock },
+    ],
   },
-  { href: "/apps/neighbor-signal", label: "Local Content Ideas", icon: Radar },
-  { href: "/apps/referral-qr", label: "Staff Referral Codes", icon: QrCode },
+  {
+    title: "Local Partnerships",
+    items: [
+      { href: "/apps/link-prospect-kit", label: "Partner Finder", icon: Link2 },
+      { href: "/apps/link-map", label: "Partnership Map", icon: MapPin },
+    ],
+  },
+  {
+    title: "Website Optimization",
+    items: [
+      { href: "/apps/seo-brief", label: "Website Guide", icon: FileText },
+      { href: "/apps/meta-planner", label: "Page Titles & Descriptions", icon: FileText },
+      { href: "/apps/citation-tracker", label: "Business Listings Check", icon: Scissors },
+    ],
+  },
 ];
 
 function NavItem({
   href,
   label,
   Icon,
+  onClick,
 }: {
   readonly href: string;
   readonly label: string;
   readonly Icon: any;
+  readonly onClick?: () => void;
 }) {
   return (
     <Link
       key={href}
       href={href}
+      onClick={onClick}
       className="group flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors"
     >
       {Icon && (
@@ -90,55 +111,130 @@ function NavItem({
 }
 
 export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close mobile menu when clicking outside or on navigation
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMobileMenuOpen && !(event.target as Element).closest('.sidebar-container')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   return (
-    <aside className="border-r bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="p-4">
-        <div className="flex items-center gap-2">
-          <Image
-            src="/images/PRAIRIESIGNALLOGO.png"
-            alt="Prairie Signal"
-            width={20}
-            height={20}
-            className="h-5 w-5"
-          />
-          <div>
-            <div className="font-semibold text-base tracking-tight">
-              Belmont
+    <>
+      {/* Mobile Menu Toggle */}
+      <button
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 h-10 w-10 rounded-md border bg-background/90 backdrop-blur shadow-lg flex items-center justify-center hover:bg-accent transition-colors"
+        aria-label="Toggle navigation menu"
+      >
+        {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </button>
+
+      <aside className={`sidebar-container border-r bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:translate-x-0 transition-transform duration-300 ease-in-out ${
+        isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      } fixed lg:static inset-y-0 left-0 z-40 w-72 lg:w-auto`}>
+        <div className="p-4 border-b lg:border-b-0">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/images/PRAIRIESIGNALLOGO.png"
+              alt="Prairie Signal"
+              width={20}
+              height={20}
+              className="h-5 w-5"
+            />
+            <div>
+              <div className="font-semibold text-base tracking-tight">
+                Belmont
+              </div>
+              <div className="text-xs text-muted-foreground">SEO Lab</div>
             </div>
-            <div className="text-xs text-muted-foreground">SEO Lab</div>
           </div>
         </div>
-      </div>
-      <nav className="px-2 space-y-1">
-        {items.map(({ href, label, icon: Icon }) => (
-          <div key={href} className="space-y-0.5">
-            <NavItem href={href} label={label} Icon={Icon} />
-            {simple && (
-              <div className="pl-10 pr-3 text-[11px] text-muted-foreground">
-                {label === "Campaign Links" &&
-                  "Create links that tell you where customers came from."}
-                {label === "QR Code Maker" &&
-                  "Make a square barcode people can scan with their phone."}
-                {label === "Review Request Links" &&
-                  "Send people straight to your review page."}
-                {label === "Search Results Analyzer" &&
-                  "See how people find you on Google."}
-                {label === "Google Posts Writer" &&
-                  "Write a short, clear update for Google."}
-                {label === "Social Media Studio" &&
-                  "Draft simple posts for Facebook/Instagram."}
-                {label === "Local Search Rankings" &&
-                  "Check where you appear in Google Maps."}
-                {label === "Partner Finder" &&
-                  "Find nearby businesses to work with."}
-                {label === "Website Improvement Guide" &&
-                  "Plain steps to tidy your website."}
+      <nav className="px-2 space-y-4">
+        {navigationGroups.map((group, groupIndex) => (
+          <div key={group.title} className="space-y-2">
+            {group.title !== "Getting Started" && (
+              <div className="px-3">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  {group.title}
+                </h3>
               </div>
             )}
+            <div className="space-y-1">
+              {group.items.map(({ href, label, icon: Icon }) => (
+                <div key={href} className="space-y-0.5">
+                  <NavItem
+                    href={href}
+                    label={label}
+                    Icon={Icon}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  />
+                  {simple && group.title === "Marketing & Tracking" && (
+                    <div className="pl-10 pr-3 text-[11px] text-muted-foreground">
+                      {label === "Campaign Links" &&
+                        "Create links that tell you where customers came from."}
+                      {label === "QR Code Maker" &&
+                        "Make a square barcode people can scan with their phone."}
+                      {label === "Review Request Links" &&
+                        "Send people straight to your review page."}
+                      {label === "Staff Referral Codes" &&
+                        "Create QR codes for staff referral rewards."}
+                    </div>
+                  )}
+                  {simple && group.title === "Content Creation" && (
+                    <div className="pl-10 pr-3 text-[11px] text-muted-foreground">
+                      {label === "Google Posts Writer" &&
+                        "Write a short, clear update for Google."}
+                      {label === "Social Media Studio" &&
+                        "Draft simple posts for Facebook/Instagram."}
+                      {label === "Content Calendar" &&
+                        "Plan and schedule your weekly posts."}
+                      {label === "Local Content Ideas" &&
+                        "See what content works best for Bridgeland."}
+                    </div>
+                  )}
+                  {simple && group.title === "Search Performance" && (
+                    <div className="pl-10 pr-3 text-[11px] text-muted-foreground">
+                      {label === "Search Performance" &&
+                        "See how people find you on Google."}
+                      {label === "Search Rankings" &&
+                        "Check where you appear in Google Maps."}
+                      {label === "Ranking Monitor" &&
+                        "Get automatic updates on ranking changes."}
+                      {label === "Service Profits" &&
+                        "See which services make the most money."}
+                      {label === "Busy Times Predictor" &&
+                        "Predict when you'll be busiest."}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         ))}
       </nav>
       <div className="mt-auto p-3" />
     </aside>
+
+    {/* Mobile Overlay */}
+    {isMobileMenuOpen && (
+      <div className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-30" />
+    )}
+    </>
   );
 }

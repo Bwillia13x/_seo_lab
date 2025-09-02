@@ -262,8 +262,8 @@ export default function Home() {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <div className="text-center space-y-4 fade-in">
-        <div className="flex items-center justify-center gap-3 mb-4">
+      <div className="text-center space-y-6 fade-in">
+        <div className="flex items-center justify-center gap-3 mb-6">
           <Image
             src="/images/PRAIRIESIGNALLOGO.png"
             alt="Prairie Signal"
@@ -275,50 +275,117 @@ export default function Home() {
             Belmont SEO Lab
           </h1>
         </div>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Professional online marketing toolkit for{" "}
           <a
             href="https://thebelmontbarber.ca/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline font-medium"
+            className="text-primary hover:underline font-medium transition-colors"
           >
             The Belmont Barbershop
           </a>{" "}
-          in Bridgeland, Calgary. Complete local marketing management with 22
+          in Bridgeland, Calgary. Streamline your local marketing with
           easy-to-use tools.
         </p>
+
+        {/* Quick Start Actions */}
+        <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+          <Button
+            size="lg"
+            className="belmont-accent text-white shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            <ArrowRight className="h-5 w-5 mr-2" />
+            Get Started
+          </Button>
+          <Button variant="outline" size="lg" asChild>
+            <Link href="#tools">
+              Browse All Tools
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      {/* Start Here (Beginner Guide) */}
-      <Card>
+      {/* Quick Start Guide */}
+      <Card className="elevated-card">
         <CardHeader>
-          <CardTitle>New? Start here (takes 2 minutes)</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            Quick Start (3 minutes to first win)
+          </CardTitle>
           <CardDescription>
-            Three quick steps to get your first win today
+            Get immediate results with these essential first steps
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ol className="list-decimal pl-5 space-y-2 text-sm">
-            <li>
-              At the top right, click <strong>Simple Mode</strong>. This shows
-              short explanations under each tool.
-            </li>
-            <li>
-              Open{" "}
-              <Link href="/apps/utm-dashboard" className="underline">
-                Campaign Link Builder
-              </Link>{" "}
-              and make a booking link. Copy it for your Instagram profile.
-            </li>
-            <li>
-              Open{" "}
-              <Link href="/apps/review-link" className="underline">
-                Review Request Links
-              </Link>{" "}
-              and copy the SMS. Send it to one recent customer.
-            </li>
-          </ol>
+          <div className="grid gap-4">
+            <div className="flex items-start gap-3 p-4 border rounded-lg bg-green-50 dark:bg-green-950/20">
+              <Badge
+                variant="outline"
+                className="mt-1 border-green-200 text-green-700 dark:border-green-800 dark:text-green-300"
+              >
+                1
+              </Badge>
+              <div>
+                <h4 className="font-semibold text-green-800 dark:text-green-200">
+                  Enable Simple Mode
+                </h4>
+                <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                  Click "Simple Mode" in the header for guided explanations
+                  under each tool.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-4 border rounded-lg bg-blue-50 dark:bg-blue-950/20">
+              <Badge
+                variant="outline"
+                className="mt-1 border-blue-200 text-blue-700 dark:border-blue-800 dark:text-blue-300"
+              >
+                2
+              </Badge>
+              <div>
+                <h4 className="font-semibold text-blue-800 dark:text-blue-200">
+                  Create Tracking Links
+                </h4>
+                <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                  Use the{" "}
+                  <Link
+                    href="/apps/utm-dashboard"
+                    className="underline font-medium hover:text-blue-600"
+                  >
+                    Campaign Link Builder
+                  </Link>{" "}
+                  to create special links that track customer sources.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 p-4 border rounded-lg bg-purple-50 dark:bg-purple-950/20">
+              <Badge
+                variant="outline"
+                className="mt-1 border-purple-200 text-purple-700 dark:border-purple-800 dark:text-purple-300"
+              >
+                3
+              </Badge>
+              <div>
+                <h4 className="font-semibold text-purple-800 dark:text-purple-200">
+                  Get Customer Reviews
+                </h4>
+                <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
+                  Generate{" "}
+                  <Link
+                    href="/apps/review-link"
+                    className="underline font-medium hover:text-purple-600"
+                  >
+                    review request links
+                  </Link>{" "}
+                  and send them to recent customers.
+                </p>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -355,37 +422,46 @@ export default function Home() {
       </div>
 
       {/* Key Features */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-lg">📍 Local Focus</CardTitle>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <Card className="elevated-card text-center group hover:scale-105 transition-transform duration-200">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center justify-center gap-2">
+              <MapPin className="h-5 w-5 text-blue-600" />
+              Local Focus
+            </CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-sm text-muted-foreground">
+          <CardContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Designed specifically for Bridgeland and Riverside neighborhoods
               with Calgary-focused marketing and local business connections
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-lg">🎯 Ready to Use</CardTitle>
+        <Card className="elevated-card text-center group hover:scale-105 transition-transform duration-200">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center justify-center gap-2">
+              <Target className="h-5 w-5 text-green-600" />
+              Ready to Use
+            </CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-sm text-muted-foreground">
+          <CardContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Everything is set up with Belmont's branding, services, contact
               information, and professional templates
             </p>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-lg">🔒 Private & Secure</CardTitle>
+        <Card className="elevated-card text-center group hover:scale-105 transition-transform duration-200">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center justify-center gap-2">
+              <Shield className="h-5 w-5 text-purple-600" />
+              Private & Secure
+            </CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-sm text-muted-foreground">
+          <CardContent>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               All work happens on your computer - no data is sent to external
               servers for maximum privacy
             </p>
@@ -438,42 +514,65 @@ export default function Home() {
       </Card>
 
       {/* Tool Categories */}
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div className="text-center">
-          <h2 className="text-2xl font-bold">Complete Marketing Toolkit</h2>
-          <p className="text-muted-foreground mt-2">
+          <h2 className="text-3xl font-bold">Complete Marketing Toolkit</h2>
+          <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
             22 Easy-to-use tools organized by category for comprehensive local
             marketing management
           </p>
         </div>
 
-        <div className="grid gap-6">
+        <div className="grid gap-8">
           {toolCategories.map((category, index) => (
-            <Card key={category.title}>
+            <Card key={category.title} className="elevated-card">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <category.icon className="h-5 w-5" />
-                  {category.title}
-                  <Badge variant="secondary" className="ml-2">
-                    {category.tools.length} tools
-                  </Badge>
+                <CardTitle className="flex items-center gap-3 text-xl">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <category.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    {category.title}
+                    <Badge variant="secondary" className="ml-2 text-xs">
+                      {category.tools.length} tools
+                    </Badge>
+                  </div>
                 </CardTitle>
-                <CardDescription>{category.description}</CardDescription>
+                <CardDescription className="text-base mt-2">
+                  {category.description}
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-3">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {category.tools.map((tool) => (
                     <div
                       key={tool.name}
-                      className="flex items-center justify-between p-3 border rounded-lg"
+                      className="group p-4 border rounded-lg hover:border-primary/50 transition-colors"
                     >
-                      <div>
-                        <h4 className="font-medium">{tool.name}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {tool.description}
-                        </p>
+                      <div className="flex items-start justify-between mb-3">
+                        <h4 className="font-semibold text-sm leading-tight">
+                          {tool.name}
+                        </h4>
+                        <Button
+                          asChild
+                          variant="ghost"
+                          size="sm"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <Link href={tool.href}>
+                            <ArrowRight className="h-3 w-3" />
+                          </Link>
+                        </Button>
                       </div>
-                      <Button asChild variant="outline" size="sm">
+                      <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                        {tool.description}
+                      </p>
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                      >
                         <Link href={tool.href}>
                           Open Tool
                           <ArrowRight className="h-3 w-3 ml-1" />
