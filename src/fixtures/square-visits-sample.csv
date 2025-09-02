@@ -1,0 +1,33 @@
+date,start_time,service,duration_min,barber,show
+2024-01-15,09:00,Men's Haircut,30,Alex,1
+2024-01-15,09:30,Beard Trim,20,Sarah,1
+2024-01-15,10:00,Men's Haircut,35,Mike,1
+2024-01-15,10:30,Hot Towel Shave,45,Alex,0
+2024-01-15,11:00,Kids Cut,25,Sarah,1
+2024-01-15,11:30,Men's Haircut,30,Mike,1
+2024-01-15,12:00,Lunch Break,60,All,1
+2024-01-15,13:00,Beard Trim,20,Alex,1
+2024-01-15,13:15,Men's Haircut,35,Sarah,1
+2024-01-15,14:00,Hot Towel Shave,50,Mike,1
+2024-01-15,14:30,Men's Haircut,30,Alex,0
+2024-01-15,15:00,Beard Trim,25,Sarah,1
+2024-01-15,15:30,Kids Cut,30,Mike,1
+2024-01-15,16:00,Men's Haircut,35,Alex,1
+2024-01-15,16:30,Hot Towel Shave,45,Sarah,1
+2024-01-15,17:00,Men's Haircut,30,Mike,1
+2024-01-16,09:00,Men's Haircut,30,Alex,1
+2024-01-16,09:30,Kids Cut,25,Sarah,1
+2024-01-16,10:00,Beard Trim,20,Mike,1
+2024-01-16,10:30,Men's Haircut,35,Alex,1
+2024-01-16,11:00,Hot Towel Shave,45,Sarah,1
+2024-01-16,11:30,Men's Haircut,30,Mike,1
+2024-01-16,12:00,Lunch Break,60,All,1
+2024-01-16,13:00,Beard Trim,20,Alex,1
+2024-01-16,13:30,Kids Cut,25,Sarah,1
+2024-01-16,14:00,Men's Haircut,35,Mike,1
+2024-01-16,14:30,Hot Towel Shave,40,Alex,0
+2024-01-16,15:00,Men's Haircut,30,Sarah,1
+2024-01-16,15:30,Beard Trim,25,Mike,1
+2024-01-16,16:00,Kids Cut,30,Alex,1
+2024-01-16,16:30,Men's Haircut,35,Sarah,1
+2024-01-16,17:00,Hot Towel Shave,45,Mike,1

@@ -1,0 +1,977 @@
+"use client";
+import React, { useEffect, useMemo, useState } from "react";
+
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+
+import {
+  Upload,
+  Download,
+  Filter,
+  Wand2,
+  Play,
+  Settings,
+  Copy,
+} from "lucide-react";
+
+import {
+  ResponsiveContainer,
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as ReTooltip,
+  LineChart,
+  Line,
+  Legend,
+} from "recharts";
+
+import { saveBlob } from "@/lib/blob";
+import { parseCSV, toCSV } from "@/lib/csv";
+import { todayISO } from "@/lib/dates";
+import { PageHeader } from "@/components/ui/page-header";
+import { KPICard } from "@/components/ui/kpi-card";
+
+// ---------------- Utilities ----------------
+function clamp(n: number, lo: number, hi: number) {
+  return Math.max(lo, Math.min(hi, n));
+}
+function toNumber(s: string) {
+  const n = parseFloat(String(s).replace(/%/g, ""));
+  return Number.isFinite(n) ? n : 0;
+}
+function pct(n: number) {
+  return `${(n * 100).toFixed(1)}%`;
+}
+
+// ---------------- Domain bucketing ----------------
+const FAMILY_PATTERNS: Record<string, RegExp> = {
+  barber: /\bbarber(s|shop)?\b/i,
+  haircut: /\bhair ?cut(s)?\b/i,
+  fade: /\bfade(s)?\b/i,
+  beard: /\bbeard(\s*trim|\s*line|\s*shave)?\b/i,
+  shave: /\bshave\b/i,
+  kids: /\bkid(s)?\b|\bchild(ren)?\b/i,
+  walkin: /walk[- ]?in(s)?/i,
+};
+const AREA_PATTERNS: Record<string, RegExp> = {
+  bridgeland: /bridgeland/i,
+  riverside: /riverside/i,
+  calgary: /calgary|yyc/i,
+  nearme: /near\s*me/i,
+};
+const BRAND_PATTERNS = [/belmont/i, /the\s+belmont\s+barber/i];
+
+function familyOf(q: string) {
+  for (const [k, re] of Object.entries(FAMILY_PATTERNS))
+    if (re.test(q)) return k;
+  return "other";
+}
+function areaOf(q: string) {
+  for (const [k, re] of Object.entries(AREA_PATTERNS)) if (re.test(q)) return k;
+  return "generic";
+}
+function isBrand(q: string) {
+  return BRAND_PATTERNS.some((re) => re.test(q));
+}
+
+// Expected CTR benchmark by position bucket (editable)
+const DEFAULT_BENCH: [string, (pos: number) => number][] = [
+  ["1", (p) => (p <= 1 ? 0.3 : 0)],
+  ["2", (p) => (p > 1 && p <= 2 ? 0.15 : 0)],
+  ["3", (p) => (p > 2 && p <= 3 ? 0.1 : 0)],
+  ["4-5", (p) => (p > 3 && p <= 5 ? 0.07 : 0)],
+  ["6-10", (p) => (p > 5 && p <= 10 ? 0.04 : 0)],
+  ["11-20", (p) => (p > 10 && p <= 20 ? 0.015 : 0)],
+  [">20", (p) => (p > 20 ? 0.005 : 0)],
+];
+
+function expectedCTR(pos: number, knobs: CTRKnobs) {
+  for (const [label, fn] of knobs.bench) {
+    const v = fn(pos);
+    if (v > 0) return v;
+  }
+  return 0.01;
+}
+
+// ---------------- Types ----------------
+
+type GSCRow = {
+  query: string;
+  page: string;
+  clicks: number;
+  impressions: number;
+  ctr: number;
+  position: number;
+  fam: string;
+  area: string;
+  brand: boolean;
+};
+
+type CTRKnobs = {
+  bench: [string, (pos: number) => number][];
+  minImpr: number;
+  includeBrand: boolean;
+};
+
+// ---------------- Main Component ----------------
+function GSCCtrMiner() {
+  const [rows, setRows] = useState<GSCRow[]>([]);
+  const [knobs, setKnobs] = useState<CTRKnobs>({
+    bench: DEFAULT_BENCH,
+    minImpr: 50,
+    includeBrand: false,
+  });
+  const [filterFam, setFilterFam] = useState<string>("all");
+  const [filterArea, setFilterArea] = useState<string>("all");
+  const [bizName, setBizName] = useState<string>("The Belmont Barbershop");
+  const [bookingUrl, setBookingUrl] = useState<string>(
+    "https://thebelmontbarber.ca/book"
+  );
+  const [copied, setCopied] = useState<string>("");
+
+  function copy(text: string, which: string) {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(which);
+      setTimeout(() => setCopied(""), 1200);
+    });
+  }
+
+  // Experiment generator
+  function cap(s: string) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  function makeTitle(fam: string, area: string) {
+    const areaLabel =
+      area === "calgary"
+        ? "Calgary"
+        : area === "generic"
+          ? "Calgary"
+          : `${cap(area)}, Calgary`;
+    switch (fam) {
+      case "fade":
+        return `Skin Fades in ${areaLabel} — Belmont Barbershop`;
+      case "beard":
+        return `Beard Trims & Line‑ups in ${areaLabel} — Belmont`;
+      case "shave":
+        return `Hot Towel Shaves in ${areaLabel} — Belmont Barbershop`;
+      case "kids":
+        return `Kids Haircuts in ${areaLabel} — Belmont Barbershop`;
+      case "haircut":
+        return `Men's Haircuts in ${areaLabel} — Belmont Barbershop`;
+      case "walkin":
+        return `Walk‑in Barber in ${areaLabel} — Belmont (When Chairs Free)`;
+      default:
+        return `Barbershop in ${areaLabel} — The Belmont`;
+    }
+  }
+
+  function makeMeta(fam: string, area: string) {
+    const areaLabel =
+      area === "calgary"
+        ? "Calgary"
+        : area === "generic"
+          ? "Calgary"
+          : `${cap(area)}, Calgary`;
+    switch (fam) {
+      case "fade":
+        return `Skin fade specialists in ${areaLabel}. Book online in seconds.`;
+      case "beard":
+        return `Beard trims and line‑ups in ${areaLabel}. Hot towel finish.`;
+      case "shave":
+        return `Classic hot towel shaves in ${areaLabel}. Relaxed, precise.`;
+      case "kids":
+        return `Kids haircuts in ${areaLabel}. Friendly barbers, quick visits.`;
+      case "haircut":
+        return `Men's haircuts in ${areaLabel}. Clean blends, easy booking.`;
+      case "walkin":
+        return `Walk‑in barber in ${areaLabel} when chairs are free.`;
+      default:
+        return `Local barbershop in ${areaLabel}. Reliable cuts, fair prices.`;
+    }
+  }
+
+  // Import
+  function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = (ev) => loadCSV(String(ev.target?.result || ""));
+    r.readAsText(f);
+  }
+
+  function loadCSV(text: string) {
+    const raw = parseCSV(text);
+    // Accept either GSC "Queries" export or Pages export; map columns flexibly
+    const qCol = pickCol(raw[0], ["Query", "Top queries", "query"]);
+    const pCol = pickCol(raw[0], ["Page", "Top pages", "page"]);
+    const clicksCol = pickCol(raw[0], ["Clicks", "Clicks*", "Clicks (all)"]);
+    const imprCol = pickCol(raw[0], [
+      "Impressions",
+      "Impressions*",
+      "Impressions (all)",
+    ]);
+    const ctrCol = pickCol(raw[0], ["CTR", "Ctr", "Click-through rate"]);
+    const posCol = pickCol(raw[0], [
+      "Position",
+      "Avg. position",
+      "Average position",
+    ]);
+    if (!qCol || !pCol) {
+      alert("CSV missing Query or Page columns.");
+      return;
+    }
+    const out: GSCRow[] = raw
+      .map((r) => {
+        const query = r[qCol!];
+        const page = r[pCol!];
+        const clicks = toNumber(r[clicksCol!] || "0");
+        const impr = toNumber(r[imprCol!] || "0");
+        const ctr =
+          ctrCol && r[ctrCol]
+            ? toNumber(r[ctrCol]) / 100
+            : impr
+              ? clicks / impr
+              : 0;
+        const pos = toNumber(r[posCol!] || "0");
+        const fam = familyOf(query);
+        const area = areaOf(query);
+        const brand = isBrand(query);
+        return {
+          query,
+          page,
+          clicks,
+          impressions: impr,
+          ctr,
+          position: pos,
+          fam,
+          area,
+          brand,
+        };
+      })
+      .filter((r) => r.query && r.page);
+    setRows(out);
+  }
+
+  function pickCol(row: Record<string, string>, names: string[]) {
+    const keys = Object.keys(row || {});
+    return keys.find((k) =>
+      names.some((n) => k.toLowerCase().includes(n.toLowerCase()))
+    );
+  }
+
+  // Filtered dataset
+  const filtered = useMemo(
+    () =>
+      rows.filter(
+        (r) =>
+          r.impressions >= knobs.minImpr &&
+          (knobs.includeBrand || !r.brand) &&
+          (filterFam === "all" || r.fam === filterFam) &&
+          (filterArea === "all" || r.area === filterArea)
+      ),
+    [rows, knobs, filterFam, filterArea]
+  );
+
+  // Aggregate by page for opportunities
+  type Opp = {
+    page: string;
+    impressions: number;
+    clicks: number;
+    avgPos: number;
+    avgCTR: number;
+    expCTR: number;
+    liftCTR: number;
+    missedClicks: number;
+    famTop: string;
+    areaTop: string;
+    topQuery: string;
+  };
+  const opps = useMemo(() => {
+    const byPage = new Map<string, GSCRow[]>();
+    for (const r of filtered) {
+      const arr = byPage.get(r.page) || [];
+      arr.push(r);
+      byPage.set(r.page, arr);
+    }
+    const o: Opp[] = [];
+    byPage.forEach((list: GSCRow[], page: string) => {
+      const impr = list.reduce((s: number, x: GSCRow) => s + x.impressions, 0);
+      const clicks = list.reduce((s: number, x: GSCRow) => s + x.clicks, 0);
+      const avgPos =
+        list.reduce(
+          (s: number, x: GSCRow) => s + x.position * x.impressions,
+          0
+        ) / Math.max(1, impr);
+      const avgCTR = clicks / Math.max(1, impr);
+      const exp = expectedCTR(avgPos, knobs);
+      const lift = Math.max(0, exp - avgCTR);
+      const missed = Math.round(lift * impr);
+      // top signals
+      const famTop = mode(list.map((x: GSCRow) => x.fam));
+      const areaTop = mode(list.map((x: GSCRow) => x.area));
+      const topQuery =
+        list
+          .slice()
+          .sort((a: GSCRow, b: GSCRow) => b.impressions - a.impressions)[0]
+          ?.query || "";
+      o.push({
+        page,
+        impressions: impr,
+        clicks,
+        avgPos,
+        avgCTR,
+        expCTR: exp,
+        liftCTR: lift,
+        missedClicks: missed,
+        famTop,
+        areaTop,
+        topQuery,
+      });
+    });
+    return o.sort((a: Opp, b: Opp) => b.missedClicks - a.missedClicks);
+  }, [filtered, knobs]);
+
+  function mode(arr: string[]) {
+    const m = new Map<string, number>();
+    arr.forEach((x: string) => m.set(x, (m.get(x) || 0) + 1));
+    let best = "";
+    let sc = -1;
+    m.forEach((v: number, k: string) => {
+      if (v > sc) {
+        best = k;
+        sc = v;
+      }
+    });
+    return best || "other";
+  }
+
+  type Rec = {
+    page: string;
+    title: string;
+    meta: string;
+    reason: string;
+    topQuery: string;
+    fam: string;
+    area: string;
+    expCTR: number;
+    avgCTR: number;
+    avgPos: number;
+    impressions: number;
+    potentialClicks: number;
+  };
+  const recs: Rec[] = useMemo(
+    () =>
+      opps.slice(0, 100).map((o) => ({
+        page: o.page,
+        title: makeTitle(o.famTop, o.areaTop),
+        meta: makeMeta(o.famTop, o.areaTop),
+        reason: `Avg pos ${o.avgPos.toFixed(1)}, CTR ${pct(
+          o.avgCTR
+        )}, vs expected ${pct(o.expCTR)} at that position. Top query: "${
+          o.topQuery
+        }".`,
+        topQuery: o.topQuery,
+        fam: o.famTop,
+        area: o.areaTop,
+        expCTR: o.expCTR,
+        avgCTR: o.avgCTR,
+        avgPos: o.avgPos,
+        impressions: o.impressions,
+        potentialClicks: o.missedClicks,
+      })),
+    [opps]
+  );
+
+  function exportRecsCSV() {
+    const rows = recs.map((r: Rec) => ({
+      page: r.page,
+      title: r.title,
+      meta: r.meta,
+      reason: r.reason,
+      fam: r.fam,
+      area: r.area,
+      avgPos: r.avgPos.toFixed(1),
+      avgCTR: pct(r.avgCTR),
+      expCTR: pct(r.expCTR),
+      impressions: r.impressions,
+      potentialClicks: r.potentialClicks,
+    }));
+    const csv = toCSV(rows);
+    saveBlob(
+      new Blob([csv], { type: "text/csv;charset=utf-8;" }),
+      `belmont-gsc-recs-${todayISO()}.csv`
+    );
+  }
+
+  // Charts data
+  const scatter = useMemo(
+    () => filtered.map((r) => ({ x: r.position, y: r.ctr * 100, q: r.query })),
+    [filtered]
+  );
+  const expectedLine = useMemo(() => {
+    const pts = [] as { x: number; y: number }[];
+    for (let p = 1; p <= 30; p += 0.5)
+      pts.push({ x: p, y: expectedCTR(p, knobs) * 100 });
+    return pts;
+  }, [knobs]);
+
+  // Self tests
+  type Test = { name: string; passed: boolean; details?: string };
+  function runTests(): Test[] {
+    const tests: Test[] = [];
+    // 1) expected CTR monotonic non‑increasing by buckets
+    const v1 = [1, 2, 3, 4, 7, 12, 25].map((p) => expectedCTR(p, knobs));
+    let ok = true;
+    for (let i = 1; i < v1.length; i++)
+      if (v1[i] > v1[i - 1] + 1e-9) ok = false;
+    tests.push({
+      name: "Benchmark non‑increasing",
+      passed: ok,
+      details: v1.map((x) => x.toFixed(3)).join(" → "),
+    });
+    // 2) bucketing
+    tests.push({
+      name: "Family bucket fade",
+      passed: familyOf("best skin fade bridgeland") === "fade",
+    });
+    tests.push({
+      name: "Area bucket bridgeland",
+      passed: areaOf("barber bridgeland calgary") === "bridgeland",
+    });
+    tests.push({
+      name: "Brand detection",
+      passed: isBrand("belmont barbershop reviews"),
+    });
+    return tests;
+  }
+  const tests = useMemo(() => runTests(), [knobs]);
+  const passCount = tests.filter((t) => t.passed).length;
+
+  return (
+    <div className="p-5 md:p-8 space-y-6">
+      <PageHeader
+        title="GSC CTR & Query Miner"
+        subtitle="Import GSC CSV, find underperforming pages, and generate Title/Meta experiments with Bridgeland/Riverside context."
+        actions={
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                try {
+                  const response = await fetch("/fixtures/gsc-sample.csv");
+                  const csvText = await response.text();
+                  loadCSV(csvText);
+                } catch (e) {
+                  alert(
+                    "Could not load sample data. Make sure fixtures are available."
+                  );
+                }
+              }}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Load Belmont Sample Data
+            </Button>
+            <input
+              type="file"
+              accept=".csv"
+              className="hidden"
+              id="gsc-upload"
+              onChange={onImportFile}
+            />
+            <label htmlFor="gsc-upload">
+              <Button variant="outline">
+                <Upload className="h-4 w-4 mr-2" />
+                Import Your GSC CSV
+              </Button>
+            </label>
+            <Button
+              variant="outline"
+              onClick={exportRecsCSV}
+              disabled={recs.length === 0}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export Recommendations
+            </Button>
+          </div>
+        }
+      />
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <KPICard label="Queries" value={rows.length} hint="Imported" />
+        <KPICard label="Opportunities" value={recs.length} hint="Found" />
+        <KPICard
+          label="Avg CTR"
+          value={`${Math.round((rows.reduce((a, r) => a + (r.ctr || 0), 0) / Math.max(rows.length, 1)) * 100)}%`}
+          hint="Overall"
+        />
+        <KPICard
+          label="Tests"
+          value={`${passCount}/${tests.length}`}
+          hint="Passed"
+        />
+      </div>
+
+      <Tabs defaultValue="settings">
+        <TabsList>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="opps">Opportunities</TabsTrigger>
+          <TabsTrigger value="pages">Page Experiments</TabsTrigger>
+          <TabsTrigger value="charts">Charts</TabsTrigger>
+          <TabsTrigger value="tests">Tests</TabsTrigger>
+          <TabsTrigger value="help">Help</TabsTrigger>
+        </TabsList>
+
+        {/* Settings */}
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                CTR Benchmarks & Filters
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm">
+              <div className="grid md:grid-cols-3 gap-3 items-end">
+                <div className="md:col-span-2">
+                  <Label>Business name</Label>
+                  <Input
+                    value={bizName}
+                    onChange={(e) => setBizName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>Booking URL</Label>
+                  <Input
+                    value={bookingUrl}
+                    onChange={(e) => setBookingUrl(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>Min impressions</Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={knobs.minImpr}
+                    onChange={(e) =>
+                      setKnobs((k) => ({
+                        ...k,
+                        minImpr: clamp(parseInt(e.target.value || "0"), 0, 1e7),
+                      }))
+                    }
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={knobs.includeBrand}
+                    onCheckedChange={(v) =>
+                      setKnobs((k) => ({ ...k, includeBrand: Boolean(v) }))
+                    }
+                  />
+                  <Label>Include brand queries</Label>
+                </div>
+                <div>
+                  <Label>Filter family</Label>
+                  <select
+                    className="w-full h-9 border rounded-md px-2"
+                    value={filterFam}
+                    onChange={(e) => setFilterFam(e.target.value)}
+                  >
+                    <option value="all">all</option>
+                    {Object.keys(FAMILY_PATTERNS).map((k) => (
+                      <option key={k} value={k}>
+                        {k}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label>Filter area</Label>
+                  <select
+                    className="w-full h-9 border rounded-md px-2"
+                    value={filterArea}
+                    onChange={(e) => setFilterArea(e.target.value)}
+                  >
+                    <option value="all">all</option>
+                    {Object.keys(AREA_PATTERNS).map((k) => (
+                      <option key={k} value={k}>
+                        {k}
+                      </option>
+                    ))}
+                    <option value="generic">generic</option>
+                  </select>
+                </div>
+              </div>
+              <Separator />
+              <div>
+                <div className="font-medium mb-2">
+                  Expected CTR by position bucket
+                </div>
+                <div className="grid md:grid-cols-6 gap-2 items-end">
+                  {knobs.bench.map(([label, fn], i) => (
+                    <div key={i} className="p-2 border rounded-md">
+                      <div className="text-xs text-muted-foreground">
+                        Pos {label}
+                      </div>
+                      <Input
+                        type="number"
+                        step="0.5"
+                        value={(fn(bucketMid(label)) * 100).toFixed(1)}
+                        onChange={(e) => {
+                          const val = clamp(
+                            parseFloat(e.target.value || "0") / 100,
+                            0,
+                            1
+                          );
+                          setKnobs((k) => ({
+                            ...k,
+                            bench: k.bench.map((b, j) =>
+                              j === i
+                                ? ([
+                                    b[0],
+                                    (p: number) =>
+                                      inBucket(p, label) ? val : 0,
+                                  ] as [string, (pos: number) => number])
+                                : b
+                            ),
+                          }));
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Values are % CTR expected if a query averages within that
+                  position bucket.
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Opportunities */}
+        <TabsContent value="opps">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">
+                Underperforming Pages by Missed Clicks
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Page</TableHead>
+                      <TableHead>Impr</TableHead>
+                      <TableHead>Clicks</TableHead>
+                      <TableHead>Avg Pos</TableHead>
+                      <TableHead>CTR</TableHead>
+                      <TableHead>Expected</TableHead>
+                      <TableHead>Potential +Clicks</TableHead>
+                      <TableHead>Top Query</TableHead>
+                      <TableHead>Family</TableHead>
+                      <TableHead>Area</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {opps.map((o, i) => (
+                      <TableRow key={i}>
+                        <TableCell className="text-xs">
+                          <a
+                            className="underline"
+                            href={o.page}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {o.page}
+                          </a>
+                        </TableCell>
+                        <TableCell>{o.impressions}</TableCell>
+                        <TableCell>{o.clicks}</TableCell>
+                        <TableCell>{o.avgPos.toFixed(1)}</TableCell>
+                        <TableCell>{pct(o.avgCTR)}</TableCell>
+                        <TableCell>{pct(o.expCTR)}</TableCell>
+                        <TableCell>{o.missedClicks}</TableCell>
+                        <TableCell className="text-xs">{o.topQuery}</TableCell>
+                        <TableCell>{o.famTop}</TableCell>
+                        <TableCell>{o.areaTop}</TableCell>
+                      </TableRow>
+                    ))}
+                    {opps.length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={10}
+                          className="text-sm text-muted-foreground"
+                        >
+                          Import a GSC CSV to see opportunities.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Page Experiments */}
+        <TabsContent value="pages">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">
+                Title/Meta Experiments
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="text-xs text-muted-foreground">
+                Click a row to copy. Keep titles ≤60 char; metas ≈155 char. Use
+                real prices and neighborhood anchors.
+              </div>
+              <div className="overflow-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Page</TableHead>
+                      <TableHead>Proposed Title</TableHead>
+                      <TableHead>Proposed Meta</TableHead>
+                      <TableHead>Why</TableHead>
+                      <TableHead>Copy</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recs.map((r, i) => (
+                      <TableRow key={i}>
+                        <TableCell className="text-xs">
+                          <a
+                            className="underline"
+                            href={r.page}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {r.page}
+                          </a>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {r.title}{" "}
+                          <div className="text-[10px] text-muted-foreground">
+                            {r.title.length} chars
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">
+                          {r.meta}{" "}
+                          <div className="text-[10px] text-muted-foreground">
+                            {r.meta.length} chars
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {r.reason}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              copy(
+                                `Title: ${r.title}\nMeta: ${r.meta}`,
+                                `copy-${i}`
+                              )
+                            }
+                          >
+                            <Copy className="h-4 w-4 mr-1" />
+                            Copy
+                          </Button>
+                          {copied === `copy-${i}` && (
+                            <Badge className="ml-2">Copied</Badge>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {recs.length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={5}
+                          className="text-sm text-muted-foreground"
+                        >
+                          No recommendations yet — check filters or import data.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Charts */}
+        <TabsContent value="charts">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">CTR vs Position</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <ScatterChart>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      type="number"
+                      dataKey="x"
+                      name="Position"
+                      domain={[1, 30]}
+                    />
+                    <YAxis
+                      type="number"
+                      dataKey="y"
+                      name="CTR %"
+                      domain={[0, 40]}
+                    />
+                    <ReTooltip cursor={{ strokeDasharray: "3 3" }} />
+                    <Scatter data={scatter} fill="#8884d8" />
+                  </ScatterChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="h-56 mt-6">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={expectedLine}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="x" />
+                    <YAxis domain={[0, 40]} />
+                    <Legend />
+                    <Line
+                      dataKey="y"
+                      name="Expected CTR %"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tests */}
+        <TabsContent value="tests">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Play className="h-4 w-4" />
+                Self‑tests
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Test</TableHead>
+                    <TableHead>Result</TableHead>
+                    <TableHead>Details</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tests.map((t, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{t.name}</TableCell>
+                      <TableCell>{t.passed ? "PASS" : "FAIL"}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">
+                        {t.details || ""}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <div className="mt-2 text-xs text-muted-foreground">
+                {passCount}/{tests.length} passed
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Help */}
+        <TabsContent value="help">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                How to Collect Ranks
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-2">
+              <ol className="list-decimal pl-5 space-y-1">
+                <li>
+                  In Google Search Console, export <em>Search results</em> with
+                  columns Query, Page, Clicks, Impressions, CTR, Position (last
+                  28–90 days).
+                </li>
+                <li>
+                  Import the CSV here. Adjust minimum impressions and whether to
+                  include brand queries.
+                </li>
+                <li>
+                  Review <strong>Underperforming Pages</strong>; the tool
+                  highlights potential extra clicks if your CTR matched a
+                  realistic benchmark at your average position.
+                </li>
+                <li>
+                  Copy a proposed <strong>Title/Meta</strong> pair, tweak for
+                  truthfulness (prices, hours), and deploy in your CMS.
+                </li>
+                <li>
+                  Re‑export recommendations as CSV for the backlog. Track uplift
+                  weekly.
+                </li>
+              </ol>
+              <p className="text-xs text-muted-foreground">
+                Benchmarks are heuristics. Calibrate to your site's historical
+                CTR curves where possible.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// ---- helpers for settings ----
+function bucketMid(label: string) {
+  if (label === "1") return 1;
+  if (label === "2") return 2;
+  if (label === "3") return 3;
+  if (label === "4-5") return 4.5;
+  if (label === "6-10") return 8;
+  if (label === "11-20") return 15;
+  return 25;
+}
+function inBucket(p: number, label: string) {
+  if (label === "1") return p <= 1;
+  if (label === "2") return p > 1 && p <= 2;
+  if (label === "3") return p > 2 && p <= 3;
+  if (label === "4-5") return p > 3 && p <= 5;
+  if (label === "6-10") return p > 5 && p <= 10;
+  if (label === "11-20") return p > 10 && p <= 20;
+  return p > 20;
+}
+
+export default function Page() {
+  return <GSCCtrMiner />;
+}
