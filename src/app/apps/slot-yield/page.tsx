@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +22,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   BarChart,
   Bar,
@@ -28,17 +35,13 @@ import {
 } from "recharts";
 import {
   Upload,
-  Download,
-  Filter,
-  Wand2,
-  Play,
   Settings,
-  Copy,
   FileDown,
   Flame,
   Sparkles,
   TrendingUp,
   TrendingDown,
+  Info,
 } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
@@ -559,8 +562,9 @@ export default function SlotYieldAnalyzer() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="Slot‑Yield Analyzer"
-        subtitle="Upload Square CSV or use demo data. Set hours/chairs, then review utilization heatmap and recommendations."
+        title="Service Profits"
+        subtitle="Analyze appointment data to maximize revenue and optimize scheduling"
+        showLogo={true}
         actions={
           <>
             <Button variant="secondary" onClick={loadDemo}>
@@ -586,416 +590,718 @@ export default function SlotYieldAnalyzer() {
         }
       />
 
-      {loadState && (
-        <div className="text-xs text-muted-foreground">{loadState}</div>
-      )}
+      <Tabs defaultValue="howto" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="howto">How To</TabsTrigger>
+          <TabsTrigger value="data">Upload Data</TabsTrigger>
+          <TabsTrigger value="analysis">Analysis</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
+        </TabsList>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPICard
-          label="Utilization"
-          value={utilPct}
-          icon={
-            totals.util > 0.7 ? (
-              <TrendingUp className="h-4 w-4 text-emerald-600" />
-            ) : (
-              <TrendingDown className="h-4 w-4 text-amber-600" />
-            )
-          }
-          hint="Booked minutes / capacity minutes"
-        />
-        <KPICard
-          label="No‑Show Rate"
-          value={noshowPct}
-          icon={<TrendingDown className="h-4 w-4 text-amber-600" />}
-          hint="No‑shows / all appointments"
-        />
-        <KPICard
-          label="Idle Minutes"
-          value={idleMin.toLocaleString()}
-          icon={<TrendingUp className="h-4 w-4 text-emerald-600" />}
-          hint="Capacity − booked over period"
-        />
-        <KPICard
-          label="Total Appointments"
-          value={totals.totalAppts}
-          icon={<TrendingUp className="h-4 w-4" />}
-          hint={`Kept ${totals.keptAppts} · No‑show ${totals.noshowAppts} · Cancel ${totals.cancelledAppts}`}
-        />
-      </div>
-
-      {/* Settings */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Settings className="h-4 w-4" />
-            Business Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-4 gap-3">
-            <div>
-              <Label>Chairs</Label>
-              <Input
-                type="number"
-                min={1}
-                value={settings.chairs}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    chairs: clamp(parseInt(e.target.value || "1"), 1, 50),
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <Label>Slot minutes</Label>
-              <Input
-                type="number"
-                min={15}
-                step={15}
-                value={settings.slotMin}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    slotMin: clamp(parseInt(e.target.value || "60"), 15, 120),
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <Label>Timezone</Label>
-              <Input
-                value={settings.tz}
-                onChange={(e) =>
-                  setSettings((s) => ({ ...s, tz: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <Label>Date range (from)</Label>
-              <Input
-                type="date"
-                value={dateRange.from}
-                onChange={(e) =>
-                  setDateRange((r) => ({ ...r, from: e.target.value }))
-                }
-              />
-            </div>
-            <div>
-              <Label>Date range (to)</Label>
-              <Input
-                type="date"
-                value={dateRange.to}
-                onChange={(e) =>
-                  setDateRange((r) => ({ ...r, to: e.target.value }))
-                }
-              />
-            </div>
-          </div>
-
-          <Separator className="my-2" />
-
-          {/* Hours grid */}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {Array.from({ length: 7 }, (_, d) => d).map((d) => {
-              const day = settings.week[d];
-              return (
-                <div key={d} className="border rounded-xl p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="font-medium">{DOW_LABELS[d]}</div>
-                    <div className="flex items-center gap-2 text-xs">
-                      <span>Open</span>
-                      <Checkbox
-                        checked={day.openEnabled}
-                        onCheckedChange={(v) =>
-                          setBusinessHour(d, "openEnabled", Boolean(v))
-                        }
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label className="text-xs">Open</Label>
-                      <Input
-                        value={day.open}
-                        onChange={(e) =>
-                          setBusinessHour(d, "open", e.target.value)
-                        }
-                        placeholder="10:00"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Close</Label>
-                      <Input
-                        value={day.close}
-                        onChange={(e) =>
-                          setBusinessHour(d, "close", e.target.value)
-                        }
-                        placeholder="19:00"
-                      />
-                    </div>
-                  </div>
+        {/* How To Tab */}
+        <TabsContent value="howto" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                How to Use the Service Profits Tool
+              </CardTitle>
+              <CardDescription>
+                Learn how to analyze your appointment data to increase revenue
+                and optimize your schedule
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    What This Tool Does
+                  </h3>
+                  <p className="text-muted-foreground">
+                    This tool analyzes your appointment booking data to help
+                    Belmont make smarter business decisions. It shows you when
+                    you're busiest, which timeslots are underutilized, and how
+                    to maximize your revenue by filling more appointments and
+                    reducing no-shows.
+                  </p>
                 </div>
-              );
-            })}
-          </div>
 
-          <Separator className="my-2" />
-
-          {/* Status mapping */}
-          <div className="grid md:grid-cols-3 gap-3">
-            <div>
-              <Label>Kept statuses (comma‑sep)</Label>
-              <Input
-                value={settings.keptStatuses.join(", ")}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    keptStatuses: e.target.value
-                      .split(/\s*,\s*/)
-                      .filter(Boolean),
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <Label>No‑show statuses</Label>
-              <Input
-                value={settings.noshowStatuses.join(", ")}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    noshowStatuses: e.target.value
-                      .split(/\s*,\s*/)
-                      .filter(Boolean),
-                  }))
-                }
-              />
-            </div>
-            <div>
-              <Label>Cancelled statuses</Label>
-              <Input
-                value={settings.cancelledStatuses.join(", ")}
-                onChange={(e) =>
-                  setSettings((s) => ({
-                    ...s,
-                    cancelledStatuses: e.target.value
-                      .split(/\s*,\s*/)
-                      .filter(Boolean),
-                  }))
-                }
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Heatmap & charts */}
-      <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-2 flex items-center justify-between">
-            <CardTitle className="text-base">
-              Utilization Heatmap (hour × day)
-            </CardTitle>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => heatRef.current && window.print()}
-              >
-                <FileDown className="h-4 w-4 mr-1" />
-                Print Heatmap
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div ref={heatRef} className="overflow-auto">
-              <div className="min-w-[720px]">
-                {/* header row */}
-                <div className="grid grid-cols-[120px_repeat(24,1fr)] sticky top-0 bg-background z-10">
-                  <div className="p-2 text-xs font-medium">Day / Hour</div>
-                  {HOUR_LABELS.map((h, i) => (
-                    <div
-                      key={i}
-                      className="p-2 text-[10px] text-center text-muted-foreground"
-                    >
-                      {h}
-                    </div>
-                  ))}
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Why Service Profit Analysis Matters for Belmont
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Every appointment slot that goes unfilled represents lost
+                    revenue opportunity. This tool helps you:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                    <li>
+                      <strong>Identify peak hours:</strong> See when customers
+                      are most likely to book appointments
+                    </li>
+                    <li>
+                      <strong>Find underutilized times:</strong> Discover
+                      off-peak hours where you can add more appointments
+                    </li>
+                    <li>
+                      <strong>Reduce no-shows:</strong> Track cancellation and
+                      no-show patterns to improve reliability
+                    </li>
+                    <li>
+                      <strong>Maximize chair utilization:</strong> Ensure all
+                      your chairs are working efficiently throughout the day
+                    </li>
+                    <li>
+                      <strong>Increase revenue:</strong> Fill more slots and
+                      reduce wasted time to grow your business
+                    </li>
+                  </ul>
                 </div>
-                {/* rows */}
-                {Array.from({ length: 7 }, (_, d) => d).map((d) => (
-                  <div
-                    key={d}
-                    className="grid grid-cols-[120px_repeat(24,1fr)] border-b"
-                  >
-                    <div className="p-2 text-xs font-medium flex items-center gap-2">
-                      {DOW_LABELS[d]}
-                      <Badge variant="secondary">
-                        {fmtPct(perDay[d].util)}
-                      </Badge>
-                    </div>
-                    {Array.from({ length: 24 }, (_, h) => h).map((h) => {
-                      const cell = grid[d][h];
-                      const cap = capacity[d][h];
-                      const u = cap > 0 ? cell.bookedMin / cap : 0;
-                      const active = cap > 0;
-                      const color = active ? utilColor(u) : "hsl(0 0% 96%)";
-                      return (
-                        <div
-                          key={h}
-                          className="h-8 border-r"
-                          style={{ background: color }}
-                          title={`Utilization: ${fmtPct(u)}\nKept min: ${cell.bookedMin} / Cap: ${cap}\nAppts: kept ${cell.kept} · no‑show ${cell.noshow} · cancel ${cell.cancelled}`}
-                        ></div>
-                      );
-                    })}
-                  </div>
-                ))}
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Step-by-Step Instructions
+                  </h3>
+                  <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                    <li>
+                      <strong>Upload your appointment data:</strong> Click the
+                      "Upload Data" tab and upload a CSV file from Square or
+                      other booking system, or use the demo data to see how it
+                      works
+                    </li>
+                    <li>
+                      <strong>Configure your business settings:</strong> Go to
+                      the "Settings" tab and enter your business hours, number
+                      of chairs, and how you classify appointment statuses
+                      (completed, no-show, cancelled)
+                    </li>
+                    <li>
+                      <strong>Map your data columns:</strong> Tell the tool
+                      which columns in your CSV contain the appointment start
+                      time, duration, and status information
+                    </li>
+                    <li>
+                      <strong>Review the analysis:</strong> Check the "Analysis"
+                      tab to see your utilization heatmap and performance
+                      metrics
+                    </li>
+                    <li>
+                      <strong>Get recommendations:</strong> Look at the
+                      "Recommendations" tab for specific suggestions on off-peak
+                      hours where you can add more appointments
+                    </li>
+                    <li>
+                      <strong>Export your insights:</strong> Download CSV files
+                      with your recommendations or JSON data for your records
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Best Practices for Belmont
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Regular analysis:</strong> Run this analysis
+                      weekly to track your performance trends
+                    </li>
+                    <li>
+                      <strong>Focus on high-value services:</strong> Use the
+                      insights to schedule more profitable services during peak
+                      times
+                    </li>
+                    <li>
+                      <strong>Promote off-peak specials:</strong> Use the
+                      recommendations to create special offers for slower times
+                    </li>
+                    <li>
+                      <strong>Monitor no-show rates:</strong> Keep no-show rates
+                      below 10% by following up with reminders
+                    </li>
+                    <li>
+                      <strong>Staff scheduling:</strong> Use the utilization
+                      data to schedule staff more efficiently
+                    </li>
+                    <li>
+                      <strong>Marketing timing:</strong> Post on social media
+                      during times when customers are most likely to book
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Understanding the Metrics
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Utilization:</strong> Percentage of available time
+                      that was actually booked (aim for 70-85%)
+                    </li>
+                    <li>
+                      <strong>No-show rate:</strong> Percentage of appointments
+                      where customers didn't show up (keep under 10%)
+                    </li>
+                    <li>
+                      <strong>Idle minutes:</strong> Total minutes where chairs
+                      were available but not booked
+                    </li>
+                    <li>
+                      <strong>Heatmap colors:</strong> Green = high utilization,
+                      Red = low utilization, Gray = closed hours
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Data Requirements
+                  </h3>
+                  <p className="text-muted-foreground mb-2">
+                    Your CSV file should include these key columns (you can map
+                    them in the tool):
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Start datetime:</strong> When the appointment
+                      begins (e.g., "2024-01-15T14:00:00")
+                    </li>
+                    <li>
+                      <strong>Duration:</strong> How long the appointment lasts
+                      in minutes (e.g., 30, 45, 60)
+                    </li>
+                    <li>
+                      <strong>Status:</strong> Whether the appointment was
+                      completed, cancelled, or no-show
+                    </li>
+                    <li>
+                      <strong>Optional:</strong> Staff member and service type
+                      for more detailed analysis
+                    </li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Per‑Day Summary</CardTitle>
-          </CardHeader>
-          <CardContent className="h-full">
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={perDay}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis tickFormatter={(v) => `${Math.round(v * 100)}%`} />
-                  <ReTooltip
-                    formatter={(v) => `${Math.round((v as number) * 100)}%`}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Upload Data Tab */}
+        <TabsContent value="data" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-4 w-4" />
+                Upload Your Appointment Data
+              </CardTitle>
+              <CardDescription>
+                Upload a CSV file from Square or your booking system, or try the
+                demo data
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  variant="secondary"
+                  onClick={loadDemo}
+                  className="flex-1"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Load Demo Data
+                </Button>
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={onFile}
+                    className="hidden"
+                    id="csvFile"
                   />
-                  <Legend />
-                  <Bar dataKey="util" name="Utilization" />
-                  <Bar dataKey="noshow" name="No‑show rate" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                  <label htmlFor="csvFile">
+                    <Button variant="outline" className="w-full" asChild>
+                      <span>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload CSV File
+                      </span>
+                    </Button>
+                  </label>
+                </div>
+              </div>
 
-      {/* Column mapper */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">
-            Column Mapping (match your CSV headings)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid md:grid-cols-5 gap-3">
-          <div>
-            <Label>Start datetime</Label>
-            <Input
-              value={mappedCols.start}
-              onChange={(e) =>
-                setMappedCols((c) => ({ ...c, start: e.target.value }))
-              }
-            />
-          </div>
-          <div>
-            <Label>Duration (minutes)</Label>
-            <Input
-              value={mappedCols.duration}
-              onChange={(e) =>
-                setMappedCols((c) => ({ ...c, duration: e.target.value }))
-              }
-            />
-          </div>
-          <div>
-            <Label>Status</Label>
-            <Input
-              value={mappedCols.status}
-              onChange={(e) =>
-                setMappedCols((c) => ({ ...c, status: e.target.value }))
-              }
-            />
-          </div>
-          <div>
-            <Label>Staff (optional)</Label>
-            <Input
-              value={mappedCols.staff}
-              onChange={(e) =>
-                setMappedCols((c) => ({ ...c, staff: e.target.value }))
-              }
-            />
-          </div>
-          <div>
-            <Label>Service (optional)</Label>
-            <Input
-              value={mappedCols.service}
-              onChange={(e) =>
-                setMappedCols((c) => ({ ...c, service: e.target.value }))
-              }
-            />
-          </div>
-        </CardContent>
-      </Card>
+              {loadState && (
+                <div className="text-sm text-muted-foreground p-3 bg-muted rounded-md">
+                  {loadState}
+                </div>
+              )}
 
-      {/* Recommendations */}
-      <Card>
-        <CardHeader className="pb-2 flex items-center justify-between">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Flame className="h-4 w-4" />
-            Off‑Peak Windows (Top Suggestions)
-          </CardTitle>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={exportRecs}>
-              <FileDown className="h-4 w-4 mr-1" />
-              Export CSV
-            </Button>
-            <Button variant="outline" size="sm" onClick={exportMetricsJSON}>
-              <FileDown className="h-4 w-4 mr-1" />
-              Export Metrics (JSON)
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Window</TableHead>
-                <TableHead>Utilization</TableHead>
-                <TableHead>Suggestion</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recs.map((r, i) => (
-                <TableRow key={i}>
-                  <TableCell className="font-medium">{r.window}</TableCell>
-                  <TableCell>{fmtPct(r.utilization)}</TableCell>
-                  <TableCell className="text-sm">{r.suggestion}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {recs.length === 0 && (
-            <div className="text-sm text-muted-foreground mt-2">
-              No recommendations yet — upload data or load demo.
+              <div className="text-sm text-muted-foreground">
+                <p className="mb-2">
+                  <strong>Expected CSV format:</strong> Your file should include
+                  appointment start times, durations, and status information.
+                </p>
+                <p>
+                  Don't worry about exact column names - you can map them in the
+                  next step.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* KPI Cards */}
+          {totals.totalAppts > 0 && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <KPICard
+                label="Utilization"
+                value={utilPct}
+                icon={
+                  totals.util > 0.7 ? (
+                    <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4 text-amber-600" />
+                  )
+                }
+                hint="Booked minutes / capacity minutes"
+              />
+              <KPICard
+                label="No‑Show Rate"
+                value={noshowPct}
+                icon={<TrendingDown className="h-4 w-4 text-amber-600" />}
+                hint="No‑shows / all appointments"
+              />
+              <KPICard
+                label="Idle Minutes"
+                value={idleMin.toLocaleString()}
+                icon={<TrendingUp className="h-4 w-4 text-emerald-600" />}
+                hint="Capacity − booked over period"
+              />
+              <KPICard
+                label="Total Appointments"
+                value={totals.totalAppts}
+                icon={<TrendingUp className="h-4 w-4" />}
+                hint={`Kept ${totals.keptAppts} · No‑show ${totals.noshowAppts} · Cancel ${totals.cancelledAppts}`}
+              />
             </div>
           )}
-        </CardContent>
-      </Card>
 
-      {/* Footer help */}
-      <div className="text-xs text-muted-foreground">
-        <p className="mb-1">
-          Expected CSV columns (you can rename in the mapper):{" "}
-          <strong>Start</strong> (datetime), <strong>DurationMin</strong>,{" "}
-          <strong>Status</strong>, optional <strong>Staff</strong>,{" "}
-          <strong>Service</strong>.
-        </p>
-        <p>
-          Capacity is modeled as <em>chairs × open minutes</em>. Kept statuses
-          count toward utilization; cancelled/no‑show do not. Adjust status
-          lists in settings.
-        </p>
-      </div>
+          {/* Column Mapping */}
+          {raw.length > 0 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">
+                  Column Mapping (match your CSV headings)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid md:grid-cols-5 gap-3">
+                <div>
+                  <Label>Start datetime</Label>
+                  <Input
+                    value={mappedCols.start}
+                    onChange={(e) =>
+                      setMappedCols((c) => ({ ...c, start: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Duration (minutes)</Label>
+                  <Input
+                    value={mappedCols.duration}
+                    onChange={(e) =>
+                      setMappedCols((c) => ({ ...c, duration: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <Input
+                    value={mappedCols.status}
+                    onChange={(e) =>
+                      setMappedCols((c) => ({ ...c, status: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Staff (optional)</Label>
+                  <Input
+                    value={mappedCols.staff}
+                    onChange={(e) =>
+                      setMappedCols((c) => ({ ...c, staff: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Service (optional)</Label>
+                  <Input
+                    value={mappedCols.service}
+                    onChange={(e) =>
+                      setMappedCols((c) => ({ ...c, service: e.target.value }))
+                    }
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        {/* Analysis Tab */}
+        <TabsContent value="analysis" className="space-y-6">
+          {totals.totalAppts === 0 && (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-muted-foreground">
+                  No data to analyze yet. Upload your appointment data or load
+                  the demo to see the analysis.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {totals.totalAppts > 0 && (
+            <>
+              {/* Heatmap & charts */}
+              <div className="grid lg:grid-cols-3 gap-4">
+                <Card className="lg:col-span-2">
+                  <CardHeader className="pb-2 flex items-center justify-between">
+                    <CardTitle className="text-base">
+                      Utilization Heatmap (hour × day)
+                    </CardTitle>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => heatRef.current && window.print()}
+                      >
+                        <FileDown className="h-4 w-4 mr-1" />
+                        Print Heatmap
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div ref={heatRef} className="overflow-auto">
+                      <div className="min-w-[720px]">
+                        {/* header row */}
+                        <div className="grid grid-cols-[120px_repeat(24,1fr)] sticky top-0 bg-background z-10">
+                          <div className="p-2 text-xs font-medium">
+                            Day / Hour
+                          </div>
+                          {HOUR_LABELS.map((h, i) => (
+                            <div
+                              key={i}
+                              className="p-2 text-[10px] text-center text-muted-foreground"
+                            >
+                              {h}
+                            </div>
+                          ))}
+                        </div>
+                        {/* rows */}
+                        {Array.from({ length: 7 }, (_, d) => d).map((d) => (
+                          <div
+                            key={d}
+                            className="grid grid-cols-[120px_repeat(24,1fr)] border-b"
+                          >
+                            <div className="p-2 text-xs font-medium flex items-center gap-2">
+                              {DOW_LABELS[d]}
+                              <Badge variant="secondary">
+                                {fmtPct(perDay[d].util)}
+                              </Badge>
+                            </div>
+                            {Array.from({ length: 24 }, (_, h) => h).map(
+                              (h) => {
+                                const cell = grid[d][h];
+                                const cap = capacity[d][h];
+                                const u = cap > 0 ? cell.bookedMin / cap : 0;
+                                const active = cap > 0;
+                                const color = active
+                                  ? utilColor(u)
+                                  : "hsl(0 0% 96%)";
+                                return (
+                                  <div
+                                    key={h}
+                                    className="h-8 border-r"
+                                    style={{ background: color }}
+                                    title={`Utilization: ${fmtPct(u)}\nKept min: ${cell.bookedMin} / Cap: ${cap}\nAppts: kept ${cell.kept} · no‑show ${cell.noshow} · cancel ${cell.cancelled}`}
+                                  ></div>
+                                );
+                              }
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base">Per‑Day Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-full">
+                    <div className="h-72">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={perDay}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="day" />
+                          <YAxis
+                            tickFormatter={(v) => `${Math.round(v * 100)}%`}
+                          />
+                          <ReTooltip
+                            formatter={(v) =>
+                              `${Math.round((v as number) * 100)}%`
+                            }
+                          />
+                          <Legend />
+                          <Bar dataKey="util" name="Utilization" />
+                          <Bar dataKey="noshow" name="No‑show rate" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
+        </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings" className="space-y-6">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Business Settings
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-4 gap-3">
+                <div>
+                  <Label>Chairs</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    value={settings.chairs}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        chairs: clamp(parseInt(e.target.value || "1"), 1, 50),
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Slot minutes</Label>
+                  <Input
+                    type="number"
+                    min={15}
+                    step={15}
+                    value={settings.slotMin}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        slotMin: clamp(
+                          parseInt(e.target.value || "60"),
+                          15,
+                          120
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Timezone</Label>
+                  <Input
+                    value={settings.tz}
+                    onChange={(e) =>
+                      setSettings((s) => ({ ...s, tz: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Date range (from)</Label>
+                  <Input
+                    type="date"
+                    value={dateRange.from}
+                    onChange={(e) =>
+                      setDateRange((r) => ({ ...r, from: e.target.value }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Date range (to)</Label>
+                  <Input
+                    type="date"
+                    value={dateRange.to}
+                    onChange={(e) =>
+                      setDateRange((r) => ({ ...r, to: e.target.value }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <Separator className="my-2" />
+
+              {/* Hours grid */}
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {Array.from({ length: 7 }, (_, d) => d).map((d) => {
+                  const day = settings.week[d];
+                  return (
+                    <div key={d} className="border rounded-xl p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="font-medium">{DOW_LABELS[d]}</div>
+                        <div className="flex items-center gap-2 text-xs">
+                          <span>Open</span>
+                          <Checkbox
+                            checked={day.openEnabled}
+                            onCheckedChange={(v) =>
+                              setBusinessHour(d, "openEnabled", Boolean(v))
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label className="text-xs">Open</Label>
+                          <Input
+                            value={day.open}
+                            onChange={(e) =>
+                              setBusinessHour(d, "open", e.target.value)
+                            }
+                            placeholder="10:00"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Close</Label>
+                          <Input
+                            value={day.close}
+                            onChange={(e) =>
+                              setBusinessHour(d, "close", e.target.value)
+                            }
+                            placeholder="19:00"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <Separator className="my-2" />
+
+              {/* Status mapping */}
+              <div className="grid md:grid-cols-3 gap-3">
+                <div>
+                  <Label>Kept statuses (comma‑sep)</Label>
+                  <Input
+                    value={settings.keptStatuses.join(", ")}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        keptStatuses: e.target.value
+                          .split(/\s*,\s*/)
+                          .filter(Boolean),
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>No‑show statuses</Label>
+                  <Input
+                    value={settings.noshowStatuses.join(", ")}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        noshowStatuses: e.target.value
+                          .split(/\s*,\s*/)
+                          .filter(Boolean),
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Cancelled statuses</Label>
+                  <Input
+                    value={settings.cancelledStatuses.join(", ")}
+                    onChange={(e) =>
+                      setSettings((s) => ({
+                        ...s,
+                        cancelledStatuses: e.target.value
+                          .split(/\s*,\s*/)
+                          .filter(Boolean),
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Recommendations Tab */}
+        <TabsContent value="recommendations" className="space-y-6">
+          {totals.totalAppts === 0 && (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p className="text-muted-foreground">
+                  No recommendations available yet. Upload your appointment data
+                  to see optimization suggestions.
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {totals.totalAppts > 0 && (
+            <Card>
+              <CardHeader className="pb-2 flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Flame className="h-4 w-4" />
+                  Off‑Peak Windows (Top Suggestions)
+                </CardTitle>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" onClick={exportRecs}>
+                    <FileDown className="h-4 w-4 mr-1" />
+                    Export CSV
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={exportMetricsJSON}
+                  >
+                    <FileDown className="h-4 w-4 mr-1" />
+                    Export Metrics (JSON)
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Window</TableHead>
+                      <TableHead>Utilization</TableHead>
+                      <TableHead>Suggestion</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recs.map((r, i) => (
+                      <TableRow key={i}>
+                        <TableCell className="font-medium">
+                          {r.window}
+                        </TableCell>
+                        <TableCell>{fmtPct(r.utilization)}</TableCell>
+                        <TableCell className="text-sm">
+                          {r.suggestion}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {recs.length === 0 && (
+                  <div className="text-sm text-muted-foreground mt-2">
+                    No recommendations yet — upload data or load demo.
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

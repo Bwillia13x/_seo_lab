@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +21,7 @@ import {
   Calendar,
   Instagram,
   MessageSquare,
+  Info,
 } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
 import { addDays, todayISO } from "@/lib/dates";
@@ -204,7 +211,7 @@ export default function PostOracle() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Post Oracle"
+        title="Content Calendar"
         subtitle="Generate weekly GBP and Instagram posts with UTM tracking for The Belmont Barbershop."
         actions={
           <div className="flex gap-2">
@@ -259,11 +266,270 @@ export default function PostOracle() {
         />
       </div>
 
-      <Tabs defaultValue="generator">
-        <TabsList>
+      <Tabs defaultValue="howto">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="generator">Generator</TabsTrigger>
           <TabsTrigger value="calendar">Calendar View</TabsTrigger>
         </TabsList>
+
+        {/* How To Tab */}
+        <TabsContent value="howto" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                How to Use the Content Calendar Tool
+              </CardTitle>
+              <CardDescription>
+                Learn how to create and manage weekly social media and Google
+                Business Profile posts for Belmont
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    What This Tool Does
+                  </h3>
+                  <p className="text-muted-foreground">
+                    This tool generates a complete weekly content calendar with
+                    ready-to-post content for Google Business Profile and
+                    Instagram. It creates engaging posts that highlight
+                    Belmont's services, includes UTM tracking links for
+                    analytics, and provides AI image prompts for visual content.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Why Content Calendar Matters for Belmont
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Consistent social media presence helps Belmont stay
+                    top-of-mind with customers and improves local search
+                    rankings:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                    <li>
+                      <strong>Google Business Profile posts</strong> improve
+                      local search visibility and click-through rates
+                    </li>
+                    <li>
+                      <strong>Instagram content</strong> builds community
+                      engagement and brand awareness
+                    </li>
+                    <li>
+                      <strong>UTM tracking links</strong> help measure which
+                      posts drive the most bookings
+                    </li>
+                    <li>
+                      <strong>Consistent posting</strong> signals to Google that
+                      Belmont is an active, reliable business
+                    </li>
+                    <li>
+                      <strong>Local event tie-ins</strong> help Belmont
+                      participate in community conversations
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Step-by-Step Instructions
+                  </h3>
+                  <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                    <li>
+                      <strong>Set your parameters:</strong> Choose the week you
+                      want to plan for and optionally add a custom local event
+                    </li>
+                    <li>
+                      <strong>Select services to feature:</strong> Click on
+                      service badges to include or exclude specific services
+                      from the calendar
+                    </li>
+                    <li>
+                      <strong>Generate posts:</strong> Click "Generate Posts" to
+                      create 4 days worth of content (8 posts total - 4 GBP + 4
+                      Instagram)
+                    </li>
+                    <li>
+                      <strong>Review generated content:</strong> Check each
+                      post's title, content, hashtags, and UTM tracking links
+                    </li>
+                    <li>
+                      <strong>Copy content to post:</strong> Use the copy
+                      buttons to copy post content to your clipboard
+                    </li>
+                    <li>
+                      <strong>Export for records:</strong> Download a CSV file
+                      of all posts for your content management records
+                    </li>
+                    <li>
+                      <strong>Copy to Post Studio:</strong> Send the generated
+                      content to the Post Studio tool for further editing
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Best Practices for Belmont Posts
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Post consistently:</strong> Aim for 3-4 posts per
+                      week to stay visible without overwhelming your audience
+                    </li>
+                    <li>
+                      <strong>Include local context:</strong> Mention
+                      Bridgeland, Riverside, or Calgary events and landmarks
+                    </li>
+                    <li>
+                      <strong>Highlight specials:</strong> Promote veterans
+                      discounts, groomsmen packages, and seasonal offers
+                    </li>
+                    <li>
+                      <strong>Use emojis strategically:</strong> Add personality
+                      but don't overdo it (2-3 per Instagram post)
+                    </li>
+                    <li>
+                      <strong>Include booking CTAs:</strong> Every post should
+                      encourage customers to book appointments
+                    </li>
+                    <li>
+                      <strong>Track performance:</strong> Use UTM links to see
+                      which types of posts drive the most bookings
+                    </li>
+                    <li>
+                      <strong>Engage with responses:</strong> Reply to comments
+                      and messages within 24 hours
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    UTM Tracking Parameters
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Source:</strong> Identifies where traffic comes
+                      from (google, instagram, facebook)
+                    </li>
+                    <li>
+                      <strong>Medium:</strong> Describes the type of link (gbp,
+                      social, email, referral)
+                    </li>
+                    <li>
+                      <strong>Campaign:</strong> Groups related posts
+                      (weekly-post-1, stampede-special, etc.)
+                    </li>
+                    <li>
+                      <strong>Content:</strong> Identifies the specific service
+                      or offer being promoted
+                    </li>
+                    <li>
+                      <strong>Tracking benefits:</strong> See which posts drive
+                      the most bookings and customer engagement
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Content Types and Timing
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Monday:</strong> Service highlights and weekly
+                      specials
+                    </li>
+                    <li>
+                      <strong>Wednesday:</strong> Local event tie-ins and
+                      community content
+                    </li>
+                    <li>
+                      <strong>Friday:</strong> Weekend promotions and
+                      appointment availability
+                    </li>
+                    <li>
+                      <strong>Sunday:</strong> Preview of upcoming week's
+                      services and staff highlights
+                    </li>
+                    <li>
+                      <strong>Best posting times:</strong> Weekdays 11AM-2PM,
+                      Weekends 10AM-12PM
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Google Business Profile Posts
+                  </h3>
+                  <p className="text-muted-foreground mb-2">
+                    GBP posts appear directly in Google search results and Maps:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Keep under 750 characters</strong> for full
+                      display in search results
+                    </li>
+                    <li>
+                      <strong>Include your phone number</strong> so customers
+                      can call directly
+                    </li>
+                    <li>
+                      <strong>Add location context</strong> like "in Bridgeland"
+                      or "near the LRT"
+                    </li>
+                    <li>
+                      <strong>Use keywords naturally</strong> like "men's
+                      haircut", "beard trim", "professional barber"
+                    </li>
+                    <li>
+                      <strong>Include booking encouragement</strong> like "Book
+                      now" or "Easy online booking"
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Instagram Content Strategy
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Visual storytelling:</strong> Use the AI image
+                      prompts to create compelling visuals
+                    </li>
+                    <li>
+                      <strong>Engagement hooks:</strong> Ask questions like
+                      "What's your go-to hairstyle?"
+                    </li>
+                    <li>
+                      <strong>Behind-the-scenes:</strong> Show staff, equipment,
+                      and the Belmont atmosphere
+                    </li>
+                    <li>
+                      <strong>Customer features:</strong> Share before/after
+                      photos (with permission)
+                    </li>
+                    <li>
+                      <strong>Reels for education:</strong> Short videos showing
+                      haircut techniques or product demos
+                    </li>
+                    <li>
+                      <strong>Stories for daily updates:</strong> Quick polls,
+                      appointment availability, daily specials
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="generator" className="space-y-4">
           <Card>

@@ -3,7 +3,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,6 +43,7 @@ import {
 import { saveBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
+import { BELMONT_CONSTANTS } from "@/lib/constants";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
 
@@ -92,20 +99,26 @@ type ConsentLog = {
 // ---------------- Main Component ----------------
 export default function ReviewKit() {
   // Business & links
-  const [bizName, setBizName] = useState<string>("The Belmont Barbershop");
-  const [neighborhood, setNeighborhood] = useState<string>(
-    "Bridgeland/Riverside, Calgary"
+  const [bizName, setBizName] = useState<string>(
+    BELMONT_CONSTANTS.BUSINESS_NAME
   );
-  const [identifyEmail, setIdentifyEmail] = useState<string>(DEFAULT_EMAIL_ID);
-  const [identifyPhone, setIdentifyPhone] = useState<string>(DEFAULT_PHONE_ID);
+  const [neighborhood, setNeighborhood] = useState<string>(
+    "Bridgeland, Calgary"
+  );
+  const [identifyEmail, setIdentifyEmail] = useState<string>(
+    "hello@thebelmontbarber.ca"
+  );
+  const [identifyPhone, setIdentifyPhone] = useState<string>(
+    BELMONT_CONSTANTS.PHONE_DISPLAY
+  );
   const [googleReviewLink, setGoogleReviewLink] = useState<string>(
-    "https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID"
+    BELMONT_CONSTANTS.REVIEW_GOOGLE_URL
   );
   const [applePlaceLink, setApplePlaceLink] = useState<string>(
-    "https://maps.apple.com/?address=Calgary%2C%20AB"
+    BELMONT_CONSTANTS.REVIEW_APPLE_URL
   );
   const [bookingLink, setBookingLink] = useState<string>(
-    "https://thebelmontbarber.ca/book"
+    BELMONT_CONSTANTS.BOOK_URL
   );
 
   // Compliance toggles
@@ -313,9 +326,24 @@ export default function ReviewKit() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="Review Link & Script Generator"
+        title="Review Request Links"
         subtitle={`CASL‑safe scripts, email/SMS templates, and QR review cards for ${bizName}.`}
       />
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Do this next</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm">
+          <ol className="list-decimal pl-5 space-y-1">
+            <li>Enter or confirm your Google and Apple review links.</li>
+            <li>Copy the Email and SMS from the Compose tab.</li>
+            <li>Ask permission, then send one message to a recent client.</li>
+            <li>Log consent in the Consent Log (optional, recommended).</li>
+            <li>Print a counter card with the QR in the QR & Cards tab.</li>
+          </ol>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard
@@ -344,8 +372,9 @@ export default function ReviewKit() {
         />
       </div>
 
-      <Tabs defaultValue="compose">
+      <Tabs defaultValue="howto">
         <TabsList>
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="compose">Compose</TabsTrigger>
           <TabsTrigger value="compliance">Compliance</TabsTrigger>
           <TabsTrigger value="qrs">QR & Cards</TabsTrigger>
@@ -476,7 +505,7 @@ export default function ReviewKit() {
                       <Copy className="h-4 w-4 mr-1" />
                       {copied === "wa" ? "Copied" : "Copy WA"}
                     </Button>
-                    <Button size="sm" variant="outline" onClick={exportTxtPack}>
+                    <Button size="sm" onClick={exportTxtPack}>
                       <Download className="h-4 w-4 mr-1" />
                       Export .txt Pack
                     </Button>
@@ -575,6 +604,7 @@ export default function ReviewKit() {
                   <Label>Google Reviews</Label>
                   <div className="border rounded-md p-3 bg-white min-h-[260px] flex items-center justify-center">
                     {qrGoogle ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- Data URL used for on-page preview
                       <img
                         src={qrGoogle}
                         alt="QR Google"
@@ -607,6 +637,7 @@ export default function ReviewKit() {
                   <Label>Apple Maps (optional)</Label>
                   <div className="border rounded-md p-3 bg-white min-h-[260px] flex items-center justify-center">
                     {qrApple ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- Data URL used for on-page preview
                       <img
                         src={qrApple}
                         alt="QR Apple"
@@ -671,6 +702,7 @@ export default function ReviewKit() {
                   <select
                     id="c_chan"
                     className="w-full border rounded-md h-9 px-2"
+                    aria-label="Select communication channel for review request"
                   >
                     <option value="email">email</option>
                     <option value="sms">sms</option>
@@ -757,6 +789,301 @@ export default function ReviewKit() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* How To */}
+        <TabsContent value="howto">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  How to Use the Review Request System
+                </CardTitle>
+                <CardDescription>
+                  Create professional review requests that follow Canadian
+                  privacy laws and get more customer reviews for Belmont
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      What This Tool Does
+                    </h3>
+                    <p className="text-muted-foreground">
+                      This tool helps Belmont ask customers for reviews in a
+                      professional, legal way. It creates special links that
+                      customers can click to leave reviews on Google Maps and
+                      Apple Maps. Everything is set up to follow Canadian
+                      privacy laws (CASL) so Belmont stays compliant.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Why This Matters for Belmont
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Customer reviews are incredibly important for Belmont's
+                      success. More reviews mean:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                      <li>
+                        More customers find Belmont when searching for barbers
+                        in Calgary
+                      </li>
+                      <li>Google shows Belmont higher in search results</li>
+                      <li>
+                        New customers trust Belmont more when they see positive
+                        reviews
+                      </li>
+                      <li>
+                        Belmont builds a stronger reputation in the Bridgeland
+                        community
+                      </li>
+                      <li>
+                        Reviews help potential customers choose Belmont over
+                        competitors
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      How to Request Reviews the Right Way
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          1
+                        </Badge>
+                        <div>
+                          <p className="font-medium">
+                            Choose Your Communication Method
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Decide if you want to send review requests by email,
+                            text message, or both. The tool creates ready-to-use
+                            templates for each method.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          2
+                        </Badge>
+                        <div>
+                          <p className="font-medium">
+                            Customize the Business Information
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            The tool is pre-filled with Belmont's information
+                            (address, phone, etc.), but you can adjust the
+                            wording or add personal touches for each customer.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          3
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Generate Review Links</p>
+                          <p className="text-sm text-muted-foreground">
+                            Click the buttons to create unique links for Google
+                            and Apple Maps reviews. These links take customers
+                            directly to the review page for Belmont.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          4
+                        </Badge>
+                        <div>
+                          <p className="font-medium">
+                            Create Professional Messages
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Use the pre-written templates to create personalized
+                            messages. All templates include the legally required
+                            "STOP" option for customers who don't want to
+                            receive messages.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          5
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Track Your Consent</p>
+                          <p className="text-sm text-muted-foreground">
+                            Log when and how you contacted each customer. This
+                            helps Belmont stay compliant with Canadian privacy
+                            laws and shows you followed the rules.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          6
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Send and Follow Up</p>
+                          <p className="text-sm text-muted-foreground">
+                            Send your review requests and follow up politely if
+                            needed. Always respect customers who don't want to
+                            be contacted again.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Legal Compliance (Very Important)
+                    </h3>
+                    <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <ShieldCheck className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-1 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-amber-800 dark:text-amber-200 mb-2">
+                            CASL Compliance Requirements
+                          </p>
+                          <ul className="space-y-1 text-sm text-amber-700 dark:text-amber-300">
+                            <li>
+                              • Always include a way for customers to
+                              unsubscribe ("STOP")
+                            </li>
+                            <li>
+                              • Get permission before sending marketing messages
+                            </li>
+                            <li>
+                              • Keep records of when and how you contacted
+                              customers
+                            </li>
+                            <li>
+                              • Respect customers who ask not to be contacted
+                            </li>
+                            <li>
+                              • Use Belmont's official contact information
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Tips for Belmont
+                    </h3>
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            💡
+                          </span>
+                          <span>
+                            Send review requests within 24 hours of the
+                            customer's visit while the experience is fresh
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            🎯
+                          </span>
+                          <span>
+                            Personalize messages with the customer's name and
+                            specific service they received
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            📱
+                          </span>
+                          <span>
+                            Test your review links by clicking them yourself
+                            first
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            📊
+                          </span>
+                          <span>
+                            Track which communication method gets the most
+                            reviews (email vs text)
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            🤝
+                          </span>
+                          <span>
+                            Always thank customers for their reviews, even if
+                            they're not positive
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Best Times to Ask for Reviews
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">
+                          After Great Service
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Send requests after exceptional service experiences.
+                          Customers are more likely to leave positive reviews.
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">
+                          After Special Occasions
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Great timing after weddings, proms, or other special
+                          events where customers want to share their experience.
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">
+                          During Slow Periods
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Use quiet times to catch up on review requests for
+                          recent customers.
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">
+                          Before Competitor Visits
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Ask for reviews before customers might visit
+                          competitors to capture their positive experience.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Tests */}

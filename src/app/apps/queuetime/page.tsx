@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useMemo, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,9 +19,9 @@ import {
   Upload,
   Download,
   Clock,
-  Users,
   TrendingUp,
   Calendar,
+  Info,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -32,7 +38,7 @@ import {
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { holtWinters, clamp } from "@/lib/math";
-import { todayISO, addDays } from "@/lib/dates";
+import { todayISO } from "@/lib/dates";
 
 type Visit = {
   date: string;
@@ -158,8 +164,9 @@ export default function QueueTimeAI() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="QueueTime AI"
+        title="Busy Times Predictor"
         subtitle="Forecast walk‑in traffic and optimize chair utilization for Belmont Barbershop."
+        showLogo={true}
         actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={loadSampleData}>
@@ -191,12 +198,225 @@ export default function QueueTimeAI() {
         }
       />
 
-      <Tabs defaultValue="dashboard">
-        <TabsList>
+      <Tabs defaultValue="howto">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="forecast">Forecast</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
+
+        {/* How To Tab */}
+        <TabsContent value="howto" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                How to Use the Busy Times Predictor
+              </CardTitle>
+              <CardDescription>
+                Learn how to analyze customer traffic patterns to optimize
+                Belmont's staffing and scheduling
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    What This Tool Does
+                  </h3>
+                  <p className="text-muted-foreground">
+                    This tool analyzes Belmont's historical appointment data to
+                    predict when customers are most likely to visit. It uses
+                    advanced time series forecasting (Holt-Winters method) to
+                    identify busy periods, slow times, and optimal staffing
+                    levels throughout the day and week.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Why Busy Time Prediction Matters for Belmont
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Knowing when customers are most likely to visit helps
+                    Belmont make smarter business decisions:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                    <li>
+                      <strong>Staff scheduling:</strong> Schedule more barbers
+                      during peak hours and fewer during slow times
+                    </li>
+                    <li>
+                      <strong>Reduce wait times:</strong> Ensure enough chairs
+                      are available when customers need them most
+                    </li>
+                    <li>
+                      <strong>Increase revenue:</strong> Maximize chair
+                      utilization and handle more customers efficiently
+                    </li>
+                    <li>
+                      <strong>Customer satisfaction:</strong> Minimize wait
+                      times during busy periods
+                    </li>
+                    <li>
+                      <strong>Staff productivity:</strong> Match staff
+                      availability with customer demand patterns
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Step-by-Step Instructions
+                  </h3>
+                  <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                    <li>
+                      <strong>Upload your data:</strong> Click "Import Visits
+                      CSV" and upload a CSV file from Square or your booking
+                      system, or use the "Load Sample Data" button to try the
+                      tool with demo data
+                    </li>
+                    <li>
+                      <strong>Review the dashboard:</strong> Check the
+                      "Dashboard" tab to see current availability and best times
+                    </li>
+                    <li>
+                      <strong>Analyze the forecast:</strong> Look at the
+                      "Forecast" tab to see predicted traffic patterns and
+                      charts
+                    </li>
+                    <li>
+                      <strong>Fine-tune settings:</strong> Adjust the
+                      forecasting parameters in the "Settings" tab if needed
+                    </li>
+                    <li>
+                      <strong>Export recommendations:</strong> Use the "Export
+                      Best Times" button to download optimal scheduling
+                      suggestions
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Best Practices for Belmont
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Weekly planning:</strong> Run this analysis every
+                      Monday to plan the week's staffing
+                    </li>
+                    <li>
+                      <strong>Peak hour focus:</strong> Schedule experienced
+                      barbers during the busiest times (typically mornings and
+                      afternoons)
+                    </li>
+                    <li>
+                      <strong>Lunch coverage:</strong> Ensure adequate coverage
+                      during lunch hours when traffic might dip
+                    </li>
+                    <li>
+                      <strong>Walk-in management:</strong> Use the predictions
+                      to manage walk-in customers during peak times
+                    </li>
+                    <li>
+                      <strong>Marketing timing:</strong> Post social media
+                      promotions during predicted slow times to boost traffic
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Understanding the Forecast
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Holt-Winters method:</strong> Advanced time series
+                      forecasting that considers level, trend, and seasonality
+                    </li>
+                    <li>
+                      <strong>Alpha parameter:</strong> Controls how much weight
+                      to give recent data vs. historical patterns
+                    </li>
+                    <li>
+                      <strong>Beta parameter:</strong> Controls trend
+                      sensitivity in the forecast
+                    </li>
+                    <li>
+                      <strong>Gamma parameter:</strong> Controls seasonal
+                      pattern recognition
+                    </li>
+                    <li>
+                      <strong>Season length:</strong> Number of time periods in
+                      a seasonal cycle (default 24 hours)
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Data Format Requirements
+                  </h3>
+                  <p className="text-muted-foreground mb-2">
+                    Your CSV file should include these columns (the tool will
+                    automatically map common variations):
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Date:</strong> Appointment date (YYYY-MM-DD
+                      format)
+                    </li>
+                    <li>
+                      <strong>Start:</strong> Appointment start time (HH:MM
+                      format, 24-hour)
+                    </li>
+                    <li>
+                      <strong>Service:</strong> Type of service (Men's Cut,
+                      Beard Trim, etc.)
+                    </li>
+                    <li>
+                      <strong>Duration:</strong> Appointment duration in minutes
+                    </li>
+                    <li>
+                      <strong>Barber/Staff:</strong> Which barber/staff member
+                      (optional)
+                    </li>
+                    <li>
+                      <strong>Status:</strong> Whether appointment was kept,
+                      cancelled, or no-show
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Interpreting Results
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Available chairs:</strong> Shows how many chairs
+                      are free at current time
+                    </li>
+                    <li>
+                      <strong>Best times:</strong> Hours with lowest predicted
+                      traffic (good for scheduling)
+                    </li>
+                    <li>
+                      <strong>Traffic heatmap:</strong> Visual representation of
+                      busy vs. slow periods
+                    </li>
+                    <li>
+                      <strong>Forecast accuracy:</strong> How well the model
+                      predicts future traffic patterns
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="dashboard" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -479,9 +485,25 @@ export default function SEOBriefSchemaBuilder() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="On‑Site SEO Brief & Schema Builder"
+        title="Website Guide"
         subtitle="Generate page briefs & JSON‑LD for Belmont — copy‑paste into your CMS today."
+        showLogo={true}
       />
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Do this next</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm">
+          <ol className="list-decimal pl-5 space-y-1">
+            <li>Fill in Business Inputs (name, website, hours).</li>
+            <li>Open Page Briefs and copy the Title and Meta for a page.</li>
+            <li>Paste into your CMS page settings.</li>
+            <li>Open JSON‑LD and export Business or Service schema.</li>
+            <li>Paste the JSON‑LD into your site.</li>
+          </ol>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard
@@ -510,14 +532,209 @@ export default function SEOBriefSchemaBuilder() {
         />
       </div>
 
-      <Tabs defaultValue="inputs">
+      <Tabs defaultValue="howto">
         <TabsList>
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="inputs">Business Inputs</TabsTrigger>
           <TabsTrigger value="pages">Page Briefs</TabsTrigger>
           <TabsTrigger value="schema">JSON‑LD</TabsTrigger>
           <TabsTrigger value="tests">Tests</TabsTrigger>
-          <TabsTrigger value="help">Help</TabsTrigger>
         </TabsList>
+
+        {/* How To */}
+        <TabsContent value="howto">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  How to Use the Website Improvement Guide
+                </CardTitle>
+                <CardDescription>
+                  Create optimized page content and structured data to help
+                  Google understand Belmont's services
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      What This Tool Does
+                    </h3>
+                    <p className="text-muted-foreground">
+                      This tool creates optimized content and code for Belmont's
+                      website that helps Google better understand what services
+                      Belmont offers. It generates page titles, descriptions,
+                      and special code (JSON-LD) that tells search engines about
+                      Belmont's business information.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Why Website Optimization Matters for Belmont
+                    </h3>
+                    <p className="text-muted-foreground">
+                      When customers search for Belmont's services online,
+                      Google uses the information on Belmont's website to decide
+                      how to display Belmont in search results:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                      <li>
+                        Page titles appear in search results as clickable
+                        headlines
+                      </li>
+                      <li>
+                        Meta descriptions show a preview of what the page
+                        contains
+                      </li>
+                      <li>
+                        Structured data helps Google show Belmont's business
+                        info in search results
+                      </li>
+                      <li>
+                        Well-optimized pages rank higher and get more clicks
+                        from customers
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Step-by-Step Instructions
+                    </h3>
+                    <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                      <li>
+                        <strong>Enter business information:</strong> Go to the
+                        "Business Inputs" tab and fill in Belmont's details
+                        (name, address, phone, services, hours)
+                      </li>
+                      <li>
+                        <strong>Generate page content:</strong> Click the "Page
+                        Briefs" tab to see optimized titles and descriptions for
+                        different pages on Belmont's website
+                      </li>
+                      <li>
+                        <strong>Copy the suggestions:</strong> Click the copy
+                        buttons to copy the recommended titles and descriptions
+                      </li>
+                      <li>
+                        <strong>Update your website:</strong> Paste the
+                        optimized titles and descriptions into your website's
+                        content management system (CMS)
+                      </li>
+                      <li>
+                        <strong>Add structured data:</strong> Go to the
+                        "JSON-LD" tab to get special code that helps Google
+                        understand Belmont's business information
+                      </li>
+                      <li>
+                        <strong>Install the code:</strong> Copy the JSON-LD code
+                        and paste it into your website's settings or page HTML
+                      </li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Best Practices for Belmont
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        <strong>Use clear, benefit-focused titles:</strong>{" "}
+                        Instead of just "Haircuts", use "Professional Men's
+                        Haircuts & Styling in Bridgeland"
+                      </li>
+                      <li>
+                        <strong>Include location keywords:</strong> Add
+                        "Bridgeland", "Riverside", or "Calgary" to help local
+                        customers find Belmont
+                      </li>
+                      <li>
+                        <strong>Highlight unique services:</strong> Mention
+                        "Veterans Discount", "Groomsmen Party Packages", or "Hot
+                        Towel Shaves" in titles
+                      </li>
+                      <li>
+                        <strong>Add booking links:</strong> Include
+                        calls-to-action like "Book Now" in titles and
+                        descriptions
+                      </li>
+                      <li>
+                        <strong>Keep descriptions under 160 characters:</strong>{" "}
+                        Meta descriptions should be concise and compelling
+                      </li>
+                      <li>
+                        <strong>Update regularly:</strong> Refresh page content
+                        monthly to keep it current and effective
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Content Guidelines
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        <strong>Titles:</strong> Keep under 60 characters for
+                        best display in search results
+                      </li>
+                      <li>
+                        <strong>Meta descriptions:</strong> Aim for 150-160
+                        characters to fit perfectly in search results
+                      </li>
+                      <li>
+                        <strong>One service per page:</strong> Focus each page
+                        on a specific service (haircuts, beard trims, etc.)
+                      </li>
+                      <li>
+                        <strong>Include booking CTAs:</strong> Add
+                        calls-to-action and links to your booking system
+                      </li>
+                      <li>
+                        <strong>Add internal links:</strong> Link to related
+                        services and Belmont's location page
+                      </li>
+                      <li>
+                        <strong>Natural language:</strong> Write for humans
+                        first, search engines second. Avoid keyword stuffing
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Installing JSON-LD Structured Data
+                    </h3>
+                    <p className="text-muted-foreground mb-2">
+                      Structured data (JSON-LD) helps Google display Belmont's
+                      information in rich search results:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        <strong>Copy the code:</strong> Click the copy button
+                        next to the JSON-LD section
+                      </li>
+                      <li>
+                        <strong>Paste into your CMS:</strong> Add the code to
+                        your website's settings or page HTML
+                      </li>
+                      <li>
+                        <strong>Test the code:</strong> Use Google's Rich
+                        Results Test tool to verify it works
+                      </li>
+                      <li>
+                        <strong>One script per page:</strong> Add the
+                        appropriate JSON-LD to each relevant page
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* Inputs */}
         <TabsContent value="inputs">
@@ -550,6 +767,7 @@ export default function SEOBriefSchemaBuilder() {
                       }))
                     }
                     className="w-full h-9 border rounded-md px-2"
+                    aria-label="Price range selection"
                   >
                     <option value="$">$</option>
                     <option value="$$">$$</option>
@@ -857,6 +1075,7 @@ export default function SEOBriefSchemaBuilder() {
                     className="w-full h-9 border rounded-md px-2"
                     value={activeKey}
                     onChange={(e) => setActiveKey(e.target.value)}
+                    aria-label="Page selection"
                   >
                     {pages.map((p) => (
                       <option key={String(p.key)} value={String(p.key)}>
@@ -1007,38 +1226,6 @@ export default function SEOBriefSchemaBuilder() {
               <div className="mt-2 text-xs text-muted-foreground">
                 {passCount}/{tests.length} passed
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Help */}
-        <TabsContent value="help">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                Guidance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <ul className="list-disc pl-5 space-y-1">
-                <li>
-                  Titles ≤60 characters, meta ≈ 155 characters for best SERP
-                  fit.
-                </li>
-                <li>
-                  One service per page; include booking CTAs and internal links
-                  to related services + area page.
-                </li>
-                <li>
-                  Paste JSON‑LD into your CMS settings or page HTML (one script
-                  per page).
-                </li>
-                <li>
-                  Keep copy human‑first; avoid keyword stuffing. Use
-                  Bridgeland/Riverside anchors naturally.
-                </li>
-              </ul>
             </CardContent>
           </Card>
         </TabsContent>

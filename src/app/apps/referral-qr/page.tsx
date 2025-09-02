@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useRef, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +20,7 @@ import {
   Trophy,
   Users,
   DollarSign,
+  Info,
 } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
 import { PageHeader } from "@/components/ui/page-header";
@@ -150,7 +157,7 @@ export default function ReferralQR() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Referral QR Generator"
+        title="Staff Referral Codes"
         subtitle="Create QR codes for staff, partners, and events with UTM tracking for The Belmont Barbershop."
         actions={
           <div className="flex gap-2">
@@ -201,11 +208,282 @@ export default function ReferralQR() {
         />
       </div>
 
-      <Tabs defaultValue="generator">
-        <TabsList>
+      <Tabs defaultValue="howto">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="generator">QR Generator</TabsTrigger>
           <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
         </TabsList>
+
+        {/* How To Tab */}
+        <TabsContent value="howto" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                How to Use the Staff Referral Codes Tool
+              </CardTitle>
+              <CardDescription>
+                Learn how to create and manage QR codes for staff referrals,
+                partners, and events to track marketing performance
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    What This Tool Does
+                  </h3>
+                  <p className="text-muted-foreground">
+                    This tool creates unique QR codes and tracking links for
+                    different referral sources (staff, partners, events). Each
+                    code includes UTM parameters for detailed analytics,
+                    allowing you to track which referrals drive the most
+                    bookings and revenue for Belmont.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Why Referral Tracking Matters for Belmont
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Referral tracking helps Belmont understand which marketing
+                    channels and partnerships are most effective:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                    <li>
+                      <strong>Staff performance:</strong> Track which barbers
+                      bring in the most referrals through their personal QR
+                      codes
+                    </li>
+                    <li>
+                      <strong>Partner ROI:</strong> Measure the revenue
+                      generated from each business partnership
+                    </li>
+                    <li>
+                      <strong>Event effectiveness:</strong> See which community
+                      events and promotions drive the most bookings
+                    </li>
+                    <li>
+                      <strong>Marketing optimization:</strong> Focus resources
+                      on the highest-performing referral channels
+                    </li>
+                    <li>
+                      <strong>Incentive programs:</strong> Reward top-performing
+                      staff and partners based on actual results
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Step-by-Step Instructions
+                  </h3>
+                  <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                    <li>
+                      <strong>Choose referral type:</strong> Select whether
+                      you're creating a code for staff, partner, or event
+                    </li>
+                    <li>
+                      <strong>Enter name:</strong> Add the person's name or
+                      event/partner business name
+                    </li>
+                    <li>
+                      <strong>Generate QR code:</strong> Click "Generate QR
+                      Code" to create a unique code with UTM tracking
+                    </li>
+                    <li>
+                      <strong>Download QR code:</strong> Save the QR code as PNG
+                      for printing or digital sharing
+                    </li>
+                    <li>
+                      <strong>Share with referrer:</strong> Give the QR code to
+                      staff for their business cards or partners for their
+                      website
+                    </li>
+                    <li>
+                      <strong>Track performance:</strong> Monitor clicks,
+                      bookings, and revenue in the leaderboard
+                    </li>
+                    <li>
+                      <strong>Export reports:</strong> Download CSV files for
+                      detailed analysis and incentive calculations
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Understanding UTM Parameters
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Source:</strong> Identifies the referral type
+                      (staff, partner, event)
+                    </li>
+                    <li>
+                      <strong>Medium:</strong> Always "referral" for these
+                      tracking links
+                    </li>
+                    <li>
+                      <strong>Campaign:</strong> The unique referral code (e.g.,
+                      BELMONT-ABC123)
+                    </li>
+                    <li>
+                      <strong>Content:</strong> The referrer's name or
+                      identifier
+                    </li>
+                    <li>
+                      <strong>Benefits:</strong> Track exactly which referrals
+                      convert to bookings
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Referral Code Types
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Staff codes:</strong> Personal QR codes for
+                      barbers to include on business cards, social media, etc.
+                    </li>
+                    <li>
+                      <strong>Partner codes:</strong> For local businesses that
+                      refer customers to Belmont
+                    </li>
+                    <li>
+                      <strong>Event codes:</strong> For community events,
+                      sponsorships, or promotional campaigns
+                    </li>
+                    <li>
+                      <strong>Benefits:</strong> Each type gets different UTM
+                      parameters for accurate attribution
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Best Practices for Referral Programs
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Clear incentives:</strong> Define what
+                      staff/partners earn for successful referrals
+                    </li>
+                    <li>
+                      <strong>Easy sharing:</strong> Make QR codes available in
+                      multiple formats (print, digital, email)
+                    </li>
+                    <li>
+                      <strong>Regular reporting:</strong> Share performance data
+                      with staff and partners monthly
+                    </li>
+                    <li>
+                      <strong>Quality referrals:</strong> Encourage referrals
+                      from satisfied customers who will book again
+                    </li>
+                    <li>
+                      <strong>Track all sources:</strong> Use different codes
+                      for different marketing channels
+                    </li>
+                    <li>
+                      <strong>Celebrate successes:</strong> Recognize top
+                      performers publicly (with permission)
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Staff Referral Program Ideas
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Business cards:</strong> Include personal QR codes
+                      on all staff business cards
+                    </li>
+                    <li>
+                      <strong>Social media:</strong> Staff can share their
+                      referral links on personal Instagram/TikTok
+                    </li>
+                    <li>
+                      <strong>Email signatures:</strong> Add referral links to
+                      professional email signatures
+                    </li>
+                    <li>
+                      <strong>Word-of-mouth:</strong> Encourage staff to mention
+                      Belmont when out in the community
+                    </li>
+                    <li>
+                      <strong>Commission structure:</strong> Offer percentage of
+                      service revenue from referrals
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Partner Referral Opportunities
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Local restaurants:</strong> Partner with nearby
+                      cafes and restaurants
+                    </li>
+                    <li>
+                      <strong>Salons and spas:</strong> Cross-promote with other
+                      personal care businesses
+                    </li>
+                    <li>
+                      <strong>Gyms and fitness:</strong> Partner with local
+                      fitness centers
+                    </li>
+                    <li>
+                      <strong>Real estate agents:</strong> Work with local
+                      realtors for new resident welcome packages
+                    </li>
+                    <li>
+                      <strong>Event venues:</strong> Partner with hotels,
+                      community centers, and event spaces
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Measuring Success
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Conversion rate:</strong> Percentage of clicks
+                      that become bookings
+                    </li>
+                    <li>
+                      <strong>Revenue per referral:</strong> Average revenue
+                      generated from each successful referral
+                    </li>
+                    <li>
+                      <strong>Top performers:</strong> Identify which
+                      staff/partners bring in the most business
+                    </li>
+                    <li>
+                      <strong>Channel effectiveness:</strong> Compare
+                      performance across different referral types
+                    </li>
+                    <li>
+                      <strong>ROI analysis:</strong> Calculate return on
+                      investment for referral incentives
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="generator" className="space-y-4">
           {/* Add New Code */}
@@ -231,6 +509,7 @@ export default function ReferralQR() {
                     className="w-full px-3 py-2 border border-input rounded-md bg-background"
                     value={newType}
                     onChange={(e) => setNewType(e.target.value as any)}
+                    aria-label="Referral type selection"
                   >
                     <option value="staff">Staff</option>
                     <option value="partner">Partner</option>
@@ -269,6 +548,7 @@ export default function ReferralQR() {
                 <CardContent className="space-y-3">
                   {code.qrDataUrl ? (
                     <div className="flex justify-center">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- Safe data URL preview for generated QR */}
                       <img
                         src={code.qrDataUrl}
                         alt={`QR Code for ${code.name}`}

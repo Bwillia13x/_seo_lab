@@ -481,7 +481,7 @@ export default function RFMMicroCRM() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="RFM Micro‑CRM"
+        title="Customer Analysis"
         subtitle="Segment customers by Recency, Frequency, and Monetary value. Generate winback/VIP templates and export lists."
         actions={
           <>

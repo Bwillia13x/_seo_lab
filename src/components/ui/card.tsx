@@ -78,3 +78,27 @@ export {
   CardDescription,
   CardContent,
 };
+
+const CardSkeleton = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("rounded-xl elevated-card animate-pulse", className)}
+    {...props}
+  >
+    <div className="flex flex-col space-y-1.5 p-6">
+      <div className="h-4 bg-muted rounded w-3/4"></div>
+      <div className="h-3 bg-muted rounded w-1/2"></div>
+    </div>
+    <div className="p-6 pt-0 space-y-3">
+      <div className="h-4 bg-muted rounded"></div>
+      <div className="h-4 bg-muted rounded w-5/6"></div>
+      <div className="h-4 bg-muted rounded w-4/6"></div>
+    </div>
+  </div>
+));
+CardSkeleton.displayName = "CardSkeleton";
+
+export { CardSkeleton };

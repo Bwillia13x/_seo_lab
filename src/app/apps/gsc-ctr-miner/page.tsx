@@ -1,7 +1,13 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,6 +33,7 @@ import {
   Play,
   Settings,
   Copy,
+  Info,
 } from "lucide-react";
 
 import {
@@ -468,7 +475,7 @@ function GSCCtrMiner() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="GSC CTR & Query Miner"
+        title="Search Performance"
         subtitle="Import GSC CSV, find underperforming pages, and generate Title/Meta experiments with Bridgeland/Riverside context."
         actions={
           <div className="flex gap-2">
@@ -514,6 +521,23 @@ function GSCCtrMiner() {
         }
       />
 
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Do this next</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm">
+          <ol className="list-decimal pl-5 space-y-1">
+            <li>Click “Load Belmont Sample Data” to see how it works.</li>
+            <li>Then click “Import Your GSC CSV” and upload your export.</li>
+            <li>
+              Open Opportunities and note the top 3 pages by missed clicks.
+            </li>
+            <li>Go to Page Experiments and copy a Title/Meta pair.</li>
+            <li>Paste into your CMS and track the uplift next week.</li>
+          </ol>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard label="Queries" value={rows.length} hint="Imported" />
         <KPICard label="Opportunities" value={recs.length} hint="Found" />
@@ -529,15 +553,177 @@ function GSCCtrMiner() {
         />
       </div>
 
-      <Tabs defaultValue="settings">
+      <Tabs defaultValue="howto">
         <TabsList>
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="opps">Opportunities</TabsTrigger>
           <TabsTrigger value="pages">Page Experiments</TabsTrigger>
           <TabsTrigger value="charts">Charts</TabsTrigger>
           <TabsTrigger value="tests">Tests</TabsTrigger>
-          <TabsTrigger value="help">Help</TabsTrigger>
         </TabsList>
+
+        {/* How To */}
+        <TabsContent value="howto">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  How to Use the Search Results Analyzer
+                </CardTitle>
+                <CardDescription>
+                  Analyze Belmont's performance in Google searches and discover
+                  opportunities to get more customers online
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      What This Tool Does
+                    </h3>
+                    <p className="text-muted-foreground">
+                      This tool analyzes data from Google Search Console to show
+                      Belmont exactly how customers are finding the website
+                      online. It reveals which search terms people use to find
+                      barbers in Calgary and helps identify opportunities to
+                      improve Belmont's search rankings.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Why Search Analysis Matters for Belmont
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Understanding how customers search for Belmont's services
+                      is crucial because:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                      <li>
+                        Shows which keywords customers actually use when looking
+                        for barbers in Calgary
+                      </li>
+                      <li>
+                        Reveals if Belmont appears when people search for
+                        "barber shop bridgeland"
+                      </li>
+                      <li>
+                        Identifies pages that could get more clicks with better
+                        titles and descriptions
+                      </li>
+                      <li>
+                        Helps Belmont compete better with other local barber
+                        shops
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Step-by-Step Instructions
+                    </h3>
+                    <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                      <li>
+                        <strong>Get your Google Search Console data:</strong>{" "}
+                        Export search results from Google Search Console (last
+                        28-90 days) with columns for Query, Page, Clicks,
+                        Impressions, CTR, Position
+                      </li>
+                      <li>
+                        <strong>Import the CSV:</strong> Click "Import CSV" and
+                        upload your Google Search Console export file
+                      </li>
+                      <li>
+                        <strong>Adjust settings:</strong> Set minimum
+                        impressions and choose whether to include brand queries
+                        (searches for "Belmont")
+                      </li>
+                      <li>
+                        <strong>Review opportunities:</strong> Look at the
+                        "Opportunities" tab to see which pages could get more
+                        clicks
+                      </li>
+                      <li>
+                        <strong>Check page experiments:</strong> Go to "Page
+                        Experiments" to see suggested title and description
+                        improvements
+                      </li>
+                      <li>
+                        <strong>Copy and implement:</strong> Copy the suggested
+                        titles and descriptions, then update them on your
+                        website
+                      </li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Best Practices for Belmont
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        <strong>Focus on local keywords:</strong> Pay special
+                        attention to searches containing "Calgary",
+                        "Bridgeland", or "Riverside"
+                      </li>
+                      <li>
+                        <strong>Improve low-CTR pages first:</strong> Start with
+                        pages that get many impressions but few clicks - these
+                        have the biggest improvement potential
+                      </li>
+                      <li>
+                        <strong>Use clear, benefit-focused titles:</strong>{" "}
+                        Instead of just "Barber Services", use "Professional
+                        Haircuts & Beard Trims in Bridgeland"
+                      </li>
+                      <li>
+                        <strong>Include your unique advantages:</strong> Mention
+                        "Veterans Discount", "Groomsmen Party Packages", or "Hot
+                        Towel Shaves" in titles and descriptions
+                      </li>
+                      <li>
+                        <strong>Test and measure:</strong> After making changes,
+                        wait 2-4 weeks and check if your click-through rates
+                        improve
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">Quick Tips</h3>
+                    <ol className="list-decimal pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        In Google Search Console, export <em>Search results</em>{" "}
+                        with columns Query, Page, Clicks, Impressions, CTR,
+                        Position (last 28–90 days).
+                      </li>
+                      <li>
+                        Import the CSV here. Adjust minimum impressions and
+                        whether to include brand queries.
+                      </li>
+                      <li>
+                        Review <strong>Underperforming Pages</strong>; the tool
+                        highlights potential extra clicks if your CTR matched a
+                        realistic benchmark at your average position.
+                      </li>
+                      <li>
+                        Copy a proposed <strong>Title/Meta</strong> pair, tweak
+                        for truthfulness (prices, hours), and deploy in your
+                        CMS.
+                      </li>
+                      <li>
+                        Consider A/B testing title variations on high-traffic
+                        pages.
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* Settings */}
         <TabsContent value="settings">
@@ -593,6 +779,7 @@ function GSCCtrMiner() {
                     className="w-full h-9 border rounded-md px-2"
                     value={filterFam}
                     onChange={(e) => setFilterFam(e.target.value)}
+                    aria-label="Filter by search term family"
                   >
                     <option value="all">all</option>
                     {Object.keys(FAMILY_PATTERNS).map((k) => (
@@ -608,6 +795,7 @@ function GSCCtrMiner() {
                     className="w-full h-9 border rounded-md px-2"
                     value={filterArea}
                     onChange={(e) => setFilterArea(e.target.value)}
+                    aria-label="Filter by geographic area"
                   >
                     <option value="all">all</option>
                     {Object.keys(AREA_PATTERNS).map((k) => (
@@ -867,6 +1055,368 @@ function GSCCtrMiner() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* How to Use Instructions */}
+        <TabsContent value="instructions">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  How to Use the Search Results Analyzer
+                </CardTitle>
+                <CardDescription>
+                  Analyze Belmont's performance in Google searches and discover
+                  opportunities to get more customers online
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      What This Tool Does
+                    </h3>
+                    <p className="text-muted-foreground">
+                      This tool analyzes data from Google Search Console to show
+                      Belmont exactly how customers are finding the website
+                      online. It reveals which search terms people use to find
+                      barbers in Calgary and helps identify opportunities to
+                      improve Belmont's search rankings.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Why Search Analysis Matters for Belmont
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Understanding how customers search for Belmont's services
+                      is crucial because:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                      <li>
+                        Shows which keywords customers actually use when looking
+                        for barbers in Calgary
+                      </li>
+                      <li>
+                        Reveals if Belmont appears when people search for
+                        "barber shop bridgeland"
+                      </li>
+                      <li>
+                        Identifies pages on Belmont's website that need
+                        improvement
+                      </li>
+                      <li>
+                        Helps Belmont create better content that matches what
+                        customers want
+                      </li>
+                      <li>
+                        Shows whether Belmont's Google Business Profile is
+                        working effectively
+                      </li>
+                      <li>
+                        Provides data to make smart decisions about marketing
+                        and website changes
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      How to Analyze Belmont's Search Performance
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          1
+                        </Badge>
+                        <div>
+                          <p className="font-medium">
+                            Get Your Google Search Console Data
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Go to Google Search Console for Belmont's website
+                            and export the "Queries" report. This shows all the
+                            search terms people used to find Belmont online.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          2
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Upload the Data File</p>
+                          <p className="text-sm text-muted-foreground">
+                            Click "Upload CSV" and select the file you
+                            downloaded from Google Search Console. The tool will
+                            automatically read and analyze all the search data.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          3
+                        </Badge>
+                        <div>
+                          <p className="font-medium">
+                            Review the Opportunities Tab
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Check the "Opportunities" section to see search
+                            terms where Belmont could rank higher. Look for
+                            terms like "barber Calgary", "mens haircut near me",
+                            or "bridgeland barber".
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          4
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Analyze the Charts</p>
+                          <p className="text-sm text-muted-foreground">
+                            Look at the performance charts to understand
+                            click-through rates and impressions. Higher
+                            impressions mean more people see Belmont, higher
+                            clicks mean better engagement.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          5
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Check Page Performance</p>
+                          <p className="text-sm text-muted-foreground">
+                            Review the "Page Experiments" tab to see which pages
+                            on Belmont's website perform best. Identify pages
+                            that need title or description improvements.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          6
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Apply the Insights</p>
+                          <p className="text-sm text-muted-foreground">
+                            Use the recommendations to improve Belmont's website
+                            content, meta descriptions, and Google Business
+                            Profile to attract more local customers.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      What the Numbers Mean
+                    </h3>
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                            Impressions 📊
+                          </h4>
+                          <p className="text-blue-700 dark:text-blue-300">
+                            How many times Belmont appeared in Google search
+                            results. More impressions = more visibility.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                            Clicks 🖱️
+                          </h4>
+                          <p className="text-blue-700 dark:text-blue-300">
+                            How many times people clicked on Belmont's link.
+                            More clicks = better engagement.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                            Click-Through Rate 📈
+                          </h4>
+                          <p className="text-blue-700 dark:text-blue-300">
+                            Percentage of people who clicked after seeing
+                            Belmont. Higher CTR = more effective listings.
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">
+                            Average Position 🎯
+                          </h4>
+                          <p className="text-blue-700 dark:text-blue-300">
+                            Where Belmont appears in search results (1 = top,
+                            10+ = lower). Lower numbers are better.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Belmont-Specific Search Insights
+                    </h3>
+                    <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                      <ul className="space-y-2 text-sm text-green-700 dark:text-green-300">
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 dark:text-green-400 mt-1">
+                            🏙️
+                          </span>
+                          <span>
+                            Calgary searches: Focus on "barber Calgary",
+                            "haircut downtown Calgary", "mens grooming Calgary"
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 dark:text-green-400 mt-1">
+                            🏘️
+                          </span>
+                          <span>
+                            Bridgeland searches: Target "barber shop
+                            bridgeland", "bridgeland haircut", "local barber
+                            bridgeland"
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 dark:text-green-400 mt-1">
+                            💇‍♂️
+                          </span>
+                          <span>
+                            Service searches: Watch for "mens haircut", "beard
+                            trim", "hot towel shave", "kids haircut"
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 dark:text-green-400 mt-1">
+                            🎩
+                          </span>
+                          <span>
+                            Special services: Track "groomsmen packages",
+                            "wedding haircuts", "veterans discount"
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-green-600 dark:text-green-400 mt-1">
+                            🕐
+                          </span>
+                          <span>
+                            Timing searches: Monitor "barber open now", "walk-in
+                            barber", "emergency haircut"
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Action Steps for Belmont
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">
+                          Quick Wins (Do First)
+                        </h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• Update Google Business Profile</li>
+                          <li>• Improve page titles and descriptions</li>
+                          <li>• Add missing keywords to website</li>
+                          <li>• Fix any broken links</li>
+                        </ul>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">
+                          Long-term Improvements
+                        </h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>
+                            • Create content for high-opportunity keywords
+                          </li>
+                          <li>• Build local backlinks</li>
+                          <li>• Improve website loading speed</li>
+                          <li>• Add customer reviews and photos</li>
+                        </ul>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">Monthly Monitoring</h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• Track position changes</li>
+                          <li>• Monitor new search terms</li>
+                          <li>• Review CTR improvements</li>
+                          <li>• Check competitor performance</li>
+                        </ul>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">Success Metrics</h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          <li>• Higher search rankings</li>
+                          <li>• More website visitors</li>
+                          <li>• Increased phone calls</li>
+                          <li>• More online bookings</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Getting Google Search Console Data
+                    </h3>
+                    <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                      <div className="space-y-3 text-sm">
+                        <div>
+                          <h4 className="font-medium text-amber-800 dark:text-amber-200">
+                            Step 1: Access Google Search Console
+                          </h4>
+                          <p className="text-amber-700 dark:text-amber-300">
+                            Go to search.google.com/search-console and sign in
+                            with Belmont's Google account
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-amber-800 dark:text-amber-200">
+                            Step 2: Select Belmont's Website
+                          </h4>
+                          <p className="text-amber-700 dark:text-amber-300">
+                            Choose "thebelmontbarber.ca" from the property list
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-amber-800 dark:text-amber-200">
+                            Step 3: Go to Performance Report
+                          </h4>
+                          <p className="text-amber-700 dark:text-amber-300">
+                            Click "Performance" in the left sidebar
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-amber-800 dark:text-amber-200">
+                            Step 4: Export Queries Data
+                          </h4>
+                          <p className="text-amber-700 dark:text-amber-300">
+                            Click the export button and save the file as CSV
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Tests */}

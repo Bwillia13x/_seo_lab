@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +22,7 @@ import {
   CheckCircle,
   Clock,
   Edit,
+  Info,
 } from "lucide-react";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
@@ -178,7 +185,7 @@ export default function MetaPlanner() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Title/Meta Multivariate Planner"
+        title="Page Titles & Descriptions"
         subtitle="Manage A/B/C title and meta description experiments with CTR tracking."
         actions={
           <div className="flex gap-2">
@@ -213,11 +220,237 @@ export default function MetaPlanner() {
         />
       </div>
 
-      <Tabs defaultValue="board">
-        <TabsList>
+      <Tabs defaultValue="howto">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="board">Kanban Board</TabsTrigger>
           <TabsTrigger value="add">Add Experiment</TabsTrigger>
         </TabsList>
+
+        {/* How To Tab */}
+        <TabsContent value="howto" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                How to Use the Page Titles & Descriptions Tool
+              </CardTitle>
+              <CardDescription>
+                Learn how to optimize your page titles and meta descriptions for
+                better search rankings and click-through rates
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    What This Tool Does
+                  </h3>
+                  <p className="text-muted-foreground">
+                    This tool helps you manage A/B/C experiments for page titles
+                    and meta descriptions to improve your search engine rankings
+                    and click-through rates (CTR). It provides a Kanban board to
+                    track experiments from planning to review, with built-in CTR
+                    tracking and performance analysis.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Why Title & Meta Description Optimization Matters
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Page titles and meta descriptions are the first things
+                    customers see when your business appears in Google search
+                    results:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                    <li>
+                      <strong>Titles appear as clickable headlines</strong> in
+                      search results and influence click-through rates
+                    </li>
+                    <li>
+                      <strong>Meta descriptions provide previews</strong> of
+                      what customers will find on your page
+                    </li>
+                    <li>
+                      <strong>
+                        Well-optimized titles can increase CTR by 20-50%
+                      </strong>{" "}
+                      compared to generic titles
+                    </li>
+                    <li>
+                      <strong>A/B/C testing helps you find</strong> what works
+                      best for your specific audience
+                    </li>
+                    <li>
+                      <strong>Data-driven improvements</strong> ensure you're
+                      making changes that actually work
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Step-by-Step Instructions
+                  </h3>
+                  <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                    <li>
+                      <strong>Start with sample experiments:</strong> Click
+                      "Load Sample Experiments" to see examples of title and
+                      meta variations
+                    </li>
+                    <li>
+                      <strong>Review the Kanban board:</strong> Check the
+                      "Kanban Board" tab to see experiments organized by status
+                      (Planned, Shipped, Review)
+                    </li>
+                    <li>
+                      <strong>Create new experiments:</strong> Go to the "Add
+                      Experiment" tab to create new A/B/C tests for different
+                      pages
+                    </li>
+                    <li>
+                      <strong>Implement winning variations:</strong> Move
+                      experiments to "Shipped" status and update your website
+                    </li>
+                    <li>
+                      <strong>Track performance:</strong> After 2-4 weeks, add
+                      CTR delta data to see which variations performed best
+                    </li>
+                    <li>
+                      <strong>Move to review:</strong> When experiments are
+                      ready, move them to "Review" status and analyze results
+                    </li>
+                    <li>
+                      <strong>Export your backlog:</strong> Download CSV files
+                      of all experiments for record-keeping and analysis
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Best Practices for Belmont
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Test one page at a time:</strong> Focus on
+                      high-traffic pages like homepage, services, and location
+                      pages
+                    </li>
+                    <li>
+                      <strong>Include location keywords:</strong> Add
+                      "Bridgeland", "Calgary", and "Riverside" to help local
+                      searches
+                    </li>
+                    <li>
+                      <strong>Highlight unique services:</strong> Mention
+                      "Veterans Discount", "Hot Towel Shaves", and "Kids Cuts"
+                    </li>
+                    <li>
+                      <strong>Create urgency:</strong> Use phrases like "Book
+                      Now", "Easy Online Booking" in meta descriptions
+                    </li>
+                    <li>
+                      <strong>Keep titles under 60 characters:</strong> Longer
+                      titles get truncated in search results
+                    </li>
+                    <li>
+                      <strong>Write compelling descriptions:</strong> Meta
+                      descriptions should be 150-160 characters for full display
+                    </li>
+                    <li>
+                      <strong>Test different approaches:</strong> Try
+                      benefit-focused vs. feature-focused vs. location-focused
+                      variations
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Understanding CTR Tracking
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>CTR Delta:</strong> The percentage change in
+                      click-through rate compared to the original
+                    </li>
+                    <li>
+                      <strong>Positive values:</strong> Variations that perform
+                      better than the original (+15% = 15% better)
+                    </li>
+                    <li>
+                      <strong>Negative values:</strong> Variations that perform
+                      worse than the original (-5% = 5% worse)
+                    </li>
+                    <li>
+                      <strong>Test duration:</strong> Give experiments 2-4 weeks
+                      to accumulate enough data for reliable results
+                    </li>
+                    <li>
+                      <strong>Statistical significance:</strong> Look for
+                      changes of ±5% or more to be confident in the results
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Experiment Workflow
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Planned:</strong> Experiments ready to be
+                      implemented on your website
+                    </li>
+                    <li>
+                      <strong>Shipped:</strong> Variations are live and
+                      collecting performance data
+                    </li>
+                    <li>
+                      <strong>Review:</strong> Experiments complete and ready
+                      for performance analysis
+                    </li>
+                    <li>
+                      <strong>Notes field:</strong> Use this to record
+                      implementation details and observations
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Common Title Patterns to Test
+                  </h3>
+                  <div className="space-y-2 text-muted-foreground">
+                    <p>
+                      <strong>Location-focused:</strong> "Barbershop in
+                      Bridgeland | The Belmont (Calgary)"
+                    </p>
+                    <p>
+                      <strong>Service-focused:</strong> "Men's Haircuts & Beard
+                      Trims | Belmont Barbershop"
+                    </p>
+                    <p>
+                      <strong>Benefit-focused:</strong> "Professional Cuts &
+                      Luxury Grooming in Calgary"
+                    </p>
+                    <p>
+                      <strong>Call-to-action:</strong> "Book Your Haircut Online
+                      | The Belmont Barbershop"
+                    </p>
+                    <p>
+                      <strong>Trust-focused:</strong> "Award-Winning Barbershop
+                      in Bridgeland Since 2019"
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="board" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

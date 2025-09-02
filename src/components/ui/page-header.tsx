@@ -1,11 +1,13 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type PageHeaderProps = {
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   actions?: React.ReactNode;
   className?: string;
+  showLogo?: boolean;
 };
 
 export function PageHeader({
@@ -13,14 +15,26 @@ export function PageHeader({
   subtitle,
   actions,
   className,
-}: PageHeaderProps) {
+  showLogo = false,
+}: Readonly<PageHeaderProps>) {
   return (
     <div className={cn("page-header", className)}>
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {subtitle && (
-          <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+      <div className="flex items-center gap-3">
+        {showLogo && (
+          <Image
+            src="/images/PRAIRIESIGNALLOGO.png"
+            alt="Prairie Signal"
+            width={32}
+            height={32}
+            className="h-8 w-8"
+          />
         )}
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          {subtitle && (
+            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+          )}
+        </div>
       </div>
       {actions && <div className="flex items-center gap-2">{actions}</div>}
     </div>

@@ -1,14 +1,19 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
-// import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -22,8 +27,43 @@ import {
 } from "@/components/ui/table";
 import { Wand2, Copy, Info, Settings, Download, Play } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
-// import { toCSV } from "@/lib/csv";
-// import { todayISO } from "@/lib/dates";
+
+// ---------------- Types ----------------
+type BaseState = {
+  bizName: string;
+  service: string;
+  area: string;
+  type: string;
+  tone: string;
+  wordTarget: number;
+  offerText: string;
+  hoursText: string;
+  bookingUrl: string;
+  addTags: boolean;
+  addNeighborhood: boolean;
+  autoUtm: boolean;
+  phone: string;
+};
+
+// ---------------- Constants ----------------
+const SERVICES = [
+  "Men's Haircut",
+  "Skin Fade",
+  "Beard Trim",
+  "Hot Towel Shave",
+  "Kids Cut",
+  "Groomsmen Party",
+  "Veterans Discount",
+];
+const AREAS = ["Bridgeland", "Riverside", "Calgary Downtown", "Inglewood"];
+const POST_TYPES = [
+  "Style Spotlight",
+  "Offer",
+  "Event",
+  "Hours Update",
+  "What's New",
+];
+const TONES = ["Professional", "Friendly", "Classic", "Modern"];
 
 // ---------------- Utilities ----------------
 function clamp(n: number, lo: number, hi: number) {
@@ -72,75 +112,45 @@ function buildUtmUrl(
   try {
     u = new URL(safe);
   } catch {
-    return { url: "", error: "Invalid base URL" };
+    return { url: safe, error: "Invalid URL" };
   }
-  for (const [k, v] of Object.entries(params)) {
-    if (!v) continue;
-    if (overwrite || !u.searchParams.has(k)) u.searchParams.set(k, v);
+
+  // Remove existing UTM params if overwrite
+  if (overwrite) {
+    Array.from(u.searchParams.keys()).forEach((key) => {
+      if (key.startsWith("utm_")) {
+        u.searchParams.delete(key);
+      }
+    });
   }
-  return { url: u.toString(), error: "" };
+
+  // Add new params
+  for (const [key, value] of Object.entries(params)) {
+    u.searchParams.set(key, value);
+  }
+
+  return { url: u.toString() };
 }
 
-// ---------------- Domain presets ----------------
-const SERVICES = [
-  "Men's Cut",
-  "Skin Fade",
-  "Beard Trim",
-  "Hot Towel Shave",
-  "Kids Cut",
-] as const;
-const AREAS = ["Bridgeland", "Riverside", "Calgary"] as const;
-const POST_TYPES = [
-  "What's New",
-  "Offer",
-  "Event",
-  "Hours Update",
-  "Style Spotlight",
-  "Testimonial",
-] as const;
-const TONES = ["Classic", "Modern", "Minimal", "Playful"] as const;
-
-// Hashtags (short list; GBP truncates hashtags in some surfaces, but safe to include a few)
-const BASE_TAGS = [
-  "#BelmontBarbershop",
-  "#CalgaryBarber",
-  "#Bridgeland",
-  "#RiversideYYC",
-  "#YYC",
-];
-
-// ---------------- Generators ----------------
 function makeTitle(biz: string, service: string, area: string, type: string) {
-  const areaStr = area === "Calgary" ? "Calgary" : `${area}, Calgary`;
-  switch (type) {
-    case "Offer":
-      return `${service} — Weekday Window in ${areaStr}`;
-    case "Event":
-      return `${service} Day — ${areaStr}`;
-    case "Hours Update":
-      return `${biz}: Updated Hours for ${areaStr}`;
-    case "Style Spotlight":
-      return `Fresh ${service}s in ${areaStr}`;
-    case "Testimonial":
-      return `Why ${biz} — from a ${areaStr} regular`;
-    default:
-      return `${service} at ${biz} — ${areaStr}`;
-  }
+  const templates = {
+    "Style Spotlight": `${service} Excellence at ${biz}`,
+    Offer: `Special: ${service} at ${biz}`,
+    Event: `${biz} Event: ${service}`,
+    "Hours Update": `${biz} Hours & Services Update`,
+    "What's New": `New at ${biz}: ${service}`,
+  };
+  return templates[type as keyof typeof templates] || `${service} at ${biz}`;
 }
 
 function toneLine(tone: string, service: string) {
-  switch (tone) {
-    case "Classic":
-      return `Crisp, clean, and consistent — our ${service} focuses on shape, balance, and growth pattern.`;
-    case "Modern":
-      return `Sharp lines, blended fade, and a finish that photographs well — ${service} dialed for your style.`;
-    case "Minimal":
-      return `${service}. Precise. Efficient. In and out.`;
-    case "Playful":
-      return `${service} so clean your selfie does the talking.`;
-    default:
-      return `${service} done right.`;
-  }
+  const tones = {
+    Professional: `Experience our professional ${service.toLowerCase()} services`,
+    Friendly: `Come enjoy our amazing ${service.toLowerCase()} experience`,
+    Classic: `Discover traditional ${service.toLowerCase()} craftsmanship`,
+    Modern: `Experience contemporary ${service.toLowerCase()} styling`,
+  };
+  return tones[tone as keyof typeof tones] || tones.Professional;
 }
 
 function buildBody(opts: {
@@ -169,165 +179,78 @@ function buildBody(opts: {
     addTags,
     addNeighborhoodNote,
   } = opts;
-  const areaStr = area === "Calgary" ? "Calgary" : `${area}, Calgary`;
-  const lines: string[] = [];
 
-  // Hook
-  switch (type) {
-    case "Offer":
-      lines.push(
-        offer && offer.trim()
-          ? `Limited‑time: ${offer.trim()}`
-          : `Limited‑time weekday window for ${service}.`
-      );
-      break;
-    case "Event":
-      lines.push(
-        details && details.trim()
-          ? details.trim()
-          : `One‑day focus on ${service}. Book early.`
-      );
-      break;
-    case "Hours Update":
-      lines.push(
-        details && details.trim()
-          ? details.trim()
-          : `Updated hours posted below — book the slots that fit your week.`
-      );
-      break;
-    case "Style Spotlight":
-      lines.push(`${service} — featured this week.`);
-      break;
-    case "Testimonial":
-      lines.push(`A neighbor on why they choose ${biz}.`);
-      break;
-    default:
-      lines.push(`${service} at ${biz}.`);
+  let body = toneLine(tone, service);
+
+  if (offer) {
+    body += `. ${offer}`;
   }
 
-  // Tone line
-  lines.push(toneLine(tone, service));
-
-  // Neighborhood note
-  if (addNeighborhoodNote)
-    lines.push(
-      `We're right in ${areaStr} — easy walk from the Bridgeland LRT.`
-    );
-
-  // Booking
-  lines.push(`Book online in seconds: ${booking}`);
-
-  // Soft proof points
-  lines.push(
-    `Walk‑ins welcome when chairs are free. Square Appointments keeps wait times honest.`
-  );
-
-  if (addTags) lines.push(BASE_TAGS.join(" "));
-
-  // Adjust length toward target by adding/removing filler guidance lines
-  const desired = clamp(targetWords, 120, 320); // words range
-  let text = lines.join("\n\n");
-  let w = words(text);
-  const fillers = [
-    `Pro tip: early weekday slots (11–2) are quickest for a lunch‑hour cut.`,
-    `Ask for a hot towel finish — on us during quieter hours.`,
-    `Bring a photo reference; we'll translate it to your hair density and growth pattern.`,
-  ];
-  let fi = 0;
-  while (w < desired - 20 && fi < fillers.length) {
-    text += `\n\n${fillers[fi++]}`;
-    w = words(text);
+  if (details) {
+    body += `. ${details}`;
   }
 
-  // If too long, trim the last paragraph
-  if (w > desired + 20) {
-    const paras = text.split(/\n\n/);
-    while (paras.length > 3 && words(paras.join(" ")) > desired + 10)
-      paras.pop();
-    text = paras.join("\n\n");
+  if (addNeighborhoodNote) {
+    body += `. Located in beautiful ${area}, Calgary.`;
   }
-  return text;
+
+  body += ` Book your appointment today at ${booking}`;
+
+  if (addTags) {
+    body += ` #${slugify(service)} #${slugify(area)} #${slugify(biz)}`;
+  }
+
+  return body;
 }
 
 function altTextFor(service: string, area: string) {
-  const loc = area === "Calgary" ? "Calgary" : `${area}, Calgary`;
-  return `${service} at The Belmont Barbershop in ${loc}: chair, cape, barber's hands, clean blend, natural light.`;
+  return `${service} service at Belmont Barbershop in ${area}, Calgary`;
 }
 
 function hashtagFor(service: string) {
-  const s = slugify(service).replace(/-/g, "");
-  const serviceTag = `#${s}`;
-  const extras = ["#menshair", "#barberlife", "#fade", "#beardtrim"];
-  return Array.from(new Set([...BASE_TAGS, serviceTag, ...extras]))
-    .slice(0, 6)
-    .join(" ");
+  return `#${slugify(service)}`;
 }
 
-// 4‑post pack factory
 function makePack(p: BaseState) {
-  const booking = buildBookingUrl(p);
-  const theme = (type: string, offer?: string, details?: string) => ({
-    title: makeTitle(p.bizName, p.service, p.area, type),
-    body: buildBody({
+  const variations = [
+    { type: "Style Spotlight", tone: "Professional" },
+    { type: "Offer", tone: "Friendly" },
+    { type: "Event", tone: "Classic" },
+    { type: "What's New", tone: "Modern" },
+  ];
+
+  return variations.map((v, i) => {
+    const title = makeTitle(p.bizName, p.service, p.area, v.type);
+    const body = buildBody({
       biz: p.bizName,
       service: p.service,
       area: p.area,
-      type,
-      tone: p.tone,
-      offer,
-      details,
+      type: v.type,
+      tone: v.tone,
+      offer: p.type === "Offer" ? p.offerText : undefined,
+      details: p.type === "Hours Update" ? p.hoursText : undefined,
       targetWords: p.wordTarget,
-      booking,
+      booking: p.bookingUrl,
       addTags: p.addTags,
       addNeighborhoodNote: p.addNeighborhood,
-    }),
-    alt: altTextFor(p.service, p.area),
+    });
+    const alt = altTextFor(p.service, p.area);
+    return { title, body, alt };
   });
-  return [
-    theme("Style Spotlight"),
-    theme(
-      "Offer",
-      p.offerText || "Weekday 11–2: $5 off online bookings this month."
-    ),
-    theme(
-      "Hours Update",
-      undefined,
-      p.hoursText || "Mon–Fri 10–7, Sat–Sun 10–5."
-    ),
-    theme(
-      "What's New",
-      undefined,
-      "Fresh photos on our profile; pop by to see the shop."
-    ),
-  ];
 }
 
-// ---------------- State shape ----------------
-type BaseState = {
-  bizName: string;
-  service: (typeof SERVICES)[number];
-  area: (typeof AREAS)[number];
-  type: (typeof POST_TYPES)[number];
-  tone: (typeof TONES)[number];
-  wordTarget: number; // 150..300
-  offerText?: string;
-  hoursText?: string;
-  bookingUrl: string;
-  addTags: boolean;
-  addNeighborhood: boolean;
-  autoUtm: boolean;
-  phone?: string;
-};
-
 function buildBookingUrl(p: BaseState) {
-  const base = p.bookingUrl || "https://thebelmontbarber.ca/book";
-  if (!p.autoUtm) return base;
-  const campaign = `belmont-${slugify(p.service)}-${slugify(p.area)}-${monthCode()}`;
-  return buildUtmUrl(
-    base,
-    { utm_source: "google", utm_medium: "gbp", utm_campaign: campaign },
-    true
-  ).url;
+  if (!p.autoUtm) return p.bookingUrl;
+
+  const params = {
+    utm_source: "google",
+    utm_medium: "gbp",
+    utm_campaign: `belmont_${new Date().toISOString().slice(0, 7)}`,
+    utm_content: slugify(p.service),
+  };
+
+  const result = buildUtmUrl(p.bookingUrl, params, true);
+  return result.url;
 }
 
 // ---------------- Main Component ----------------
@@ -345,7 +268,7 @@ export default function GBPPostComposer() {
     addTags: true,
     addNeighborhood: true,
     autoUtm: true,
-    phone: "403-000-0000",
+    phone: "403-618-6113",
   });
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -362,7 +285,7 @@ export default function GBPPostComposer() {
       area: state.area,
       type: state.type,
       tone: state.tone,
-      offer: state.offerText,
+      offer: state.type === "Offer" ? state.offerText : undefined,
       details: state.type === "Hours Update" ? state.hoursText : undefined,
       targetWords: state.wordTarget,
       booking,
@@ -455,8 +378,9 @@ export default function GBPPostComposer() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="GBP Post Composer"
-        subtitle="Structured, on‑brand posts for Google Business Profile with UTM links and alt‑text."
+        title="Google Business Profile Post Composer"
+        subtitle="Create professional, on-brand posts for Belmont's Google Business Profile with UTM tracking and alt-text."
+        showLogo={true}
       />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -466,364 +390,313 @@ export default function GBPPostComposer() {
         <KPICard label="Tests" value={`${passCount}/${tests.length}`} />
       </div>
 
-      <Tabs defaultValue="compose">
-        <TabsList>
+      <Tabs defaultValue="compose" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="compose">Compose</TabsTrigger>
-          <TabsTrigger value="pack">4‑Post Pack</TabsTrigger>
-          <TabsTrigger value="help">Help</TabsTrigger>
+          <TabsTrigger value="preview">Preview</TabsTrigger>
+          <TabsTrigger value="pack">4-Post Pack</TabsTrigger>
           <TabsTrigger value="tests">Tests</TabsTrigger>
         </TabsList>
 
-        {/* Compose */}
-        <TabsContent value="compose">
+        <TabsContent value="compose" className="space-y-6">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Post Settings
-              </CardTitle>
+            <CardHeader>
+              <CardTitle>Post Configuration</CardTitle>
+              <CardDescription>
+                Customize your Google Business Profile post settings
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label>Business name</Label>
+                  <Label htmlFor="bizName">Business Name</Label>
                   <Input
+                    id="bizName"
                     value={state.bizName}
                     onChange={(e) =>
-                      setState((s) => ({ ...s, bizName: e.target.value }))
+                      setState({ ...state, bizName: e.target.value })
                     }
                   />
                 </div>
                 <div>
-                  <Label htmlFor="gbpService">Service</Label>
+                  <Label htmlFor="service">Service</Label>
                   <select
-                    id="gbpService"
-                    title="Select service"
+                    id="service"
+                    className="w-full px-3 py-2 border rounded-md"
                     value={state.service}
                     onChange={(e) =>
-                      setState((s) => ({
-                        ...s,
-                        service: e.target.value as any,
-                      }))
+                      setState({ ...state, service: e.target.value })
                     }
-                    className="w-full h-9 border rounded-md px-2"
                   >
-                    {SERVICES.map((x) => (
-                      <option key={x} value={x}>
-                        {x}
+                    {SERVICES.map((service) => (
+                      <option key={service} value={service}>
+                        {service}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="gbpArea">Area</Label>
+                  <Label htmlFor="area">Area</Label>
                   <select
-                    id="gbpArea"
-                    title="Select area"
+                    id="area"
+                    className="w-full px-3 py-2 border rounded-md"
                     value={state.area}
                     onChange={(e) =>
-                      setState((s) => ({ ...s, area: e.target.value as any }))
+                      setState({ ...state, area: e.target.value })
                     }
-                    className="w-full h-9 border rounded-md px-2"
                   >
-                    {AREAS.map((x) => (
-                      <option key={x} value={x}>
-                        {x}
+                    {AREAS.map((area) => (
+                      <option key={area} value={area}>
+                        {area}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <Label htmlFor="gbpType">Post type</Label>
+                  <Label htmlFor="type">Post Type</Label>
                   <select
-                    id="gbpType"
-                    title="Select post type"
+                    id="type"
+                    className="w-full px-3 py-2 border rounded-md"
                     value={state.type}
                     onChange={(e) =>
-                      setState((s) => ({ ...s, type: e.target.value as any }))
+                      setState({ ...state, type: e.target.value })
                     }
-                    className="w-full h-9 border rounded-md px-2"
                   >
-                    {POST_TYPES.map((x) => (
-                      <option key={x} value={x}>
-                        {x}
+                    {POST_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
                       </option>
                     ))}
                   </select>
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tone">Tone</Label>
+                <select
+                  id="tone"
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={state.tone}
+                  onChange={(e) => setState({ ...state, tone: e.target.value })}
+                >
+                  {TONES.map((tone) => (
+                    <option key={tone} value={tone}>
+                      {tone}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="gbpTone">Tone</Label>
-                  <select
-                    id="gbpTone"
-                    title="Select tone"
-                    value={state.tone}
-                    onChange={(e) =>
-                      setState((s) => ({ ...s, tone: e.target.value as any }))
-                    }
-                    className="w-full h-9 border rounded-md px-2"
-                  >
-                    {TONES.map((x) => (
-                      <option key={x} value={x}>
-                        {x}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <Label>Target words</Label>
+                  <Label htmlFor="wordTarget">Word Target</Label>
                   <Input
+                    id="wordTarget"
                     type="number"
-                    min={150}
-                    max={300}
                     value={state.wordTarget}
                     onChange={(e) =>
-                      setState((s) => ({
-                        ...s,
-                        wordTarget: clamp(
-                          parseInt(e.target.value || "200"),
-                          150,
-                          300
-                        ),
-                      }))
+                      setState({ ...state, wordTarget: Number(e.target.value) })
                     }
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <Label>Booking link</Label>
+                <div>
+                  <Label htmlFor="bookingUrl">Booking URL</Label>
                   <Input
+                    id="bookingUrl"
                     value={state.bookingUrl}
                     onChange={(e) =>
-                      setState((s) => ({ ...s, bookingUrl: e.target.value }))
-                    }
-                    placeholder="https://thebelmontbarber.ca/book"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    checked={state.autoUtm}
-                    onCheckedChange={(v) =>
-                      setState((s) => ({ ...s, autoUtm: Boolean(v) }))
+                      setState({ ...state, bookingUrl: e.target.value })
                     }
                   />
-                  <Label>Append UTM (google/gbp/campaign)</Label>
                 </div>
-                <div className="flex items-center gap-2">
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
                   <Checkbox
+                    id="addTags"
                     checked={state.addTags}
-                    onCheckedChange={(v) =>
-                      setState((s) => ({ ...s, addTags: Boolean(v) }))
+                    onCheckedChange={(checked) =>
+                      setState({ ...state, addTags: !!checked })
                     }
                   />
-                  <Label>Add hashtags</Label>
+                  <Label htmlFor="addTags">Add hashtags</Label>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center space-x-2">
                   <Checkbox
+                    id="addNeighborhood"
                     checked={state.addNeighborhood}
-                    onCheckedChange={(v) =>
-                      setState((s) => ({ ...s, addNeighborhood: Boolean(v) }))
+                    onCheckedChange={(checked) =>
+                      setState({ ...state, addNeighborhood: !!checked })
                     }
                   />
-                  <Label>Add neighborhood note</Label>
+                  <Label htmlFor="addNeighborhood">
+                    Add neighborhood mention
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="autoUtm"
+                    checked={state.autoUtm}
+                    onCheckedChange={(checked) =>
+                      setState({ ...state, autoUtm: !!checked })
+                    }
+                  />
+                  <Label htmlFor="autoUtm">Auto-generate UTM parameters</Label>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="preview" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Post Preview</CardTitle>
+              <CardDescription>
+                See how your post will look on Google Business Profile
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium">Title</Label>
+                  <div className="p-3 bg-muted rounded-md font-medium">
+                    {title || "Title will appear here..."}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Body</Label>
+                  <div className="p-3 bg-muted rounded-md whitespace-pre-wrap">
+                    {body || "Post body will appear here..."}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Alt Text</Label>
+                  <div className="p-3 bg-muted rounded-md text-sm">
+                    {alt || "Alt text will appear here..."}
+                  </div>
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-3">
-                {state.type === "Offer" && (
-                  <div>
-                    <Label>Offer copy</Label>
-                    <Input
-                      value={state.offerText}
-                      onChange={(e) =>
-                        setState((s) => ({ ...s, offerText: e.target.value }))
-                      }
-                      placeholder="Weekday 11–2: $5 off online bookings this month."
-                    />
-                  </div>
-                )}
-                {state.type === "Hours Update" && (
-                  <div>
-                    <Label>Hours text</Label>
-                    <Input
-                      value={state.hoursText}
-                      onChange={(e) =>
-                        setState((s) => ({ ...s, hoursText: e.target.value }))
-                      }
-                      placeholder="Mon–Fri 10–7, Sat–Sun 10–5."
-                    />
-                  </div>
-                )}
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => copy(title, "title")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Title
+                  {copied === "title" && (
+                    <Badge className="ml-2">Copied!</Badge>
+                  )}
+                </Button>
+                <Button
+                  onClick={() => copy(body, "body")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Body
+                  {copied === "body" && <Badge className="ml-2">Copied!</Badge>}
+                </Button>
+                <Button
+                  onClick={() => copy(alt, "alt")}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Alt
+                  {copied === "alt" && <Badge className="ml-2">Copied!</Badge>}
+                </Button>
               </div>
 
               <Separator />
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <Label>Generated title</Label>
-                  <Input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-
-                  <Label>Generated body</Label>
-                  <Textarea
-                    value={body}
-                    onChange={(e) => setBody(e.target.value)}
-                    className="h-56"
-                  />
-
-                  <div className="text-xs text-muted-foreground">
-                    Words: <strong>{words(body)}</strong> · Recommended 150–300
-                    words. (GBP supports much longer, but concise wins.)
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => copy(title, "title")}>
-                      <Copy className="h-4 w-4 mr-1" />
-                      {copied === "title" ? "Copied" : "Copy title"}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => copy(body, "body")}
-                    >
-                      <Copy className="h-4 w-4 mr-1" />
-                      {copied === "body" ? "Copied" : "Copy body"}
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={exportTxt}>
-                      <Download className="h-4 w-4 mr-1" />
-                      Export .txt
-                    </Button>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <Label>Alt‑text suggestion (for image/video)</Label>
-                  <Textarea
-                    value={alt}
-                    onChange={(e) => setAlt(e.target.value)}
-                    className="h-24"
-                  />
-                  <div className="text-xs text-muted-foreground">
-                    Tip: describe subject, action, setting, and style (avoid
-                    keyword stuffing).
-                  </div>
-
-                  <Separator />
-
-                  <Label>Preview</Label>
-                  <div className="border rounded-md p-3 bg-muted/20 text-sm">
-                    <div className="font-medium mb-1">{title}</div>
-                    <div className="whitespace-pre-wrap">{body}</div>
-                  </div>
-
-                  <Separator />
-
-                  <div>
-                    <Label>Hashtags</Label>
-                    <div className="p-2 border rounded-md bg-muted/30 text-xs">
-                      {hashtagFor(state.service)}
-                    </div>
-                  </div>
-
-                  <div className="text-xs text-muted-foreground">
-                    <p className="mb-1">
-                      <strong>Checklist</strong>: match price wording to in‑shop
-                      prices; include end date for offers; use real photos;
-                      avoid exaggerated claims.
-                    </p>
-                  </div>
-                </div>
+              <div className="flex gap-2">
+                <Button onClick={exportTxt} variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export as Text
+                </Button>
+                <Button onClick={exportPack} variant="outline">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export 4-Post Pack
+                </Button>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Pack */}
-        <TabsContent value="pack">
+        <TabsContent value="pack" className="space-y-6">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">
-                Auto‑generate 4‑Post Pack
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-muted-foreground">
-                Creates: Style Spotlight, Offer, Hours Update, and What's New —
-                using your current settings.
-              </p>
-              <Button onClick={exportPack}>
-                <Wand2 className="h-4 w-4 mr-2" />
-                Generate & Export .txt
-              </Button>
-              <Separator />
-              <div className="text-xs text-muted-foreground">
-                Open the file and paste each post into GBP. Pair with fresh
-                photos and your booking link.
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Help */}
-        <TabsContent value="help">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                Guidance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <ul className="list-disc pl-5 space-y-1">
-                <li>
-                  Posts 150–300 words perform well for discovery; keep the first
-                  line punchy.
-                </li>
-                <li>
-                  Use neighborhood anchors: "Bridgeland LRT," "Edmonton Tr NE,"
-                  "ZCREW Café nearby."
-                </li>
-                <li>
-                  Include a clear CTA and a booking link with UTM
-                  (source=google, medium=gbp).
-                </li>
-                <li>Swap in real photos weekly; avoid stock images.</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Tests */}
-        <TabsContent value="tests">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Play className="h-4 w-4" />
-                Self‑tests
-              </CardTitle>
+            <CardHeader>
+              <CardTitle>4-Post Content Pack</CardTitle>
+              <CardDescription>
+                Generate a complete set of posts for your posting schedule
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Test</TableHead>
-                    <TableHead>Result</TableHead>
-                    <TableHead>Details</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tests.map((t, i) => (
-                    <TableRow key={i}>
-                      <TableCell>{t.name}</TableCell>
-                      <TableCell>{t.passed ? "PASS" : "FAIL"}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">
-                        {t.details || ""}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className="mt-2 text-xs text-muted-foreground">
-                {passCount}/{tests.length} passed
+              <div className="space-y-4">
+                {makePack(state).map((post, index) => (
+                  <Card key={index}>
+                    <CardHeader>
+                      <CardTitle className="text-lg">
+                        Post {index + 1}: {post.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div>
+                          <Label className="text-sm font-medium">Body</Label>
+                          <div className="p-3 bg-muted rounded-md whitespace-pre-wrap text-sm">
+                            {post.body}
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-sm font-medium">
+                            Alt Text
+                          </Label>
+                          <div className="p-2 bg-muted rounded-md text-xs">
+                            {post.alt}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tests" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Self-Tests</CardTitle>
+              <CardDescription>
+                Automated checks to ensure post quality and functionality
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {tests.map((test, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div>
+                      <div className="font-medium">{test.name}</div>
+                      {test.details && (
+                        <div className="text-sm text-muted-foreground">
+                          {test.details}
+                        </div>
+                      )}
+                    </div>
+                    <Badge variant={test.passed ? "default" : "destructive"}>
+                      {test.passed ? "✓ Pass" : "✗ Fail"}
+                    </Badge>
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>

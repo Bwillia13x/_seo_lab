@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,8 +30,9 @@ import {
 } from "lucide-react";
 
 import { saveBlob } from "@/lib/blob";
-import { parseCSV, toCSV } from "@/lib/csv";
+import { toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
+
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
 
@@ -116,7 +117,7 @@ function inferAuthority(url: string, type: string) {
 // Ease scoring
 function inferEase(email?: string, contact?: string) {
   let pts = 1; // base
-  pts += scoreBool(Boolean(email && email.includes("@")), 2);
+  pts += scoreBool(Boolean(email?.includes("@")), 2);
   pts += scoreBool(Boolean(contact && contact.length > 0), 1);
   return clamp(pts, 0, 5);
 }
@@ -271,6 +272,18 @@ const DEMO: Partial<Prospect>[] = [
     url: "https://calgarynewsnow.com/",
     type: "news",
     email: "tips@calgarynewsnow.com",
+  },
+  {
+    name: "Calgary Wedding Guide",
+    url: "https://calgaryweddings.ca/",
+    type: "event",
+    email: "info@calgaryweddings.ca",
+  },
+  {
+    name: "Calgary Veterans Association",
+    url: "https://calgaryveterans.ca/",
+    type: "community",
+    email: "support@calgaryveterans.ca",
   },
   {
     name: "Local Calgary Directories",
@@ -446,7 +459,7 @@ function LinkProspectKit() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="Local Link Prospect Scorer & Outreach Kit"
+        title="Partner Finder"
         subtitle="Rank neighborhood prospects by local relevance, then send CASL-aware outreach."
         actions={
           <div className="flex gap-2">
@@ -525,15 +538,279 @@ function LinkProspectKit() {
         />
       </div>
 
-      <Tabs defaultValue="settings">
+      <Tabs defaultValue="howto">
         <TabsList>
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="prospects">Prospects</TabsTrigger>
           <TabsTrigger value="outreach">Outreach</TabsTrigger>
           <TabsTrigger value="bulk">Bulk Add</TabsTrigger>
           <TabsTrigger value="tests">Tests</TabsTrigger>
-          <TabsTrigger value="help">Help</TabsTrigger>
         </TabsList>
+
+        {/* How To - First Tab */}
+        <TabsContent value="howto">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                How to Use the Partner Finder Tool
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm space-y-6">
+              <div>
+                <h3 className="font-semibold text-base mb-3">
+                  🎯 What This Tool Does
+                </h3>
+                <p className="mb-3">
+                  This tool helps you find and contact local businesses or
+                  organizations that could help promote The Belmont Barbershop.
+                  It ranks potential partners based on how valuable they might
+                  be and makes it easy to reach out to them.
+                </p>
+                <p>
+                  Think of it like a matchmaking service for businesses - it
+                  finds good fits for collaborations, cross-promotions, or
+                  simply getting listed on local directories.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-base mb-3">
+                  📋 Step-by-Step Guide
+                </h3>
+                <ol className="list-decimal pl-5 space-y-3">
+                  <li>
+                    <strong>Start Here:</strong> Click "Load Belmont Sample" to
+                    see example local businesses already in the system. These
+                    are real Bridgeland businesses you could partner with.
+                  </li>
+                  <li>
+                    <strong>Add Your Own Prospects:</strong> Use the "Bulk Add"
+                    tab to paste in businesses you find yourself. Just copy from
+                    a spreadsheet or type them as: "Business Name,
+                    https://website.com, business-type, email@business.com"
+                  </li>
+                  <li>
+                    <strong>Check the Rankings:</strong> Look at the "Prospects"
+                    tab. The tool automatically scores each business on how good
+                    a partner they might be. Higher scores = better partners.
+                  </li>
+                  <li>
+                    <strong>Reach Out:</strong> When you find a good prospect,
+                    click the "Email" button next to their name. This opens your
+                    email program with a ready-to-send message.
+                  </li>
+                  <li>
+                    <strong>Track Your Progress:</strong> Mark prospects as
+                    "Sent", "Responded", or "Ignore" so you know what you've
+                    done.
+                  </li>
+                </ol>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-base mb-3">
+                  📊 Understanding the Scores
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <strong className="text-green-700">
+                      Priority Score (0-100%):
+                    </strong>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      This is the main ranking. Higher percentages mean better
+                      partners. The tool considers how valuable a link would be,
+                      how confident we are in the contact info, and how easy it
+                      is to reach them.
+                    </p>
+                  </div>
+
+                  <div>
+                    <strong className="text-blue-700">
+                      ICE Score (out of 125):
+                    </strong>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      ICE stands for Impact × Confidence × Ease. It's how the
+                      tool calculates priority:
+                    </p>
+                    <ul className="list-disc pl-5 mt-2 text-xs text-muted-foreground space-y-1">
+                      <li>
+                        <strong>Impact:</strong> How valuable would a
+                        partnership be? (News sites = highest, local directories
+                        = high, nearby businesses = medium)
+                      </li>
+                      <li>
+                        <strong>Confidence:</strong> How sure are we this is a
+                        real business with good contact info?
+                      </li>
+                      <li>
+                        <strong>Ease:</strong> How easy is it to contact them?
+                        (Direct email = easiest)
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <strong className="text-purple-700">
+                      Localness Score (0-5):
+                    </strong>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      How local is this business? Higher scores for
+                      Bridgeland/Riverside mentions in their name or website.
+                    </p>
+                  </div>
+
+                  <div>
+                    <strong className="text-orange-700">
+                      Relevance Score (0-5):
+                    </strong>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      How related are they to barber services? Higher scores for
+                      businesses that mention "barber", "hair", "salon", or
+                      "local".
+                    </p>
+                  </div>
+
+                  <div>
+                    <strong className="text-red-700">
+                      Authority Score (0-5):
+                    </strong>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      How trustworthy is their website? Higher scores for .ca,
+                      .org, .edu domains and established news sites.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-base mb-3">
+                  🏷️ Business Types Explained
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <strong>Directory:</strong> Local business listings (like
+                    Bridgeland BIA) - great for getting found
+                  </div>
+                  <div>
+                    <strong>News:</strong> Local news websites - perfect for
+                    community stories and features
+                  </div>
+                  <div>
+                    <strong>Event:</strong> Community event organizers - good
+                    for charity events or sponsorships
+                  </div>
+                  <div>
+                    <strong>Partner:</strong> Nearby businesses - potential for
+                    cross-promotions or referrals
+                  </div>
+                  <div>
+                    <strong>Cafe:</strong> Local coffee shops - could display
+                    your cards or do joint promotions
+                  </div>
+                  <div>
+                    <strong>Gym/Tattoo:</strong> Fitness centers or tattoo shops
+                    - good demographic overlap
+                  </div>
+                  <div>
+                    <strong>School:</strong> Local schools - potential for
+                    community events or student discounts
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-base mb-3">
+                  ⚖️ Legal Stuff (CASL Compliance)
+                </h3>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm">
+                  <p className="font-medium text-yellow-800 mb-2">
+                    Important: Canadian Anti-Spam Law
+                  </p>
+                  <p className="text-yellow-700 mb-2">
+                    When emailing businesses, you must include an unsubscribe
+                    option. The tool does this automatically by adding a "STOP"
+                    line at the bottom of emails.
+                  </p>
+                  <p className="text-yellow-700 text-xs">
+                    Keep emails professional, brief, and focused on mutual
+                    benefit. Don't send promotional emails without a clear
+                    business relationship first.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-base mb-3">💡 Pro Tips</h3>
+                <ul className="list-disc pl-5 space-y-2 text-sm">
+                  <li>
+                    <strong>Start with high-priority prospects:</strong> Look
+                    for scores above 70% first
+                  </li>
+                  <li>
+                    <strong>Personalize your emails:</strong> The tool gives you
+                    a template, but add a personal touch
+                  </li>
+                  <li>
+                    <strong>Follow up:</strong> If you don't hear back in 2
+                    weeks, send a gentle follow-up
+                  </li>
+                  <li>
+                    <strong>Track everything:</strong> Use the status column to
+                    remember who you've contacted
+                  </li>
+                  <li>
+                    <strong>Quality over quantity:</strong> Better to have 5
+                    good partnerships than 50 weak ones
+                  </li>
+                  <li>
+                    <strong>Give to get:</strong> Think about what you can offer
+                    them, not just what you want
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-base mb-3">
+                  🎯 Common Questions
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <strong className="text-gray-700">
+                      What if I don't have email addresses?
+                    </strong>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      No problem! The tool still ranks prospects. You can find
+                      emails by visiting their websites or calling them
+                      directly.
+                    </p>
+                  </div>
+                  <div>
+                    <strong className="text-gray-700">
+                      How do I know if a partnership will work?
+                    </strong>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Start small - suggest a simple cross-promotion like
+                      "mention us and we'll mention you" or "display our
+                      business card for a free haircut referral".
+                    </p>
+                  </div>
+                  <div>
+                    <strong className="text-gray-700">
+                      What if they say no?
+                    </strong>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      That's okay! Mark them as "Ignore" and move on to the next
+                      prospect. Not every business is a good fit for
+                      partnerships.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Settings */}
         <TabsContent value="settings">
@@ -604,6 +881,7 @@ function LinkProspectKit() {
                 />
                 <select
                   className="h-9 border rounded-md px-2"
+                  title="Filter prospects by type"
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
                 >
@@ -672,6 +950,7 @@ function LinkProspectKit() {
                         <TableCell>
                           <select
                             className="h-8 text-xs border rounded px-1"
+                            title="Update prospect status"
                             value={p.status}
                             onChange={(e) =>
                               updateProspect(i, {
@@ -757,7 +1036,10 @@ function LinkProspectKit() {
               <div className="grid md:grid-cols-2 gap-3">
                 <div>
                   <Label>Prospect</Label>
-                  <select className="w-full h-9 border rounded-md px-2">
+                  <select
+                    className="w-full h-9 border rounded-md px-2"
+                    title="Select a prospect to compose email"
+                  >
                     <option value="">Select a prospect...</option>
                     {filtered
                       .filter((p) => p.status === "todo")
@@ -845,8 +1127,8 @@ Bridgeland Coffee, https://bridgelandcoffee.ca/, cafe, team@bridgelandcoffee.ca`
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tests.map((t, i) => (
-                    <TableRow key={i}>
+                  {tests.map((t) => (
+                    <TableRow key={t.name}>
                       <TableCell>{t.name}</TableCell>
                       <TableCell>{t.passed ? "PASS" : "FAIL"}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">
@@ -859,54 +1141,6 @@ Bridgeland Coffee, https://bridgelandcoffee.ca/, cafe, team@bridgelandcoffee.ca`
               <div className="mt-2 text-xs text-muted-foreground">
                 {passCount}/{tests.length} passed
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Help */}
-        <TabsContent value="help">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                ICE Scoring Guide
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <ul className="list-disc pl-5 space-y-1">
-                <li>
-                  <strong>I (Impact)</strong>: How valuable is this link?
-                  News/events &gt; directories &gt; partners &gt; others
-                </li>
-                <li>
-                  <strong>C (Confidence)</strong>: How sure are we about this
-                  prospect? Name+URL = high confidence
-                </li>
-                <li>
-                  <strong>E (Ease)</strong>: How easy to contact? Email &gt;
-                  contact form &gt; none
-                </li>
-                <li>
-                  <strong>ICE = I × C × E</strong> (0-125), then converted to
-                  priority %
-                </li>
-                <li>
-                  <strong>Localness</strong>: How local is this prospect?
-                  Bridgeland/Riverside names get bonus points
-                </li>
-                <li>
-                  <strong>Relevance</strong>: How relevant to barber services?
-                  Business/local terms score higher
-                </li>
-                <li>
-                  <strong>Authority</strong>: Trustworthiness of domain
-                  (.ca/.org preferred)
-                </li>
-              </ul>
-              <p className="text-xs text-muted-foreground">
-                CASL compliance: Include STOP line for unsubscribe. Keep emails
-                brief and value-focused.
-              </p>
             </CardContent>
           </Card>
         </TabsContent>

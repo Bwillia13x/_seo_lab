@@ -78,12 +78,12 @@ type Site = {
 // ---------------- Defaults ----------------
 const DEFAULT_BIZ: Biz = {
   name: "The Belmont Barbershop",
-  street: "915 General Ave NE",
+  street: "88 9th St NE",
   city: "Calgary",
   region: "AB",
-  postal: "T2E 9E1",
+  postal: "T2E 7W3",
   country: "CA",
-  phone: "403-457-0420",
+  phone: "403-618-6113",
   email: "hello@thebelmontbarber.ca",
   website: "https://thebelmontbarber.ca",
   lat: 51.05,
@@ -399,8 +399,8 @@ function CitationNAPTracker() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="Citation Builder & NAP Consistency Tracker"
-        subtitle="Generate consistent payloads for top directories and track claim status."
+        title="Business Listings Check"
+        subtitle="Create and manage your business listings on Google, Yelp, Facebook, and other websites so more customers can find you."
         actions={
           <Button
             variant="outline"
@@ -415,6 +415,39 @@ function CitationNAPTracker() {
         }
       />
 
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Do this next</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm">
+          <ol className="list-decimal pl-5 space-y-1">
+            <li>
+              Open the Citations tab and mark your Google Business Profile as
+              "Live".
+            </li>
+            <li>
+              Click the Portal link for each site and check if you already have
+              a listing.
+            </li>
+            <li>
+              If you have a listing, copy the Profile URL and mark it as "Live".
+            </li>
+            <li>
+              If you don't have a listing, mark it as "To Do" and plan to create
+              it.
+            </li>
+            <li>
+              Use the Templates tab to get ready-made descriptions for each
+              site.
+            </li>
+            <li>
+              Check the Consistency tab to make sure all your listings match
+              exactly.
+            </li>
+          </ol>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard label="Targets" value={totalSites} />
         <KPICard label="Live" value={liveCount} />
@@ -422,16 +455,316 @@ function CitationNAPTracker() {
         <KPICard label="Tests Passed" value={`${passCount}/${tests.length}`} />
       </div>
 
-      <Tabs defaultValue="inputs">
+      <Tabs defaultValue="howto">
         <TabsList>
-          <TabsTrigger value="inputs">Business Inputs</TabsTrigger>
-          <TabsTrigger value="sites">Citations</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="consistency">Consistency</TabsTrigger>
-          <TabsTrigger value="exports">Export/Import</TabsTrigger>
+          <TabsTrigger value="howto">How To</TabsTrigger>
+          <TabsTrigger value="inputs">Your Business Info</TabsTrigger>
+          <TabsTrigger value="sites">Your Listings</TabsTrigger>
+          <TabsTrigger value="templates">Ready-Made Content</TabsTrigger>
+          <TabsTrigger value="consistency">Check for Mistakes</TabsTrigger>
+          <TabsTrigger value="exports">Save/Load Progress</TabsTrigger>
           <TabsTrigger value="tests">Tests</TabsTrigger>
-          <TabsTrigger value="help">Help</TabsTrigger>
         </TabsList>
+
+        {/* How To */}
+        <TabsContent value="howto">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Info className="h-4 w-4" />
+                  What Are Business Listings & Why Do They Matter?
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-3">
+                <p>
+                  <strong>Business listings</strong> are your shop's information
+                  that appears on websites like Google Maps, Yelp, Yellow Pages,
+                  and Facebook. They're like having your business card posted in
+                  hundreds of online phone books.
+                </p>
+                <p>
+                  <strong>Why they matter:</strong> When customers search for
+                  "barber shop near me" or "haircut Calgary", these listings
+                  help them find and contact you. Google especially uses this
+                  information to decide where your business appears in search
+                  results.
+                </p>
+                <p>
+                  <strong>The goal:</strong> Have your exact same business
+                  information (name, address, phone) on as many relevant
+                  websites as possible. This builds trust with search engines
+                  and helps more customers find you.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">
+                  How to Use This Tool - Step by Step
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-4">
+                <div>
+                  <h4 className="font-semibold text-base mb-2">
+                    1. First Time Setup
+                  </h4>
+                  <ol className="list-decimal pl-5 space-y-1">
+                    <li>
+                      Go to the "Your Business Info" tab and enter your shop's
+                      information (name, address, phone, website, hours,
+                      services)
+                    </li>
+                    <li>
+                      Make sure everything is exactly right - this will be your
+                      "master copy" that all listings should match
+                    </li>
+                    <li>
+                      The tool will automatically create descriptions and
+                      contact information for each website
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-base mb-2">
+                    2. Check Your Existing Listings
+                  </h4>
+                  <ol className="list-decimal pl-5 space-y-1">
+                    <li>
+                      Go to the "Your Listings" tab to see the list of important
+                      websites
+                    </li>
+                    <li>
+                      For each website, click the "Portal" or "Search" link to
+                      check if you already have a listing
+                    </li>
+                    <li>
+                      If you find your listing:
+                      <ul className="list-disc pl-5 mt-1">
+                        <li>
+                          Copy the web address (URL) of your listing and paste
+                          it in the "Profile URL" box
+                        </li>
+                        <li>Change the status to "Live"</li>
+                        <li>
+                          Add any login information (username/email) if you
+                          remember it
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      If you don't have a listing yet:
+                      <ul className="list-disc pl-5 mt-1">
+                        <li>Leave the status as "To Do"</li>
+                        <li>Add a note about when you plan to create it</li>
+                      </ul>
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-base mb-2">
+                    3. Get Ready-Made Content
+                  </h4>
+                  <ol className="list-decimal pl-5 space-y-1">
+                    <li>
+                      Go to the "Ready-Made Content" tab to see automatically
+                      created descriptions
+                    </li>
+                    <li>
+                      The tool creates three versions: Short (for
+                      Instagram/Twitter), Medium, and Long (for Google/Yelp)
+                    </li>
+                    <li>
+                      Click "Copy" buttons to copy the descriptions you need
+                    </li>
+                    <li>
+                      The "NAP Block" shows your name, address, and phone in a
+                      standard format
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-base mb-2">
+                    4. Check for Mistakes
+                  </h4>
+                  <ol className="list-decimal pl-5 space-y-1">
+                    <li>
+                      Go to the "Check for Mistakes" tab to compare your
+                      listings
+                    </li>
+                    <li>
+                      Check the boxes for each piece of information that matches
+                      exactly
+                    </li>
+                    <li>
+                      Focus on getting your name, phone, and address exactly the
+                      same everywhere
+                    </li>
+                    <li>
+                      If something doesn't match, make a note to fix it on that
+                      website
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-base mb-2">
+                    5. Create New Listings
+                  </h4>
+                  <ol className="list-decimal pl-5 space-y-1">
+                    <li>
+                      Start with the most important websites first: Google,
+                      Apple Maps, Bing, Facebook
+                    </li>
+                    <li>Click the "Portal" link to go to their signup page</li>
+                    <li>
+                      Use the descriptions and information from the "Ready-Made
+                      Content" tab
+                    </li>
+                    <li>
+                      Copy your business information exactly as it appears in
+                      the "Your Business Info" tab
+                    </li>
+                    <li>Upload good photos of your shop, team, and work</li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold text-base mb-2">
+                    6. Keep Everything Updated
+                  </h4>
+                  <ol className="list-decimal pl-5 space-y-1">
+                    <li>
+                      Check back every 3-6 months to make sure your information
+                      is still correct
+                    </li>
+                    <li>
+                      Update hours for holidays, add new services, refresh
+                      photos
+                    </li>
+                    <li>
+                      Export your progress using the "Save/Load Progress" tab to
+                      keep track of what you've done
+                    </li>
+                  </ol>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">
+                  What the Status Labels Mean
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-semibold mb-2">📝 To Do</h4>
+                    <p>
+                      You haven't created a listing on this website yet. This is
+                      where you should start.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">⏳ Pending</h4>
+                    <p>
+                      You've started the process of creating a listing but it's
+                      not live yet.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">✅ Live</h4>
+                    <p>
+                      Your listing is published and customers can see it on this
+                      website.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">⚠️ Inconsistent</h4>
+                    <p>
+                      You have a listing but the information doesn't match your
+                      master copy (different name, phone, or address).
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Tips for Success</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>
+                    <strong>Use the exact same words everywhere:</strong> Don't
+                    use "The Belmont Barbershop" in one place and "Belmont
+                    Barber Shop" in another. Pick one version and stick with it.
+                  </li>
+                  <li>
+                    <strong>Include your neighborhood:</strong> Add "Bridgeland"
+                    or "Riverside" to your descriptions so local customers can
+                    find you more easily.
+                  </li>
+                  <li>
+                    <strong>Add good photos:</strong> Include pictures of your
+                    shop exterior, interior, team members, equipment, and recent
+                    haircut examples. Fresh photos make your listings more
+                    trustworthy.
+                  </li>
+                  <li>
+                    <strong>Link to your booking page:</strong> Most websites
+                    let you add a link to your online booking system. Use this
+                    everywhere to make it easy for customers to book
+                    appointments.
+                  </li>
+                  <li>
+                    <strong>Respond to reviews:</strong> Many listing sites let
+                    customers leave reviews. Always respond politely, even to
+                    negative reviews - it shows you care about your customers.
+                  </li>
+                  <li>
+                    <strong>Start with Google:</strong> Google Business Profile
+                    is the most important listing. Make sure this one is perfect
+                    before moving to others.
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Saving Your Work</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm">
+                <p>
+                  This tool keeps your information in your browser while you're
+                  using it. To save your progress:
+                </p>
+                <ul className="list-disc pl-5 mt-2 space-y-1">
+                  <li>Go to the "Save/Load Progress" tab</li>
+                  <li>
+                    Click "Export Status CSV" to save just the website statuses
+                  </li>
+                  <li>
+                    Click "Export JSON" to save everything (including your
+                    business information)
+                  </li>
+                  <li>Use "Import CSV" to load your saved work later</li>
+                </ul>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  <strong>Tip:</strong> Export your work every few weeks so you
+                  don't lose track of what you've completed.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* Inputs */}
         <TabsContent value="inputs">
@@ -636,7 +969,7 @@ function CitationNAPTracker() {
         <TabsContent value="sites">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Citation Targets</CardTitle>
+              <CardTitle className="text-base">Websites to Check</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="overflow-auto">
@@ -805,7 +1138,9 @@ function CitationNAPTracker() {
         <TabsContent value="templates">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Descriptions & NAP</CardTitle>
+              <CardTitle className="text-base">
+                Ready-Made Descriptions
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid md:grid-cols-3 gap-3">
@@ -895,15 +1230,17 @@ function CitationNAPTracker() {
         <TabsContent value="consistency">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Quick Audit</CardTitle>
+              <CardTitle className="text-base">Check for Mistakes</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <p>
-                Use the table below to mark which fields are identical across
-                your live profiles. Aim for a perfect match for{" "}
-                <strong>Name</strong>, <strong>Phone</strong>, and{" "}
-                <strong>Street</strong> — small differences in suite or
-                punctuation are OK but avoid alternate names.
+                Check the boxes below to mark which pieces of your business
+                information match exactly across all your live listings. Focus
+                on getting your <strong>business name</strong>,
+                <strong>phone number</strong>, and{" "}
+                <strong>street address</strong> exactly the same everywhere.
+                Small differences in punctuation are OK, but avoid using
+                different versions of your business name.
               </p>
               <div className="overflow-auto">
                 <Table>
@@ -952,8 +1289,10 @@ function CitationNAPTracker() {
                 </Table>
               </div>
               <div className="text-xs text-muted-foreground">
-                Tip: If any field is unchecked for Google/Apple/Bing, fix those
-                first; aggregators echo from them.
+                <strong>Tip:</strong> If any information doesn't match on
+                Google, Apple Maps, or Bing, fix those first. Other websites
+                often copy information from these major sites, so getting them
+                right helps everything else stay consistent.
               </div>
             </CardContent>
           </Card>
@@ -963,7 +1302,7 @@ function CitationNAPTracker() {
         <TabsContent value="exports">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Exports</CardTitle>
+              <CardTitle className="text-base">Save Your Progress</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex flex-wrap gap-2">
@@ -981,8 +1320,9 @@ function CitationNAPTracker() {
                 </Button>
               </div>
               <div className="text-xs text-muted-foreground">
-                Import a CSV in the Citations tab to update status/profile URLs
-                in bulk.
+                You can load previously saved work by importing a CSV file in
+                the "Your Listings" tab. This lets you update many websites at
+                once instead of one by one.
               </div>
             </CardContent>
           </Card>
@@ -994,7 +1334,7 @@ function CitationNAPTracker() {
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
                 <Play className="h-4 w-4" />
-                Self‑tests
+                System Check
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1020,44 +1360,6 @@ function CitationNAPTracker() {
               </Table>
               <div className="mt-2 text-xs text-muted-foreground">
                 {passCount}/{tests.length} passed
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Help */}
-        <TabsContent value="help">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Info className="h-4 w-4" />
-                Guidance
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm space-y-2">
-              <ul className="list-disc pl-5 space-y-1">
-                <li>
-                  Use the same exact <strong>Name</strong> and{" "}
-                  <strong>Phone</strong> everywhere. Avoid abbreviations or
-                  alternate spellings.
-                </li>
-                <li>
-                  Descriptions: paste the <em>Long</em> version into
-                  Google/Bing; use <em>Short</em> for Instagram bio and tight
-                  fields.
-                </li>
-                <li>
-                  Upload fresh photos monthly; prefer
-                  exterior/interior/team/tools + recent work.
-                </li>
-                <li>
-                  For the BIA directory, mention nearby anchors (Bridgeland LRT,
-                  Edmonton Tr NE) and link your booking page.
-                </li>
-              </ul>
-              <div className="text-xs text-muted-foreground">
-                This tool stores data locally in memory while the canvas is
-                open. Export JSON/CSV to save.
               </div>
             </CardContent>
           </Card>

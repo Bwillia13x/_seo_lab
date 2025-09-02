@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +24,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Copy,
+  Info,
 } from "lucide-react";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
@@ -199,8 +206,9 @@ export default function ReviewComposer() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Review Composer"
+        title="Review Responses"
         subtitle="Manage reviews and generate CASL‑compliant responses for The Belmont Barbershop."
+        showLogo={true}
         actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={loadSampleData}>
@@ -239,11 +247,278 @@ export default function ReviewComposer() {
         <KPICard label="Replied" value={stats.replied} />
       </div>
 
-      <Tabs defaultValue="reviews">
-        <TabsList>
+      <Tabs defaultValue="howto">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="reviews">Review Queue</TabsTrigger>
           <TabsTrigger value="composer">Reply Composer</TabsTrigger>
         </TabsList>
+
+        {/* How To Tab */}
+        <TabsContent value="howto" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Info className="h-5 w-5" />
+                How to Use the Review Responses Tool
+              </CardTitle>
+              <CardDescription>
+                Learn how to manage customer reviews and generate professional,
+                CASL-compliant responses for Belmont
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    What This Tool Does
+                  </h3>
+                  <p className="text-muted-foreground">
+                    This tool helps you manage customer reviews from Google,
+                    Yelp, and other platforms by generating professional,
+                    personalized responses. It analyzes review content to
+                    understand customer sentiment and provides reply templates
+                    that maintain Belmont's brand voice while complying with
+                    Canadian privacy laws.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Why Review Management Matters for Belmont
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Customer reviews directly impact Belmont's online reputation
+                    and search rankings:
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                    <li>
+                      <strong>Google Business Profile rankings</strong> are
+                      heavily influenced by review volume and response rate
+                    </li>
+                    <li>
+                      <strong>Responding to reviews</strong> shows customers you
+                      care and can improve their future experiences
+                    </li>
+                    <li>
+                      <strong>Professional responses</strong> build trust and
+                      demonstrate Belmont's commitment to service excellence
+                    </li>
+                    <li>
+                      <strong>Review analytics</strong> help identify service
+                      improvements and customer preferences
+                    </li>
+                    <li>
+                      <strong>CASL compliance</strong> ensures all responses
+                      follow Canadian privacy regulations
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Step-by-Step Instructions
+                  </h3>
+                  <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                    <li>
+                      <strong>Import your reviews:</strong> Upload a CSV file
+                      from your review management platform or use the sample
+                      data to see how it works
+                    </li>
+                    <li>
+                      <strong>Review the queue:</strong> Check the "Review
+                      Queue" tab to see all unreplied reviews, with overdue
+                      items highlighted
+                    </li>
+                    <li>
+                      <strong>Select a review to reply:</strong> Click the
+                      "Reply" button on any review to open the reply composer
+                    </li>
+                    <li>
+                      <strong>Review analysis:</strong> The tool automatically
+                      analyzes the review content and detects mentioned aspects
+                      (service, location, atmosphere, etc.)
+                    </li>
+                    <li>
+                      <strong>Choose reply tone:</strong> Select "Warm" or
+                      "Concise" tone for the reply drafts
+                    </li>
+                    <li>
+                      <strong>Generate reply options:</strong> The tool creates
+                      3 personalized reply drafts based on the review rating and
+                      content
+                    </li>
+                    <li>
+                      <strong>Copy and customize:</strong> Copy a draft reply
+                      and make any personal touches before sending
+                    </li>
+                    <li>
+                      <strong>Mark as replied:</strong> After sending the reply,
+                      mark it as completed in the tool
+                    </li>
+                    <li>
+                      <strong>Export for records:</strong> Download CSV files of
+                      all reviews and responses for your records
+                    </li>
+                  </ol>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Best Practices for Review Responses
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Respond within 24 hours:</strong> Quick responses
+                      show you value customer feedback
+                    </li>
+                    <li>
+                      <strong>Personalize responses:</strong> Use the customer's
+                      name and reference specific details from their review
+                    </li>
+                    <li>
+                      <strong>Maintain professionalism:</strong> Keep responses
+                      positive, helpful, and aligned with Belmont's brand voice
+                    </li>
+                    <li>
+                      <strong>Address concerns privately:</strong> For negative
+                      reviews, offer to discuss issues offline via phone or
+                      email
+                    </li>
+                    <li>
+                      <strong>Highlight improvements:</strong> Show how you've
+                      addressed similar concerns in the past
+                    </li>
+                    <li>
+                      <strong>Include booking CTAs:</strong> For positive
+                      reviews, gently encourage future visits
+                    </li>
+                    <li>
+                      <strong>Stay CASL compliant:</strong> Avoid promotional
+                      content and respect privacy regulations
+                    </li>
+                    <li>
+                      <strong>Track response metrics:</strong> Monitor response
+                      time and customer satisfaction improvements
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Understanding Review Analysis
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Sentiment analysis:</strong> Reviews are
+                      categorized as positive (4-5 stars), neutral (3 stars), or
+                      negative (1-2 stars)
+                    </li>
+                    <li>
+                      <strong>Aspect detection:</strong> The tool identifies
+                      what customers are talking about (service quality,
+                      location, atmosphere, wait times)
+                    </li>
+                    <li>
+                      <strong>Reply templates:</strong> Different templates are
+                      used based on review rating and detected aspects
+                    </li>
+                    <li>
+                      <strong>Overdue tracking:</strong> Reviews older than 72
+                      hours are flagged as overdue for urgent attention
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    CASL and Privacy Compliance
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Keep responses informational:</strong> Focus on
+                      acknowledging feedback rather than selling services
+                    </li>
+                    <li>
+                      <strong>Avoid promotional content:</strong> Don't use
+                      reviews as an opportunity to advertise specials or
+                      services
+                    </li>
+                    <li>
+                      <strong>Don't collect contact info:</strong> Unless the
+                      customer specifically requests further contact
+                    </li>
+                    <li>
+                      <strong>Include opt-out language:</strong> If collecting
+                      any information, provide clear opt-out instructions
+                    </li>
+                    <li>
+                      <strong>Maintain professional boundaries:</strong> Keep
+                      responses business-focused and appropriate
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Data Format Requirements
+                  </h3>
+                  <p className="text-muted-foreground mb-2">
+                    Your CSV file should include these key columns (the tool
+                    will map common variations):
+                  </p>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>Date:</strong> When the review was posted
+                      (YYYY-MM-DD format)
+                    </li>
+                    <li>
+                      <strong>Rating:</strong> Star rating (1-5 scale)
+                    </li>
+                    <li>
+                      <strong>Author:</strong> Customer name or username
+                    </li>
+                    <li>
+                      <strong>Text:</strong> The full review content
+                    </li>
+                    <li>
+                      <strong>Platform:</strong> Where the review was posted
+                      (Google, Yelp, etc.)
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">
+                    Response Time Guidelines
+                  </h3>
+                  <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                    <li>
+                      <strong>5-star reviews:</strong> Respond within 24 hours
+                      to maintain momentum
+                    </li>
+                    <li>
+                      <strong>4-star reviews:</strong> Respond within 24 hours,
+                      acknowledge positive aspects
+                    </li>
+                    <li>
+                      <strong>3-star reviews:</strong> Respond within 12 hours,
+                      thank them and note improvements
+                    </li>
+                    <li>
+                      <strong>1-2 star reviews:</strong> Respond within 2-4
+                      hours, apologize and offer offline resolution
+                    </li>
+                    <li>
+                      <strong>Overdue reviews:</strong> Reviews over 72 hours
+                      old need immediate attention
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="reviews" className="space-y-4">
           <div className="space-y-4">

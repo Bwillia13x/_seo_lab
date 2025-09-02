@@ -1,14 +1,36 @@
-# Belmont SEO Lab
+# Belmont SEO Lab - Professional Local SEO Toolkit
 
-A comprehensive Next.js dashboard hosting all of Belmont Barbershop's local SEO tools and experimental mini-apps. Built for clarity, reliability, and speed to demo.
+*A comprehensive, Belmont-tailored SEO management platform designed specifically for The Belmont Barbershop in Bridgeland, Calgary.*
+
+![Belmont SEO Lab](https://img.shields.io/badge/Belmont-SEO%20Lab-blue?style=for-the-badge)
+![Next.js](https://img.shields.io/badge/Next.js-14.0-black?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=flat-square)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3-cyan?style=flat-square)
+
+## 📋 Overview
+
+The Belmont SEO Lab is a professional-grade, client-side SEO management platform specifically designed for **The Belmont Barbershop** in Bridgeland, Calgary. This comprehensive toolkit provides 22 specialized SEO tools that run entirely in the browser, requiring no external APIs or server infrastructure.
+
+### 🎯 Key Features
+
+- **22 Professional SEO Tools** - Complete local SEO management suite
+- **Belmont-Specific Configuration** - Pre-configured with Belmont branding and data
+- **Local Calgary Focus** - Bridgeland/Riverside neighborhood targeting
+- **Client-Side Processing** - No external dependencies for privacy and speed
+- **Professional UI/UX** - Modern design with consistent Belmont theming
+- **Compliance Ready** - CASL-compliant review management and outreach
+- **Mobile Responsive** - Works seamlessly on all devices
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ and npm
 - Modern web browser (Chrome/Edge/Firefox/Safari)
+- 4GB+ RAM recommended for large data processing
 
-### Installation
+### Installation & Development
 
 ```bash
 # Clone and install
@@ -20,312 +42,705 @@ npm install
 npm run dev
 ```
 
-Visit `http://localhost:3000` to access the dashboard.
+Visit `http://localhost:3000` to access the Belmont SEO Lab.
 
-## 📋 App Overview
-
-### Core SEO Tools (Concepts 8-12)
-| App | Route | Purpose |
-|-----|-------|---------|
-| **Citation Tracker** | `/apps/citation-tracker` | Manage NAP consistency across directories |
-| **GSC CTR Miner** | `/apps/gsc-ctr-miner` | Import GSC data, find underperforming pages, generate Title/Meta experiments |
-| **Link Prospect Kit** | `/apps/link-prospect-kit` | Local link prospecting with ICE scoring and outreach templates |
-| **UTM Dashboard** | `/apps/utm-dashboard` | UTM link builder with QR code generation |
-| **Post Studio** | `/apps/post-studio` | GBP & Instagram post creation with image composition |
-
-### New Mini-Apps
-| App | Route | Purpose |
-|-----|-------|---------|
-| **QueueTime AI** | `/apps/queuetime` | Walk-in traffic forecasting with Holt-Winters algorithm |
-| **Title/Meta Planner** | `/apps/meta-planner` | A/B/C testing kanban for SEO experiments |
-| **Post Oracle** | `/apps/post-oracle` | Generate weekly social media posts with UTM tracking |
-| **Review Composer** | `/apps/review-composer` | CASL-compliant review response composer |
-| **Link Map** | `/apps/link-map` | Neighborhood link building map with ICE scoring |
-| **No-Show Shield** | `/apps/noshow-shield` | Predict no-show risk using historical patterns |
-| **Add-On Recommender** | `/apps/addon-recommender` | Service add-on recommendations based on purchase patterns |
-| **RankGrid Watcher** | `/apps/rankgrid-watcher` | Monitor local search rankings across geographic grids |
-| **Neighbor Signal** | `/apps/neighbor-signal` | Local SEO signal analyzer for content optimization |
-| **Referral QR** | `/apps/referral-qr` | QR code generator for staff/partner referral tracking |
-
-## 🎯 Key Features
-
-### Data-Driven Insights
-- **Real Belmont Data**: All sample data customized for The Belmont Barbershop (Bridgeland location)
-- **Local SEO Focus**: Bridgeland/Riverside/Calgary specific keywords and prospects
-- **CSV Import/Export**: All tools support CSV data import/export
-- **Client-Side Processing**: No external APIs, all data processed locally
-
-### Professional UX
-- **shadcn/ui Components**: Modern, accessible component library
-- **Responsive Design**: Works on desktop and mobile
-- **Dark/Light Mode Ready**: Built with CSS variables
-- **Fast Navigation**: Persistent sidebar with all tools
-- **PageHeader Component**: Consistent page titles, subtitles, and action buttons
-- **KPICard Component**: Standardized metric display with labels, values, and hints
-- **Elevated Cards**: Premium layered card design with subtle shadows
-- **Focus Ring Utility**: Accessible focus indicators with smooth transitions
-- **Gradient Backgrounds**: Themed background with blur effects for depth
-
-### Compliance & Security
-- **CASL Compliant**: Outreach templates include opt-out language
-- **PIPEDA Ready**: Client-side data storage only
-- **Accessibility**: ARIA labels, keyboard navigation, screen reader support
-
-## 🛠 Development
-
-### Available Scripts
+### Production Deployment
 
 ```bash
-# Development
-npm run dev          # Start dev server
-npm run build        # Production build
-npm run start        # Production server
-npm run lint         # ESLint check
-npm run typecheck    # TypeScript check
+# Install Vercel CLI
+npm install -g vercel
 
-# Testing
-npm run test         # Unit tests (Vitest)
-npm run test:ui      # Vitest UI
-npm run e2e          # E2E tests (Playwright)
+# Deploy to production
+vercel --prod
 ```
 
-### Tech Stack
+---
 
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Charts**: Recharts (client-side only)
-- **Icons**: Lucide React
-- **State**: Zustand (optional, minimal use)
-- **Testing**: Vitest + React Testing Library + Playwright
-- **QR Codes**: qrcode library
+## 🏪 Belmont-Specific Configuration
 
-### Project Structure
+The Belmont SEO Lab comes pre-configured with Belmont-specific data and settings:
 
-```
-src/
-├── app/
-│   ├── layout.tsx          # Root layout with AppShell
-│   ├── page.tsx           # Landing page
-│   └── apps/              # All tool routes
-│       ├── citation-tracker/
-│       ├── gsc-ctr-miner/
-│       └── ... (all 16 apps)
-├── components/
-│   ├── shell/
-│   │   ├── AppShell.tsx   # Main layout
-│   │   └── Sidebar.tsx    # Navigation
-│   └── ui/               # shadcn components
-├── lib/
-│   ├── blob.ts           # File download utilities
-│   ├── csv.ts            # CSV parsing/generation
-│   ├── dates.ts          # Date utilities
-│   ├── storage.ts        # localStorage wrapper
-│   ├── math.ts           # Holt-Winters forecasting
-│   ├── gsc.ts            # GSC data helpers
-│   └── geo.ts            # Geographic utilities
-├── fixtures/             # Sample data files
-│   ├── gsc-sample.csv
-│   ├── prospects-sample.csv
-│   ├── reviews-sample.csv
-│   ├── square-visits-sample.csv
-│   └── rankgrid-sample.csv
-└── __tests__/           # Test files
-```
+### Business Information
+- **Business Name**: The Belmont Barbershop
+- **Location**: 915 General Ave NE, Calgary, Alberta, T2E 9E1
+- **Phone**: 403-457-0420
+- **Booking URL**: https://thebelmontbarber.ca/book
+- **Website**: https://thebelmontbarber.ca/
 
-## 🎨 Design System & UX Guidelines
+### Service Offerings
+- Men's Haircut
+- Beard Trim
+- Hot Towel Shave
+- Skin Fade
+- Kids Cut
+- **Groomsmen Party Packages**
+- **Veterans/First Responders/Seniors Discounts**
 
-### Core Components
-- **PageHeader**: Standardized page titles with consistent spacing and action buttons
-- **KPICard**: Metric tiles with label, value, and hint pattern
-- **AppShell**: Persistent layout with sidebar navigation
-- **Sidebar**: Collapsible navigation with icon + label pattern
+### Local Focus Areas
+- Bridgeland neighborhood
+- Riverside community
+- Calgary metropolitan area
+- Local business partnerships
 
-### Visual Design
-- **Color Palette**: CSS custom properties for consistent theming
-- **Typography**: System font stack with proper hierarchy
-- **Spacing**: Consistent 4px grid system (0.25rem increments)
-- **Shadows**: Layered shadow system for depth and elevation
-- **Borders**: Subtle border radius and focus states
+---
 
-### Interaction Design
-- **Hover States**: Smooth transitions on all interactive elements
-- **Focus Rings**: Accessible focus indicators with proper contrast
-- **Loading States**: Skeleton screens and progress indicators
-- **Error States**: Clear error messaging and recovery actions
+## 📊 Tool Directory
 
-### Layout Patterns
-- **Grid System**: Responsive grid layouts (2/4 column KPI cards)
-- **Card Layout**: Elevated cards with consistent padding and shadows
-- **Form Layout**: Stacked form elements with proper labeling
-- **Table Layout**: Consistent table styling with hover states
+### 🔗 **Marketing & Attribution Tools**
 
-### Accessibility Standards
-- **WCAG 2.1 AA**: Color contrast, keyboard navigation, screen readers
-- **Semantic HTML**: Proper heading hierarchy and ARIA labels
-- **Focus Management**: Logical tab order and visible focus indicators
-- **Responsive Design**: Mobile-first approach with touch targets
+#### 1. UTM Dashboard
+**Location**: `/apps/utm-dashboard`
 
-### Performance Optimizations
-- **Client-Side Rendering**: Fast initial loads, no server dependencies
-- **Lazy Loading**: Route-based code splitting for app modules
-- **Bundle Optimization**: Tree-shaking and minimal dependencies
-- **Image Optimization**: Efficient asset loading and caching
+Create professional UTM tracking links for Belmont's marketing campaigns.
 
-## 📊 Sample Data
+**Features:**
+- Pre-configured Belmont booking URL
+- Service-specific UTM parameters
+- QR code generation
+- Batch link creation
+- Campaign performance tracking
 
-All tools come pre-loaded with Belmont-specific sample data:
+**Belmont-Specific Presets:**
+- **Groomsmen Party**: Track wedding package inquiries
+- **Veterans Discount**: Monitor military discount usage
+- **First Responders**: Track emergency services outreach
+- **Seniors & Kids**: Family-focused campaign tracking
 
-### GSC Data (`gsc-sample.csv`)
-- 12 local keywords: "barber shop bridgeland", "mens haircut calgary", etc.
-- Realistic CTR ranges and position data
-- Belmont website URLs
+**Usage:**
+1. Select preset or create custom UTM parameters
+2. Choose service from Belmont's offerings
+3. Generate tracking URL and QR code
+4. Export for use in social media, email, or print materials
 
-### Link Prospects (`prospects-sample.csv`)
-- 12 local Bridgeland businesses and organizations
-- Pre-calculated ICE scores
-- Contact information for outreach
+#### 2. UTM QR Builder
+**Location**: `/apps/utm-qr`
 
-### Reviews (`reviews-sample.csv`)
-- 12 Belmont customer reviews
-- Mix of positive, neutral, and negative feedback
-- Platform-specific data
+Advanced UTM link and QR code generation with ASCII QR display.
 
-### Visit Data (`square-visits-sample.csv`)
-- Appointment and service data
-- No-show patterns for forecasting
-- Service duration and pricing
+**Features:**
+- Custom UTM parameter builder
+- ASCII QR code generation
+- URL validation
+- Download QR codes
+- Test link functionality
 
-### Rank Grid (`rankgrid-sample.csv`)
-- Geographic ranking data
+**Belmont Configuration:**
+- Default URL: Belmont's booking page
+- Pre-filled campaign parameters
+- ASCII QR for console debugging
+
+#### 3. Referral QR Generator
+**Location**: `/apps/referral-qr`
+
+Create QR codes for Belmont's referral program and staff incentives.
+
+**Features:**
+- Staff referral tracking
+- Partner program QR codes
+- Event promotion codes
+- Performance analytics
+- Leaderboard tracking
+
+**Belmont-Specific Types:**
+- **Staff**: Employee referral program
+- **Partner**: Local business partnerships
+- **Event**: Special promotions and events
+
+---
+
+### 📝 **Content Creation Tools**
+
+#### 4. GBP Post Composer
+**Location**: `/apps/gbp-composer`
+
+Create structured Google Business Profile posts with Belmont branding.
+
+**Features:**
+- Belmont-specific content templates
+- UTM tracking integration
+- Image upload and optimization
+- Character limits and formatting
+- Post scheduling suggestions
+
+**Belmont Content Types:**
+- Service announcements
+- Special offers (Veterans Day, etc.)
+- Event promotions
+- Seasonal campaigns
+
+#### 5. Post Studio
+**Location**: `/apps/post-studio`
+
+Generate multi-platform social media content for Belmont's marketing.
+
+**Features:**
+- GBP post creation
+- Instagram caption generation
+- Image composition tools
+- Belmont branding application
+- Cross-platform optimization
+
+**Belmont Templates:**
+- Groomsmen party promotions
+- Local community events
+- Service specials
+- Seasonal campaigns
+
+#### 6. Post Oracle
+**Location**: `/apps/post-oracle`
+
+Weekly content generation for Belmont's social media presence.
+
+**Features:**
+- Automated post generation
+- Belmont-specific content themes
+- UTM link integration
+- Calendar scheduling
+- Export to social platforms
+
+**Content Categories:**
+- Service promotions
+- Local events
+- Customer testimonials
+- Seasonal content
+
+---
+
+### 📞 **Review Management Tools**
+
+#### 7. Review Link Builder
+**Location**: `/apps/review-link`
+
+CASL-compliant review request system for Belmont customers.
+
+**Features:**
+- Google review link generation
+- Apple Maps review integration
+- CASL-compliant email templates
+- SMS review request templates
+- QR code review cards
+- Consent logging and tracking
+
+**Belmont Configuration:**
+- Pre-filled Belmont business information
+- Professional email templates
+- STOP line compliance
+- Consent tracking system
+
+**Usage:**
+1. Customize business information (pre-filled with Belmont data)
+2. Generate review links for Google and Apple
+3. Create CASL-compliant email/SMS templates
+4. Generate QR codes for printed review cards
+5. Track consent and review requests
+
+#### 8. Review Composer
+**Location**: `/apps/review-composer`
+
+Manage and respond to Belmont customer reviews professionally.
+
+**Features:**
+- Review import and management
+- CASL-compliant response templates
+- Sentiment analysis
+- Response tracking
+- Export formatted responses
+
+**Belmont-Specific:**
+- Pre-configured response templates
+- Local Calgary context
+- Professional Belmont branding
+- Compliance-focused language
+
+---
+
+### 🔍 **SEO Analysis Tools**
+
+#### 9. GSC CTR Miner
+**Location**: `/apps/gsc-ctr-miner`
+
+Analyze Google Search Console data to optimize Belmont's search performance.
+
+**Features:**
+- CSV data import from GSC
+- CTR analysis and benchmarking
+- Opportunity identification
+- Title/meta tag recommendations
+- Performance visualization
+
+**Belmont Keywords:**
+- "barber shop bridgeland"
+- "mens haircut calgary"
+- "beard trim calgary"
+- "bridgeland barber"
+- Local service variations
+
+#### 10. Local Rank Grid
+**Location**: `/apps/rank-grid`
+
+Monitor Belmont's local search rankings across geographic areas.
+
+**Features:**
+- Geographic ranking tracking
+- Competitor analysis
+- Ranking trend visualization
 - Local keyword performance
-- Time-series ranking changes
+- Export ranking reports
 
-## 🔧 Configuration
+**Belmont Focus Areas:**
+- Bridgeland neighborhood
+- Riverside community
+- Downtown Calgary
+- Local competitor tracking
 
-### Environment Variables
-No environment variables required - all functionality is client-side.
+#### 11. RankGrid Watcher
+**Location**: `/apps/rankgrid-watcher`
 
-### Browser Support
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+Automated monitoring of Belmont's local search performance.
 
-## 🚢 Deployment
+**Features:**
+- Real-time ranking updates
+- Geographic grid analysis
+- Performance alerts
+- Historical trend tracking
+- Competitor monitoring
 
-### Vercel (Recommended)
+---
 
-1. **Connect Repository**
-   ```bash
-   # Vercel will auto-detect Next.js
-   vercel --prod
-   ```
+### 🔗 **Link Building Tools**
 
-2. **Build Settings**
-   - Build Command: `npm run build`
-   - Output Directory: `.next`
-   - Node Version: 18.x
+#### 12. Link Prospect Kit
+**Location**: `/apps/link-prospect-kit`
 
-### Manual Deployment
+Identify and manage local link building opportunities for Belmont.
 
-```bash
-# Build and serve
-npm run build
-npm run start
+**Features:**
+- Local prospect identification
+- ICE scoring (Impact, Confidence, Ease)
+- Outreach template generation
+- Campaign tracking
+- Relationship management
+
+**Belmont Prospects Include:**
+- Bridgeland BIA
+- Bridgeland Community Association
+- Riverside BIA
+- Local Calgary businesses
+- Community organizations
+
+#### 13. Neighbor Signal Detector
+**Location**: `/apps/neighbor-signal`
+
+Analyze content for local SEO signals and Bridgeland relevance.
+
+**Features:**
+- Local keyword analysis
+- Content optimization suggestions
+- Bridgeland signal scoring
+- SEO recommendation engine
+
+**Belmont Keywords Analyzed:**
+- Bridgeland, Riverside, Calgary
+- Community, local, neighborhood
+- Service-specific terms
+
+#### 14. Link Map
+**Location**: `/apps/link-map`
+
+Visual mapping of Belmont's local link building network.
+
+**Features:**
+- Geographic link opportunity mapping
+- Prospect clustering by neighborhood
+- Outreach workflow management
+- Link acquisition tracking
+
+---
+
+### 📈 **Analytics & Forecasting Tools**
+
+#### 15. QueueTime AI
+**Location**: `/apps/queuetime`
+
+Predict Belmont's customer traffic patterns and optimize scheduling.
+
+**Features:**
+- Holt-Winters forecasting algorithm
+- Walk-in traffic prediction
+- Staff scheduling optimization
+- Peak hour analysis
+- Seasonal trend analysis
+
+**Belmont Data Sources:**
+- Historical appointment data
+- Walk-in patterns
+- Seasonal variations
+- Service duration tracking
+
+#### 16. Slot-Yield Analyzer
+**Location**: `/apps/slot-yield`
+
+Analyze Belmont's appointment slot utilization and revenue optimization.
+
+**Features:**
+- Appointment data analysis
+- Revenue per slot calculations
+- Service profitability analysis
+- Scheduling optimization
+- Peak performance identification
+
+#### 17. RFM Micro CRM
+**Location**: `/apps/rfm-crm`
+
+Customer relationship management using Recency, Frequency, Monetary analysis.
+
+**Features:**
+- Customer segmentation
+- RFM scoring
+- Targeted marketing campaigns
+- Customer lifetime value analysis
+- Retention strategy development
+
+---
+
+### 🛡️ **Risk Management Tools**
+
+#### 18. No-Show Shield
+**Location**: `/apps/noshow-shield`
+
+Predict and prevent no-show appointments using Belmont's historical data.
+
+**Features:**
+- No-show pattern analysis
+- Risk assessment algorithms
+- Preventive action recommendations
+- Customer communication templates
+- Performance tracking
+
+#### 19. Add-On Recommender
+**Location**: `/apps/addon-recommender`
+
+Recommend service add-ons based on Belmont customer purchase patterns.
+
+**Features:**
+- Purchase pattern analysis
+- Add-on recommendation engine
+- Revenue optimization suggestions
+- Customer preference learning
+- Upsell opportunity identification
+
+**Belmont Services:**
+- Beard trim with haircut
+- Hot shave with haircut
+- Kids cut with styling
+- Groomsmen package upgrades
+
+---
+
+### 📝 **Technical SEO Tools**
+
+#### 20. Meta Planner
+**Location**: `/apps/meta-planner`
+
+A/B/C testing kanban for Belmont's title and meta description optimization.
+
+**Features:**
+- Experiment planning and tracking
+- A/B/C test management
+- CTR performance monitoring
+- Winner identification
+- Implementation workflow
+
+#### 21. SEO Brief & Schema Builder
+**Location**: `/apps/seo-brief`
+
+Generate on-page SEO briefs and JSON-LD structured data for Belmont's website.
+
+**Features:**
+- Page-specific SEO briefs
+- Schema.org markup generation
+- Technical SEO recommendations
+- Implementation checklists
+- Performance tracking
+
+**Belmont Pages Covered:**
+- Home page
+- Services page
+- Groomsmen Party Packages
+- Contact/About pages
+
+#### 22. Citation Tracker
+**Location**: `/apps/citation-tracker`
+
+Manage Belmont's NAP (Name, Address, Phone) consistency across directories.
+
+**Features:**
+- Citation auditing
+- NAP consistency checking
+- Directory submission templates
+- Claiming status tracking
+- Bulk citation management
+
+**Belmont Citation Sources:**
+- Google Business Profile
+- Yelp
+- Yellow Pages
+- Local Calgary directories
+- Industry-specific listings
+
+---
+
+## ⚙️ Configuration & Customization
+
+### Belmont-Specific Settings
+
+The platform comes pre-configured with Belmont-specific data. To customize:
+
+#### Business Information
+Located in `src/lib/constants.ts`:
+```typescript
+BELMONT_CONSTANTS = {
+  BUSINESS_NAME: "The Belmont Barbershop",
+  BOOK_URL: "https://thebelmontbarber.ca/book",
+  PHONE_DISPLAY: "403-457-0420",
+  ADDRESS_STR: "915 General Ave NE, Calgary, Alberta, T2E 9E1",
+  // ... additional settings
+}
 ```
 
-## 📈 CI/CD
+#### Service Offerings
+Update services in `BELMONT_CONSTANTS.SERVICES`:
+```typescript
+SERVICES: [
+  "mens-cut",
+  "beard-trim",
+  "hot-towel-shave",
+  "skin-fade",
+  "kids-cut",
+  "groomsmen-party",
+  "veterans-discount",
+  "seniors-discount"
+]
+```
 
-GitHub Actions workflow includes:
-- **Multi-Node Testing**: Node 18.x and 20.x
-- **Linting**: ESLint checks
-- **Type Checking**: TypeScript validation
-- **Unit Tests**: Vitest suite
-- **E2E Tests**: Playwright smoke tests
-- **Build Verification**: Production build test
+#### UTM Presets
+Customize campaign tracking in `BELMONT_UTM_PRESETS`:
+```typescript
+groomsmen_party: {
+  label: "Groomsmen Party",
+  source: "organic",
+  medium: "referral",
+  campaign: `${BELMONT_CONSTANTS.UTM_CAMPAIGN_BASE}_groomsmen_${month}`,
+  content: "groomsmen-party"
+}
+```
 
-## 🐛 Known Issues & Limitations
+---
 
-### SSR & Charts
-- Recharts requires `"use client"` directive
-- All chart components are client-side only
+## 📊 Data Management
 
-### File Handling
-- CSV imports use FileReader API
-- Downloads use blob URLs (no server required)
-- Large files may impact browser performance
+### Sample Data Files
 
-### Browser Permissions
-- Clipboard API requires user interaction
-- File downloads work in all modern browsers
+The Belmont SEO Lab includes sample data files for testing and demonstration:
 
-### Data Storage
-- All data stored in localStorage
-- No server persistence (by design)
-- Data cleared on browser reset
+#### CSV Data Files
+- `src/fixtures/gsc-sample.csv` - Google Search Console export sample
+- `src/fixtures/prospects-sample.csv` - Local link building prospects
+- `src/fixtures/reviews-sample.csv` - Customer review data
+- `src/fixtures/square-visits-sample.csv` - Appointment booking data
+- `src/fixtures/rankgrid-sample.csv` - Local ranking data
 
-## 🤝 Contributing
+### Data Import/Export
 
-### Development Workflow
+#### Supported Formats
+- **CSV**: Primary data format for all tools
+- **JSON**: Schema markup and configuration export
+- **PNG/SVG**: QR codes and image exports
+- **TXT**: Bulk URL lists and citation data
 
-1. **Fork & Branch**
-   ```bash
-   git checkout -b feature/new-tool
-   ```
+#### Import Guidelines
+1. Ensure CSV headers match expected format
+2. Use UTF-8 encoding for special characters
+3. Validate data types (dates, numbers, URLs)
+4. Check file size limits (recommended <10MB)
 
-2. **Add Tests**
-   ```bash
-   # Add unit tests in __tests__/
-   npm run test
-   ```
+---
 
-3. **Update Documentation**
-   - Add new tool to this README
-   - Include sample data format
-   - Document any special requirements
+## 🔧 Technical Specifications
 
-4. **Pull Request**
-   - Ensure all tests pass
-   - Update CHANGELOG.md
-   - Request review
+### System Requirements
+- **Node.js**: 18.0+ LTS
+- **Memory**: 4GB+ RAM
+- **Storage**: 500MB+ available space
+- **Browser**: Modern evergreen browser
 
-### Code Standards
+### Performance Metrics
+- **Initial Load**: <3 seconds
+- **Route Switching**: <1 second
+- **Bundle Size**: 87.9kB shared JavaScript
+- **Static Generation**: All 26 routes pre-rendered
 
-- **TypeScript**: Strict mode, no `any` types
-- **Components**: Functional components with hooks
-- **Styling**: Tailwind classes, no custom CSS
-- **Imports**: Absolute imports from `@/*`
-- **Naming**: PascalCase for components, kebab-case for routes
+### Security & Privacy
+- **Client-Side Processing**: All data stays in browser
+- **No External APIs**: Zero third-party data transmission
+- **Local Storage**: Optional persistence for user preferences
+- **CASL Compliance**: Built-in legal compliance for outreach
 
-## 📄 License
+---
 
-MIT License - see LICENSE file for details.
+## 🐛 Troubleshooting
 
-## 🙋 Support
+### Common Issues & Solutions
 
-### Common Issues
+#### Build Errors
+```bash
+# Clear Next.js cache
+rm -rf .next
+npm run build
 
-**Charts not rendering?**
-- Ensure component has `"use client"` directive
-- Check browser console for errors
+# Clear node_modules
+rm -rf node_modules
+npm install
+```
 
-**CSV import failing?**
-- Verify CSV format matches sample files
-- Check for special characters in data
+#### Data Import Issues
+- **CSV Format**: Ensure proper headers and UTF-8 encoding
+- **File Size**: Split large files (>10MB) into smaller chunks
+- **Special Characters**: Use UTF-8 encoding for international content
 
-**Tests failing?**
-- Run `npm run test:ui` for interactive debugging
-- Check vitest.config.ts for environment setup
+#### Performance Issues
+- **Large Datasets**: Process in smaller batches
+- **Browser Memory**: Close other tabs during large data processing
+- **Cache Clearing**: Hard refresh (Ctrl+F5) to clear browser cache
 
-### Belmont-Specific Features
+#### QR Code Issues
+- **Generation Failures**: Check URL format and length
+- **Download Problems**: Ensure browser allows file downloads
+- **Display Issues**: Verify canvas support in browser
 
-This dashboard is specifically configured for **The Belmont Barbershop** with:
+---
 
-- **Location**: 915 General Ave NE, Calgary, AB T2E 9E1
-- **Service Area**: Bridgeland/Riverside neighborhoods
-- **Target Keywords**: Local barber shop, men's grooming, haircuts
-- **Local Partners**: Bridgeland BIA, community organizations
-- **Competitors**: Other Calgary barbershops and salons
+## 📞 Support & Contact
 
-All sample data and default settings are pre-configured for Belmont's specific market and services.
+### Belmont Barbershop Contact
+- **Phone**: 403-457-0420
+- **Address**: 915 General Ave NE, Calgary, AB T2E 9E1
+- **Website**: https://thebelmontbarber.ca/
+- **Booking**: https://thebelmontbarber.ca/book
+
+### Technical Support
+For technical issues with the Belmont SEO Lab:
+1. Check this README for solutions
+2. Review browser console for error messages
+3. Clear browser cache and try again
+4. Contact development team for advanced issues
+
+---
+
+## 📈 Future Enhancements
+
+### Planned Features
+- **Analytics Dashboard**: Real-time performance tracking
+- **Automated Reporting**: Scheduled SEO reports
+- **API Integration**: Google Business Profile API
+- **Multi-Location Support**: Chain management features
+- **Advanced Forecasting**: Machine learning predictions
+
+### Customization Options
+- **White-label Branding**: Custom color schemes
+- **Additional Services**: Industry-specific tool sets
+- **Integration APIs**: Third-party service connections
+- **Advanced Analytics**: Custom KPI dashboards
+
+---
+
+## 📄 License & Terms
+
+This Belmont SEO Lab platform is proprietary software developed specifically for The Belmont Barbershop. All rights reserved.
+
+### Usage Terms
+- For internal Belmont Barbershop use only
+- Data privacy and CASL compliance required
+- Regular updates recommended for optimal performance
+
+### Data Privacy
+- All processing occurs client-side
+- No external data transmission
+- User data stored locally only
+- CASL compliance built-in for outreach
+
+---
+
+## 🎯 Quick Reference
+
+### Most Used Tools
+1. **UTM Dashboard** - Daily marketing link creation
+2. **Review Link Builder** - Customer review requests
+3. **GBP Post Composer** - Social media content
+4. **Link Prospect Kit** - Local link building
+5. **GSC CTR Miner** - Search performance analysis
+
+### Daily Workflow
+1. **Morning**: Check GSC CTR Miner for performance insights
+2. **Marketing**: Create UTM links in UTM Dashboard
+3. **Content**: Generate posts in GBP Post Composer
+4. **Outreach**: Manage reviews with Review Link Builder
+5. **Links**: Work prospects in Link Prospect Kit
+
+### Monthly Tasks
+1. **Performance Review**: Analyze trends in RankGrid Watcher
+2. **Content Planning**: Generate monthly posts in Post Oracle
+3. **Link Building**: Audit progress in Link Map
+4. **Customer Analysis**: Review RFM CRM segmentation
+
+---
+
+## 🚀 Getting Started Checklist
+
+### Initial Setup
+- [ ] Install Node.js 18+ and npm
+- [ ] Clone repository and install dependencies
+- [ ] Run `npm run dev` to start development server
+- [ ] Access Belmont SEO Lab at `http://localhost:3000`
+
+### First Use
+- [ ] Explore homepage and navigation
+- [ ] Test UTM Dashboard with Belmont presets
+- [ ] Try Review Link Builder with Belmont data
+- [ ] Import sample GSC data for CTR analysis
+- [ ] Generate GBP posts for social media
+
+### Production Deployment
+- [ ] Install Vercel CLI (`npm install -g vercel`)
+- [ ] Run `vercel login` to authenticate
+- [ ] Deploy with `vercel --prod`
+- [ ] Access live site at generated Vercel URL
+
+---
+
+*This Belmont SEO Lab platform provides comprehensive local SEO management tools specifically tailored for The Belmont Barbershop's marketing and operational needs in the Bridgeland, Calgary community.*
+
+**For questions or support, contact The Belmont Barbershop at 403-457-0420 or visit https://thebelmontbarber.ca/**
+
+---
+
+## ✅ Client Handoff (Belmont)
+
+Use this checklist to verify everything is ready for client delivery:
+
+- Access the app at `http://localhost:3000` (or your Vercel URL)
+- Healthcheck: open `/api/health` → expect `{ status: "ok" }`
+- SEO assets present: `/opengraph-image`, `/twitter-image`, `/robots.txt`, `/sitemap.xml`
+- Update `src/lib/constants.ts` with final Google review URL (actual Place ID)
+- Optional: add real Google Search Console verification in `src/app/layout.tsx`
+- QR previews: verify Review Links, UTM Dashboard, and Referral QR generate and download PNGs
+- Run build/tests before release:
+  ```bash
+  npm run build
+  npx vitest run
+  ```
+
+Delivery tips:
+- Provide this README and a brief screencast walkthrough
+- Share sample CSVs path for GSC import under `src/fixtures`
+- Recommend monthly review of CTR recommendations and GBP posts

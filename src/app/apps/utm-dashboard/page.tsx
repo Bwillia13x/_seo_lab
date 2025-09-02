@@ -1,7 +1,13 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,6 +44,7 @@ import {
 import { saveBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
+import { BELMONT_CONSTANTS, BELMONT_UTM_PRESETS } from "@/lib/constants";
 
 // ---------------- UTM Building ----------------
 function buildUtmUrl(
@@ -90,13 +97,7 @@ function downloadDataUrl(dataUrl: string, filename: string) {
 }
 
 // ---------------- Presets ----------------
-const SERVICE_OPTIONS = [
-  "mens-cut",
-  "skin-fade",
-  "beard-trim",
-  "hot-towel-shave",
-  "kids-cut",
-];
+const SERVICE_OPTIONS = BELMONT_CONSTANTS.SERVICES;
 
 const AREA_OPTIONS = ["bridgeland", "riverside", "calgary"];
 
@@ -105,42 +106,34 @@ type PresetKey =
   | "gbp_profile"
   | "instagram_bio"
   | "instagram_post"
-  | "reels"
-  | "email"
-  | "sms";
+  | "groomsmen_party"
+  | "veterans_discount"
+  | "first_responders"
+  | "seniors_kids";
 
 const PRESETS: Record<
   PresetKey,
   { label: string; source: string; medium: string; contentHint?: string }
 > = {
-  gbp_post: { label: "GBP Post", source: "google", medium: "gbp" },
-  gbp_profile: {
-    label: "GBP Profile",
-    source: "google",
-    medium: "gbp-profile",
-  },
-  instagram_bio: { label: "Instagram Bio", source: "instagram", medium: "bio" },
-  instagram_post: {
-    label: "Instagram Post",
-    source: "instagram",
-    medium: "post",
-  },
-  reels: { label: "Instagram Reels", source: "instagram", medium: "reel" },
-  email: { label: "Email", source: "email", medium: "newsletter" },
-  sms: { label: "SMS", source: "sms", medium: "text" },
+  gbp_post: BELMONT_UTM_PRESETS.gbp_post,
+  gbp_profile: BELMONT_UTM_PRESETS.gbp_profile,
+  instagram_bio: BELMONT_UTM_PRESETS.instagram_bio,
+  instagram_post: BELMONT_UTM_PRESETS.instagram_post,
+  groomsmen_party: BELMONT_UTM_PRESETS.groomsmen_party,
+  veterans_discount: BELMONT_UTM_PRESETS.veterans_discount,
+  first_responders: BELMONT_UTM_PRESETS.first_responders,
+  seniors_kids: BELMONT_UTM_PRESETS.seniors_kids,
 };
 
 // ---------------- Main Component ----------------
 function UTMDashboard() {
   // Single link builder state
-  const [baseUrl, setBaseUrl] = useState<string>(
-    "https://thebelmontbarber.ca/book"
-  );
+  const [baseUrl, setBaseUrl] = useState<string>(BELMONT_CONSTANTS.BOOK_URL);
   const [preset, setPreset] = useState<PresetKey>("gbp_post");
-  const [service, setService] = useState<string>("mens-cut");
+  const [service, setService] = useState<string>(BELMONT_CONSTANTS.SERVICES[0]);
   const [area, setArea] = useState<string>("bridgeland");
   const [campaign, setCampaign] = useState<string>(
-    `belmont-mens-cut-bridgeland-${todayYYYYMM()}`
+    `${BELMONT_CONSTANTS.UTM_CAMPAIGN_BASE}_${BELMONT_CONSTANTS.SERVICES[0]}_${todayYYYYMM()}`
   );
   const [term, setTerm] = useState<string>("");
   const [content, setContent] = useState<string>("");
@@ -329,21 +322,37 @@ function UTMDashboard() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="UTM & Attribution Dashboard"
+        title="Campaign Links"
         subtitle="Build clean, consistent campaign links, batch‑generate, and produce QR codes."
+        showLogo={true}
         actions={
           <div className="flex gap-2">
             <Button onClick={build}>
               <Wand2 className="h-4 w-4 mr-2" />
               Generate UTM
             </Button>
-            <Button variant="outline" onClick={copyUrl} disabled={!builtUrl}>
+            <Button onClick={copyUrl} disabled={!builtUrl}>
               <Copy className="h-4 w-4 mr-2" />
               Copy Link
             </Button>
           </div>
         }
       />
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Do this next</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm">
+          <ol className="list-decimal pl-5 space-y-1">
+            <li>Pick the preset (Instagram Bio, GBP Post, Email, etc.).</li>
+            <li>Enter the booking link as your Base URL.</li>
+            <li>Click Generate UTM, then Copy Link.</li>
+            <li>Paste it into your post or profile.</li>
+            <li>Optional: open QR tab and print a counter QR.</li>
+          </ol>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard label="Built URL" value={builtUrl ? "Ready" : "—"} />
@@ -352,15 +361,165 @@ function UTMDashboard() {
         <KPICard label="Preset" value={PRESETS[preset].label} />
       </div>
 
-      <Tabs defaultValue="builder">
+      <Tabs defaultValue="howto">
         <TabsList>
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="builder">Link Builder</TabsTrigger>
           <TabsTrigger value="batch">Batch Builder</TabsTrigger>
           <TabsTrigger value="qr">QR Codes</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="tests">Tests</TabsTrigger>
-          <TabsTrigger value="help">Help</TabsTrigger>
         </TabsList>
+
+        {/* How To */}
+        <TabsContent value="howto">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  How to Use the Campaign Link Builder
+                </CardTitle>
+                <CardDescription>
+                  Create special tracking links that help Belmont see where
+                  customers come from when they book appointments
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      What This Tool Does
+                    </h3>
+                    <p className="text-muted-foreground">
+                      This tool creates special links that track where your
+                      customers come from. For example, when someone clicks a
+                      link in your Google Business Profile post and then books
+                      an appointment, you'll know that customer came from that
+                      specific post. This helps Belmont understand which
+                      marketing efforts are working best.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Why This Matters for Belmont
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Belmont can now track which marketing campaigns bring in
+                      the most customers. For example:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                      <li>
+                        Track how many customers book after seeing your
+                        Groomsmen Party promotions
+                      </li>
+                      <li>See which social media posts get the most clicks</li>
+                      <li>
+                        Measure the success of your Veterans discount campaigns
+                      </li>
+                      <li>
+                        Know which services customers are most interested in
+                        booking
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Step-by-Step Instructions
+                    </h3>
+                    <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                      <li>
+                        <strong>Choose a preset:</strong> Select from common
+                        marketing channels like "Instagram Bio", "GBP Post", or
+                        "Email Campaign"
+                      </li>
+                      <li>
+                        <strong>Enter your booking link:</strong> This is the
+                        web address where customers go to book appointments
+                      </li>
+                      <li>
+                        <strong>Click "Generate UTM":</strong> The tool will
+                        create a special tracking link with codes that identify
+                        where customers came from
+                      </li>
+                      <li>
+                        <strong>Copy the link:</strong> Use the copy button to
+                        get the tracking link
+                      </li>
+                      <li>
+                        <strong>Use in your marketing:</strong> Put this link in
+                        social media posts, email campaigns, or your Google
+                        Business Profile
+                      </li>
+                      <li>
+                        <strong>Track results:</strong> Use Google Analytics to
+                        see which marketing efforts bring the most bookings
+                      </li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Best Practices for Belmont
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        <strong>Use consistent naming:</strong> Always use the
+                        same format for campaign names (e.g.,
+                        "belmont-groomsmen-winter-2024")
+                      </li>
+                      <li>
+                        <strong>Track everything:</strong> Add tracking links to
+                        all social media posts, email campaigns, and online
+                        listings
+                      </li>
+                      <li>
+                        <strong>Include service details:</strong> Use specific
+                        campaign names like "belmont-skin-fade" or
+                        "belmont-veterans-discount"
+                      </li>
+                      <li>
+                        <strong>Review performance monthly:</strong> Check
+                        Google Analytics to see which campaigns bring the most
+                        customers
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      UTM Parameter Guide
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        <strong>utm_source</strong>: Where traffic comes from
+                        (google, facebook, email)
+                      </li>
+                      <li>
+                        <strong>utm_medium</strong>: Marketing medium (cpc,
+                        social, email, gbp)
+                      </li>
+                      <li>
+                        <strong>utm_campaign</strong>: Campaign identifier
+                        (belmont-skin-fade-bridgeland-202412)
+                      </li>
+                      <li>
+                        <strong>utm_term</strong>: Keywords or targeting terms
+                        (optional)
+                      </li>
+                      <li>
+                        <strong>utm_content</strong>: Specific content version
+                        (e.g., "red-button" vs "blue-button")
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* Link Builder */}
         <TabsContent value="builder">
@@ -387,6 +546,7 @@ function UTMDashboard() {
                     className="w-full h-9 border rounded-md px-2"
                     value={preset}
                     onChange={(e) => setPreset(e.target.value as PresetKey)}
+                    aria-label="Select marketing platform preset"
                   >
                     {Object.entries(PRESETS).map(([k, v]) => (
                       <option key={k} value={k}>
@@ -403,6 +563,7 @@ function UTMDashboard() {
                       className="w-full h-9 border rounded-md px-2"
                       value={service}
                       onChange={(e) => setService(e.target.value)}
+                      aria-label="Select Belmont service"
                     >
                       {SERVICE_OPTIONS.map((s) => (
                         <option key={s} value={s}>
@@ -417,6 +578,7 @@ function UTMDashboard() {
                       className="w-full h-9 border rounded-md px-2"
                       value={area}
                       onChange={(e) => setArea(e.target.value)}
+                      aria-label="Select geographic area"
                     >
                       {AREA_OPTIONS.map((a) => (
                         <option key={a} value={a}>
@@ -656,6 +818,7 @@ function UTMDashboard() {
                     onChange={(e) =>
                       setEcLevel(e.target.value as "L" | "M" | "Q" | "H")
                     }
+                    aria-label="Select QR code error correction level"
                   >
                     <option value="L">Low (7%)</option>
                     <option value="M">Medium (15%)</option>
@@ -665,7 +828,7 @@ function UTMDashboard() {
                 </div>
 
                 {qrUrl && (
-                  <Button onClick={downloadQR} variant="outline">
+                  <Button onClick={downloadQR}>
                     <Download className="h-4 w-4 mr-2" />
                     Download QR Code
                   </Button>
@@ -680,6 +843,7 @@ function UTMDashboard() {
               <CardContent>
                 {qrUrl ? (
                   <div className="text-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- Safe data URL preview for generated QR */}
                     <img
                       src={qrUrl}
                       alt="QR Code"
@@ -767,6 +931,227 @@ function UTMDashboard() {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* How to Use Instructions */}
+        <TabsContent value="instructions">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  How to Use the Campaign Link Builder
+                </CardTitle>
+                <CardDescription>
+                  Create special tracking links that help Belmont see where
+                  customers come from when they book appointments
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      What This Tool Does
+                    </h3>
+                    <p className="text-muted-foreground">
+                      This tool creates special links that track where your
+                      customers come from. For example, when someone clicks a
+                      link in your Google Business Profile post and then books
+                      an appointment, you'll know that customer came from that
+                      specific post. This helps Belmont understand which
+                      marketing efforts are working best.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Why This Matters for Belmont
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Belmont can now track which marketing campaigns bring in
+                      the most customers. For example:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                      <li>
+                        Track how many customers book after seeing your
+                        Groomsmen Party promotions
+                      </li>
+                      <li>See which social media posts get the most clicks</li>
+                      <li>
+                        Measure the success of your Veterans discount campaigns
+                      </li>
+                      <li>
+                        Know which services customers are most interested in
+                        booking
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      How to Create a Tracking Link
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          1
+                        </Badge>
+                        <div>
+                          <p className="font-medium">
+                            Choose Your Marketing Campaign
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Select from Belmont's pre-set campaigns like
+                            "Groomsmen Party", "Veterans Discount", or "Google
+                            Business Profile Post". These are already set up
+                            with the right tracking codes.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          2
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Pick the Service</p>
+                          <p className="text-sm text-muted-foreground">
+                            Choose which Belmont service you're promoting (Men's
+                            Haircut, Beard Trim, Hot Towel Shave, etc.)
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          3
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Select the Area</p>
+                          <p className="text-sm text-muted-foreground">
+                            Choose "Bridgeland" or "Riverside" to track which
+                            neighborhood customers are coming from
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          4
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Generate the Link</p>
+                          <p className="text-sm text-muted-foreground">
+                            Click "Generate UTM" and your special tracking link
+                            will be created automatically
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <Badge variant="outline" className="mt-1">
+                          5
+                        </Badge>
+                        <div>
+                          <p className="font-medium">Use the Link</p>
+                          <p className="text-sm text-muted-foreground">
+                            Copy the link and use it in your social media posts,
+                            emails, or Google Business Profile. When customers
+                            click it and book, you'll see exactly where they
+                            came from.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Tips for Belmont
+                    </h3>
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <ul className="space-y-2 text-sm">
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            💡
+                          </span>
+                          <span>
+                            Always use the pre-set campaigns - they're already
+                            configured for Belmont's marketing needs
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            📱
+                          </span>
+                          <span>
+                            Test your links by clicking them yourself first to
+                            make sure they work
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            📊
+                          </span>
+                          <span>
+                            Check Google Analytics regularly to see which
+                            campaigns bring in the most customers
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-blue-600 dark:text-blue-400 mt-1">
+                            🎯
+                          </span>
+                          <span>
+                            Focus your marketing budget on campaigns that show
+                            the best results
+                          </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Common Uses for Belmont
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">Social Media Posts</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Create unique links for each Instagram or Facebook
+                          post to track which content gets the most clicks
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">Email Newsletters</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Track which newsletter links customers click to book
+                          appointments
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">
+                          Google Business Profile
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Monitor which GBP posts drive the most bookings and
+                          customer calls
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">Special Promotions</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Track the success of Veterans Day specials, holiday
+                          offers, and seasonal promotions
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Help */}

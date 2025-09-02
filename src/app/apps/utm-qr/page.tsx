@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -341,7 +347,7 @@ export default function UTMBuilder() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="UTM Link + QR Builder"
+        title="QR Code Maker"
         subtitle="Clean campaign links for GBP, Instagram, Email, SMS — plus QR codes. Presets, naming, batch export."
         actions={
           <Button variant="outline" onClick={resetForm}>
@@ -350,6 +356,23 @@ export default function UTMBuilder() {
           </Button>
         }
       />
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Do this next</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm">
+          <ol className="list-decimal pl-5 space-y-1">
+            <li>Choose preset, service, area, and campaign name.</li>
+            <li>Click Generate to build your link and preview the QR.</li>
+            <li>Click Copy to use the link online.</li>
+            <li>
+              Click Download ASCII to save the QR preview (or use the other QR
+              tool for PNG).
+            </li>
+          </ol>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard
@@ -378,12 +401,170 @@ export default function UTMBuilder() {
         />
       </div>
 
-      <Tabs defaultValue="single">
+      <Tabs defaultValue="howto">
         <TabsList>
+          <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="single">Single Link</TabsTrigger>
-          <TabsTrigger value="help">Help</TabsTrigger>
           <TabsTrigger value="tests">Tests</TabsTrigger>
         </TabsList>
+
+        {/* How To */}
+        <TabsContent value="howto">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Info className="h-5 w-5" />
+                  How to Use the QR Code Maker
+                </CardTitle>
+                <CardDescription>
+                  Create QR codes and tracking links for Belmont's marketing
+                  campaigns
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      What This Tool Does
+                    </h3>
+                    <p className="text-muted-foreground">
+                      This tool creates QR codes that customers can scan with
+                      their phones to instantly visit Belmont's website or
+                      booking page. It also creates tracking links so you can
+                      see which marketing campaigns bring the most customers.
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Why QR Codes Matter for Belmont
+                    </h3>
+                    <p className="text-muted-foreground">
+                      QR codes make it easy for customers to contact Belmont
+                      without typing long web addresses. They're perfect for:
+                    </p>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground mt-2">
+                      <li>Business cards and flyers</li>
+                      <li>Window decals and posters</li>
+                      <li>Social media posts</li>
+                      <li>Google Business Profile posts</li>
+                      <li>Counter displays in the shop</li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Step-by-Step Instructions
+                    </h3>
+                    <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
+                      <li>
+                        <strong>Choose a preset:</strong> Select the marketing
+                        channel you're using (Instagram Bio, GBP Post, Email,
+                        etc.)
+                      </li>
+                      <li>
+                        <strong>Pick a service:</strong> Choose which Belmont
+                        service you want to promote (Haircut, Beard Trim, etc.)
+                      </li>
+                      <li>
+                        <strong>Select an area:</strong> Choose the Calgary area
+                        you want to target (Bridgeland, Riverside, etc.)
+                      </li>
+                      <li>
+                        <strong>Enter campaign name:</strong> Give your campaign
+                        a clear name (e.g., "belmont-groomsmen-winter-2024")
+                      </li>
+                      <li>
+                        <strong>Click Generate:</strong> The tool will create
+                        your tracking link and QR code
+                      </li>
+                      <li>
+                        <strong>Copy the link:</strong> Use this tracking link
+                        in your marketing materials
+                      </li>
+                      <li>
+                        <strong>Download QR code:</strong> Save the QR code
+                        image to use in your marketing
+                      </li>
+                    </ol>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Best Practices for Belmont
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        <strong>Print QR codes large:</strong> Make sure they're
+                        at least 1-2 inches square so phones can scan them
+                        easily
+                      </li>
+                      <li>
+                        <strong>Test before printing:</strong> Always scan your
+                        QR codes with different phones to make sure they work
+                      </li>
+                      <li>
+                        <strong>Include clear instructions:</strong> Add text
+                        like "Scan to book" or "Scan for specials" next to your
+                        QR codes
+                      </li>
+                      <li>
+                        <strong>Use consistent branding:</strong> Include
+                        Belmont's logo and colors with your QR codes
+                      </li>
+                      <li>
+                        <strong>Track performance:</strong> Use Google Analytics
+                        to see which QR codes get the most scans
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Campaign Naming Tips
+                    </h3>
+                    <p className="text-muted-foreground mb-2">
+                      Use this pattern for campaign names:
+                      <code className="ml-2 px-2 py-1 bg-muted rounded text-xs">
+                        belmont-{service}-{area}-{todayYYYYMM()}
+                      </code>
+                    </p>
+                    <p className="text-muted-foreground">
+                      Examples: "belmont-skin-fade-bridgeland-202412",
+                      "belmont-groomsmen-riverside-202501"
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      Where to Use QR Codes
+                    </h3>
+                    <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                      <li>
+                        <strong>GBP posts:</strong> Republish the same QR code
+                        on your counter display
+                      </li>
+                      <li>
+                        <strong>Instagram:</strong> Put the tracking link in
+                        your bio and use QR codes in Stories
+                      </li>
+                      <li>
+                        <strong>Email/SMS:</strong> Make sure you have customer
+                        permission (CASL compliance) and include unsubscribe
+                        options
+                      </li>
+                      <li>
+                        <strong>Print materials:</strong> Business cards,
+                        flyers, window decals, and posters
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
 
         {/* Single Link */}
         <TabsContent value="single">
@@ -598,7 +779,7 @@ export default function UTMBuilder() {
               <p>
                 Recommended campaign pattern:{" "}
                 <code>
-                  belmont-{"{service}"}-{"{area}"}-{"{yyyymm}"}
+                  belmont-{"{service}"}-{"{area}"}-{todayYYYYMM()}
                 </code>{" "}
                 (e.g., <code>belmont-skin-fade-bridgeland-202509</code>).
               </p>
