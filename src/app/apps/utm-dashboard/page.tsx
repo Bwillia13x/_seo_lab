@@ -313,23 +313,6 @@ function calculateCampaignQuality(
 }
 
 // ---------------- Enhanced Analytics ----------------
-function generateMockAnalytics(campaigns: Row[]): CampaignPerformance[] {
-  return campaigns.map((row, index) => ({
-    id: `perf-${index}`,
-    campaignName: row.campaign,
-    clicks: Math.floor(Math.random() * 100) + 20,
-    conversions: Math.floor(Math.random() * 15) + 3,
-    revenue: Math.floor(Math.random() * 800) + 200,
-    cost: Math.floor(Math.random() * 50) + 10,
-    roi: Math.floor(Math.random() * 300) + 50,
-    ctr: Math.floor(Math.random() * 8) + 2,
-    conversionRate: Math.floor(Math.random() * 20) + 5,
-    dateRange: "Last 30 days",
-    platform: PRESETS[row.preset].source,
-    service: row.service,
-    area: row.area,
-  }));
-}
 
 // ---------------- QR Code ----------------
 async function qrDataUrl(
@@ -455,6 +438,25 @@ function UTMDashboard() {
   type TestResult = { name: string; passed: boolean; details?: string };
   const [tests, setTests] = useState<TestResult[]>([]);
   const [testing, setTesting] = useState(false);
+
+  // Enhanced Analytics function
+  const generateMockAnalytics = (campaigns: Row[]): CampaignPerformance[] => {
+    return campaigns.map((row, index) => ({
+      id: `perf-${index}`,
+      campaignName: row.campaign,
+      clicks: Math.floor(Math.random() * 100) + 20,
+      conversions: Math.floor(Math.random() * 15) + 3,
+      revenue: Math.floor(Math.random() * 800) + 200,
+      cost: Math.floor(Math.random() * 50) + 10,
+      roi: Math.floor(Math.random() * 300) + 50,
+      ctr: Math.floor(Math.random() * 8) + 2,
+      conversionRate: Math.floor(Math.random() * 20) + 5,
+      dateRange: "Last 30 days",
+      platform: PRESETS[row.preset].source,
+      service: row.service,
+      area: row.area,
+    }));
+  };
 
   // Effects: keep campaign name in sync with selections
   useEffect(() => {
