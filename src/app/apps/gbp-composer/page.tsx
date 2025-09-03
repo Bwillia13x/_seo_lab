@@ -1660,11 +1660,7 @@ export default function GBPPostComposer() {
               )}
 
               <div className="flex gap-2">
-                <Button
-                  onClick={generateAIContent}
-                  disabled={isGenerating || !apiKey}
-                  className="gap-2"
-                >
+                <Button onClick={generateAIContent} disabled={isGenerating} className="gap-2">
                   {isGenerating ? (
                     <RefreshCw className="h-4 w-4 animate-spin" />
                   ) : (
