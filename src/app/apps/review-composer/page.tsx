@@ -64,6 +64,7 @@ import {
   Filter,
 } from "lucide-react";
 import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import { logEvent } from "@/lib/analytics";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
@@ -101,45 +102,28 @@ async function generateAIReviewResponse(
   }
 
   try {
-    const openai = new OpenAI({
+    const out = await aiChatSafe({
       apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
       model: "gpt5-mini",
+      maxTokens: 150,
       messages: [
         {
           role: "system",
-          content: `You are a professional customer service representative for Belmont Barbershop. Generate a warm, professional response to customer reviews. Keep responses concise (2-3 sentences) and always thank the customer.`,
+          content:
+            "You are a professional customer service representative for Belmont Barbershop. Generate a warm, professional response to customer reviews. Keep responses concise (2-3 sentences) and always thank the customer.",
         },
         {
           role: "user",
-          content: `Generate a response for this ${platform} review:
-
-Rating: ${rating}/5 stars
-Author: ${author}
-Review: "${reviewText}"
-
-Please provide a professional, warm response that addresses the customer's feedback.`,
+          content: `Generate a response for this ${platform} review:\n\nRating: ${rating}/5 stars\nAuthor: ${author}\nReview: \"${reviewText}\"\n\nPlease provide a professional, warm response that addresses the customer's feedback.`,
         },
       ],
-      max_tokens: 150,
-      temperature: 0.7,
     });
-
-    const generatedResponse = response.choices[0]?.message?.content || "Thank you for your feedback!";
-    
-    return {
-      response: generatedResponse,
-      confidence: 0.8,
-    };
+    if (out.ok) {
+      return { response: out.content || "Thank you for your feedback!", confidence: 0.8 };
+    }
+    return { response: "Thank you for your feedback! We appreciate you taking the time to share your experience with us.", confidence: 0.3 };
   } catch (error) {
-    console.error("AI review response generation failed:", error);
-    return {
-      response: "Thank you for your feedback! We appreciate you taking the time to share your experience with us.",
-      confidence: 0.3,
-    };
+    return { response: "Thank you for your feedback! We appreciate you taking the time to share your experience with us.", confidence: 0.3 };
   }
 }
 

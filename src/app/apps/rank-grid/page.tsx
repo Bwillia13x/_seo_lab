@@ -407,48 +407,29 @@ async function generateAIRankingOptimization(
   }
 
   try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
     const competitorSummary = competitors
       .slice(0, 5)
       .map((c) => `${c.name}: Rank ${c.rank}`)
       .join(", ");
 
-    const response = await openai.chat.completions.create({
+    const out = await aiChatSafe({
+      apiKey,
       model: "gpt5-mini",
+      maxTokens: 400,
       messages: [
         {
           role: "system",
-          content: `You are a search engine optimization expert for a barbershop. Analyze keyword ranking performance and provide specific optimization recommendations.`,
+          content:
+            "You are a search engine optimization expert for a barbershop. Analyze keyword ranking performance and provide specific optimization recommendations.",
         },
         {
           role: "user",
-          content: `Analyze this keyword ranking for Belmont Barbershop SEO optimization:
-
-Keyword: "${keyword}"
-Current Rank: ${currentRank}
-Search Type: ${searchType}
-Device: ${device}
-Location: ${location}
-Competitors: ${competitorSummary}
-
-Provide:
-1. Target rank recommendation (realistic goal)
-2. Difficulty level (easy/medium/hard)
-3. 4-6 specific optimization recommendations
-4. Priority level (high/medium/low)
-5. Estimated time to achieve results
-6. Success probability (0-1 scale)`,
+          content: `Analyze this keyword ranking for Belmont Barbershop SEO optimization:\n\nKeyword: \"${keyword}\"\nCurrent Rank: ${currentRank}\nSearch Type: ${searchType}\nDevice: ${device}\nLocation: ${location}\nCompetitors: ${competitorSummary}\n\nProvide:\n1. Target rank recommendation (realistic goal)\n2. Difficulty level (easy/medium/hard)\n3. 4-6 specific optimization recommendations\n4. Priority level (high/medium/low)\n5. Estimated time to achieve results\n6. Success probability (0-1 scale)`,
         },
       ],
-      max_tokens: 400,
-      temperature: 0.7,
     });
 
-    const content = response.choices[0]?.message?.content || "";
+    const content = out.ok ? out.content : "";
     const currentCTR =
       currentRank <= 3
         ? 0.3
