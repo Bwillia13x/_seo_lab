@@ -1464,7 +1464,7 @@ export default function RFMMicroCRM() {
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     What This Tool Does
                   </h3>
                   <p className="text-muted-foreground">
@@ -1476,7 +1476,7 @@ export default function RFMMicroCRM() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     AI-Powered Features
                   </h3>
                   <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
@@ -1504,7 +1504,7 @@ export default function RFMMicroCRM() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Step-by-Step Usage Guide
                   </h3>
                   <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
@@ -1540,7 +1540,7 @@ export default function RFMMicroCRM() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Understanding RFM Segmentation
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1581,7 +1581,7 @@ export default function RFMMicroCRM() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     AI Insights Categories
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

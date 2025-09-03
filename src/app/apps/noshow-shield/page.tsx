@@ -64,7 +64,7 @@ export default function NoShowShield() {
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     What This Tool Does
                   </h3>
                   <p className="text-muted-foreground">
@@ -77,7 +77,7 @@ export default function NoShowShield() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Why No-Show Prevention Matters for Belmont
                   </h3>
                   <p className="text-muted-foreground">
@@ -110,7 +110,7 @@ export default function NoShowShield() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Step-by-Step Instructions
                   </h3>
                   <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
@@ -146,7 +146,7 @@ export default function NoShowShield() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Understanding Risk Factors
                   </h3>
                   <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
@@ -179,7 +179,7 @@ export default function NoShowShield() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Reminder Strategies for Belmont
                   </h3>
                   <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
