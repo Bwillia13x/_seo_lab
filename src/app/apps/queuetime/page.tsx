@@ -85,6 +85,7 @@ import {
   Legend,
 } from "recharts";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
+import { fetchWithRetry } from "@/lib/net";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { holtWinters, clamp } from "@/lib/math";
 import { todayISO } from "@/lib/dates";
@@ -253,7 +254,7 @@ export default function QueueTimeAI() {
 
   const loadSampleData = async () => {
     try {
-      const response = await fetch("/fixtures/square-visits-sample.csv");
+      const response = await fetchWithRetry("/fixtures/square-visits-sample.csv");
       const csv = await response.text();
       const rows = parseCSV(csv) as Record<string, string>[];
       const mapped: Visit[] = rows.map((r) => ({

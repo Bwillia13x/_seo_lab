@@ -203,7 +203,8 @@ export default function RankGridWatcher() {
 
   const loadSampleData = async () => {
     try {
-      const response = await fetch("/fixtures/rankgrid-sample.csv");
+      const { fetchWithRetry } = await import("@/lib/net");
+      const response = await fetchWithRetry("/fixtures/rankgrid-sample.csv");
       const csv = await response.text();
       const rows = parseCSV(csv) as Record<string, string>[];
       const mapped: RankData[] = rows.map((r) => ({

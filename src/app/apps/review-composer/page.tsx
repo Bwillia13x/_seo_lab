@@ -69,6 +69,7 @@ import { logEvent } from "@/lib/analytics";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { todayISO, addDays } from "@/lib/dates";
+import { fetchWithRetry } from "@/lib/net";
 
 type Review = {
   id: string;
@@ -686,7 +687,7 @@ export default function ReviewComposer() {
 
   const loadSampleData = async () => {
     try {
-      const response = await fetch("/fixtures/reviews-sample.csv");
+      const response = await fetchWithRetry("/fixtures/reviews-sample.csv");
       const csv = await response.text();
       const rows = parseCSV(csv) as Record<string, string>[];
       const mapped = rows.map((r) => ({

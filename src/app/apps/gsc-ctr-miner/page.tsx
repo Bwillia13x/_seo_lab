@@ -77,6 +77,7 @@ import {
 } from "lucide-react";
 import OpenAI from "openai";
 import { aiChatSafe } from "@/lib/ai";
+import { fetchWithRetry } from "@/lib/net";
 
 import dynamic from "next/dynamic";
 const CTRScatter = dynamic(() => import("@/components/charts/ScatterCTR"), {
@@ -929,7 +930,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
               variant="outline"
               onClick={async () => {
                 try {
-                  const response = await fetch("/fixtures/gsc-sample.csv");
+                  const response = await fetchWithRetry("/fixtures/gsc-sample.csv");
                   const csvText = await response.text();
                   loadCSV(csvText);
                 } catch (e) {

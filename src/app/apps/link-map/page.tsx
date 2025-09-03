@@ -249,7 +249,8 @@ export default function LinkMap() {
 
   const loadSampleData = async () => {
     try {
-      const response = await fetch("/fixtures/prospects-sample.csv");
+      const { fetchWithRetry } = await import("@/lib/net");
+      const response = await fetchWithRetry("/fixtures/prospects-sample.csv");
       const csv = await response.text();
       const lines = csv.split("\n").slice(1).filter(Boolean);
       const prospectsData: Prospect[] = lines.map((line, idx) => {
