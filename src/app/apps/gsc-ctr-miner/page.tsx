@@ -77,18 +77,19 @@ import {
 } from "lucide-react";
 import OpenAI from "openai";
 
-import {
-  ResponsiveContainer,
-  ScatterChart,
-  Scatter,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as ReTooltip,
-  LineChart,
-  Line,
-  Legend,
-} from "recharts";
+import dynamic from "next/dynamic";
+const CTRScatter = dynamic(() => import("@/components/charts/ScatterCTR"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-80 rounded border p-3 text-sm text-muted-foreground">Loading chart…</div>
+  ),
+});
+const ExpectedLine = dynamic(() => import("@/components/charts/LineExpected"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-56 mt-6 rounded border p-3 text-sm text-muted-foreground">Loading chart…</div>
+  ),
+});
 
 import { saveBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
@@ -368,16 +369,29 @@ function GSCCtrMiner() {
   }, []);
 
   // Import
-  function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const r = new FileReader();
-    r.onload = (ev) => loadCSV(String(ev.target?.result || ""));
-    r.readAsText(f);
+function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  const MAX_CSV_BYTES = 5 * 1024 * 1024; // 5MB
+  if (f.size > MAX_CSV_BYTES) {
+    alert("CSV file is too large (max 5MB). Please trim the export or split it.");
+    return;
   }
+  const r = new FileReader();
+  r.onload = (ev) => loadCSV(String(ev.target?.result || ""));
+  r.readAsText(f);
+}
 
   function loadCSV(text: string) {
+    if ((text || "").length > 10 * 1024 * 1024) {
+      alert("CSV content too large. Please reduce the date range or columns.");
+      return;
+    }
     const raw = parseCSV(text);
+    if (raw.length > 50000) {
+      alert("CSV has more than 50,000 rows. Please filter the export to a smaller range.");
+      return;
+    }
     // Accept either GSC "Queries" export or Pages export; map columns flexibly
     const qCol = pickCol(raw[0], ["Query", "Top queries", "query"]);
     const pCol = pickCol(raw[0], ["Page", "Top pages", "page"]);
@@ -1549,41 +1563,10 @@ Provide:
             </CardHeader>
             <CardContent>
               <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ScatterChart>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      type="number"
-                      dataKey="x"
-                      name="Position"
-                      domain={[1, 30]}
-                    />
-                    <YAxis
-                      type="number"
-                      dataKey="y"
-                      name="CTR %"
-                      domain={[0, 40]}
-                    />
-                    <ReTooltip cursor={{ strokeDasharray: "3 3" }} />
-                    <Scatter data={scatter} fill="#8884d8" />
-                  </ScatterChart>
-                </ResponsiveContainer>
+                <CTRScatter data={scatter} />
               </div>
               <div className="h-56 mt-6">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={expectedLine}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="x" />
-                    <YAxis domain={[0, 40]} />
-                    <Legend />
-                    <Line
-                      dataKey="y"
-                      name="Expected CTR %"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <ExpectedLine data={expectedLine} />
               </div>
             </CardContent>
           </Card>

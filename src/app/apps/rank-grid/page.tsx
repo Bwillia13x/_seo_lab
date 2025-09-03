@@ -25,6 +25,13 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
+import dynamic from "next/dynamic";
+const MultiLine = dynamic(() => import("@/components/charts/MultiLine"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-80 rounded border p-3 text-sm text-muted-foreground">Loading chart…</div>
+  ),
+});
 import {
   LineChart,
   Line,
@@ -848,13 +855,18 @@ export default function LocalRankGrid() {
     setSnapshots((prev) => [...snaps, ...prev]);
   }
 
-  function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => importCSV(String(ev.target?.result || ""));
-    reader.readAsText(f);
+function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+  const f = e.target.files?.[0];
+  if (!f) return;
+  const MAX_CSV_BYTES = 5 * 1024 * 1024; // 5MB
+  if (f.size > MAX_CSV_BYTES) {
+    alert("CSV is too large (max 5MB). Please split it.");
+    return;
   }
+  const reader = new FileReader();
+  reader.onload = (ev) => importCSV(String(ev.target?.result || ""));
+  reader.readAsText(f);
+}
 
   // Trend data across snapshots (by keyword)
   const keywordList = useMemo(
@@ -2869,24 +2881,12 @@ export default function LocalRankGrid() {
             </CardHeader>
             <CardContent>
               <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={trendData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis domain={[0, 100]} />
-                    <ReTooltip />
-                    <Legend />
-                    {keywordList.map((k, i) => (
-                      <Line
-                        key={k}
-                        dataKey={k}
-                        name={`${k} (Vis%)`}
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    ))}
-                  </LineChart>
-                </ResponsiveContainer>
+                <MultiLine
+                  data={trendData}
+                  xKey="date"
+                  series={keywordList.map((k) => ({ key: k, name: `${k} (Vis%)` }))}
+                  yDomain={[0, 100]}
+                />
               </div>
             </CardContent>
           </Card>
@@ -4224,21 +4224,12 @@ export default function LocalRankGrid() {
                     Performance Trend (Last 30 Days)
                   </h4>
                   <div className="h-32">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={trendData.slice(-10)}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis domain={[0, 100]} />
-                        <ReTooltip />
-                        <Line
-                          type="monotone"
-                          dataKey={keywordList[0] || "visibility"}
-                          stroke="#3b82f6"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                      </LineChart>
-                    </ResponsiveContainer>
+                    <MultiLine
+                      data={trendData.slice(-10)}
+                      xKey="date"
+                      series={[{ key: keywordList[0] || "visibility", name: "Visibility" }]}
+                      yDomain={[0, 100]}
+                    />
                   </div>
                 </div>
               </CardContent>

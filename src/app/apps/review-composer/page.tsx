@@ -669,11 +669,20 @@ export default function ReviewComposer() {
   const onImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const MAX_CSV_BYTES = 5 * 1024 * 1024; // 5MB
+    if (file.size > MAX_CSV_BYTES) {
+      alert("CSV is too large (max 5MB). Please reduce rows or columns.");
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = (e) => {
       const csv = e.target?.result as string;
       const rows = parseCSV(csv) as Record<string, string>[];
+      if (rows.length > 50000) {
+        alert("CSV has more than 50,000 rows. Please filter your export.");
+        return;
+      }
       const mapped = rows.map((r) => ({
         date: r.date || r.Date || "",
         rating: Number(r.rating || r.stars || 5),
