@@ -70,6 +70,7 @@ import {
   ArrowDown,
 } from "lucide-react";
 // Using server-managed AI via aiChatSafe
+import { aiChatSafe } from "@/lib/ai";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
 import { todayISO, addDays } from "@/lib/dates";
