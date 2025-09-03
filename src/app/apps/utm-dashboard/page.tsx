@@ -62,6 +62,7 @@ import {
   Globe,
 } from "lucide-react";
 import OpenAI from "openai";
+import { logEvent } from "@/lib/analytics";
 
 import { saveBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
@@ -439,6 +440,14 @@ function UTMDashboard() {
   const [tests, setTests] = useState<TestResult[]>([]);
   const [testing, setTesting] = useState(false);
 
+  // Onboarding: prefer locally saved booking URL
+  useEffect(() => {
+    try {
+      const b = localStorage.getItem("belmont_onboarding_booking");
+      if (b && /^https?:\/\//.test(b)) setBaseUrl(b);
+    } catch {}
+  }, []);
+
   // Enhanced Analytics function
   const generateMockAnalytics = (campaigns: Row[]): CampaignPerformance[] => {
     return campaigns.map((row, index) => ({
@@ -608,6 +617,15 @@ function UTMDashboard() {
         overwrite
       );
       setBuiltUrl(url);
+      try {
+        logEvent("utm_link_built", {
+          source: utm_source,
+          medium: utm_medium,
+          campaign: utm_campaign,
+          service,
+          area,
+        });
+      } catch {}
       const durl = await qrDataUrl(url, size, margin, ecLevel);
       setQrUrl(durl);
     } catch (error) {

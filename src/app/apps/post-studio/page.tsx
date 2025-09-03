@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Card,
@@ -797,9 +797,9 @@ function useImageComposer() {
   const [imgSrc, setImgSrc] = useState<string>("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  function size() {
+  const size = useCallback(() => {
     return SIZES.find((s) => s.key === sizeKey) || SIZES[0];
-  }
+  }, [sizeKey]);
 
   function onUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -814,7 +814,7 @@ function useImageComposer() {
     r.readAsDataURL(f);
   }
 
-  function render() {
+  const render = useCallback(() => {
     const c = canvasRef.current;
     if (!c) return;
 
@@ -897,7 +897,7 @@ function useImageComposer() {
         h - bandH + Math.round(bandH * 0.25) + Math.round(w * 0.06)
       );
     }
-  }
+  }, [bgColor, fgColor, accentColor, title, subtitle, footer, handle, radius, overlayAlpha, imgSrc, size]);
 
   function exportPNG() {
     const c = canvasRef.current;
@@ -923,6 +923,7 @@ function useImageComposer() {
     radius,
     overlayAlpha,
     imgSrc,
+    render,
   ]);
 
   return {

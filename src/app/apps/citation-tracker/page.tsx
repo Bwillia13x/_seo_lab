@@ -1,5 +1,6 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
+import { BELMONT_CONSTANTS } from "@/lib/constants";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,15 +78,15 @@ type Site = {
 
 // ---------------- Defaults ----------------
 const DEFAULT_BIZ: Biz = {
-  name: "The Belmont Barbershop",
-  street: "88 9th St NE",
+  name: BELMONT_CONSTANTS.BUSINESS_NAME,
+  street: "915 General Ave NE",
   city: "Calgary",
   region: "AB",
-  postal: "T2E 7W3",
+  postal: "T2E 9E1",
   country: "CA",
-  phone: "403-618-6113",
+  phone: BELMONT_CONSTANTS.PHONE_DISPLAY,
   email: "hello@thebelmontbarber.ca",
-  website: "https://thebelmontbarber.ca",
+  website: BELMONT_CONSTANTS.WEBSITE_URL,
   lat: 51.05,
   lon: -114.05,
   priceRange: "$$",
@@ -282,7 +283,7 @@ function CitationNAPTracker() {
   }
 
   // Payload preview for a single site
-  function payloadFor(site: Site) {
+  const payloadFor = useCallback((site: Site) => {
     const limit = site.descLimit ?? 750;
     const d = makeDesc(biz, limit);
     return [
@@ -296,7 +297,7 @@ function CitationNAPTracker() {
       d,
       `Services: ${servicesInline(biz)}`,
     ].join("\n");
-  }
+  }, [biz]);
 
   function exportCSV() {
     const rows = sites.map((s) => ({
@@ -384,7 +385,7 @@ function CitationNAPTracker() {
     const csv = toCSV([{ a: 1, b: "x" }]);
     t.push({ name: "CSV roundtrip header", passed: /^a,b/.test(csv) });
     return t;
-  }, [biz]);
+  }, [biz, payloadFor]);
   const passCount = tests.filter((x) => x.passed).length;
   const totalSites = sites.length;
   const liveCount = useMemo(

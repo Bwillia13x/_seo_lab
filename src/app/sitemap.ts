@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 
 const appRoutes = [
+  "dashboard",
+  "onboarding",
   "addon-recommender",
   "citation-tracker",
   "gbp-composer",
@@ -26,7 +28,7 @@ const appRoutes = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://thebelmontbarber.ca";
+  const base = process.env.NEXT_PUBLIC_SITE_BASE || "http://localhost:3000";
   const now = new Date().toISOString();
   const items: MetadataRoute.Sitemap = [
     {
@@ -34,6 +36,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${base}/l`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
   ];
   for (const r of appRoutes) {

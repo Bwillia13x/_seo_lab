@@ -28,6 +28,8 @@ const navigationGroups = [
     title: "Getting Started",
     items: [
       { href: "/", label: "Home", icon: null },
+      { href: "/apps/dashboard", label: "Dashboard", icon: TrendingUp },
+      { href: "/apps/onboarding", label: "Onboarding", icon: Radar },
     ],
   },
   {
@@ -166,17 +168,29 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
           </div>
         </div>
       <nav className="px-2 space-y-4">
-        {navigationGroups.map((group, groupIndex) => (
-          <div key={group.title} className="space-y-2">
-            {group.title !== "Getting Started" && (
-              <div className="px-3">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  {group.title}
-                </h3>
-              </div>
-            )}
-            <div className="space-y-1">
-              {group.items.map(({ href, label, icon: Icon }) => (
+        {navigationGroups.map((group, groupIndex) => {
+          const simpleHide = new Set([
+            "/apps/queuetime",
+            "/apps/slot-yield",
+            "/apps/rfm-crm",
+            "/apps/noshow-shield",
+            "/apps/addon-recommender",
+          ]);
+          const items = simple
+            ? group.items.filter((it) => !simpleHide.has(it.href))
+            : group.items;
+          if (!items.length) return null;
+          return (
+            <div key={group.title} className="space-y-2">
+              {group.title !== "Getting Started" && (
+                <div className="px-3">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {group.title}
+                  </h3>
+                </div>
+              )}
+              <div className="space-y-1">
+              {items.map(({ href, label, icon: Icon }) => (
                 <div key={href} className="space-y-0.5">
                   <NavItem
                     href={href}
@@ -226,7 +240,8 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
               ))}
             </div>
           </div>
-        ))}
+          );
+        })}
       </nav>
       <div className="mt-auto p-3" />
     </aside>

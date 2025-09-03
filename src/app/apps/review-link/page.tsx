@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 
 import {
@@ -85,6 +85,7 @@ import { saveBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
+import { logEvent } from "@/lib/analytics";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
 
@@ -124,7 +125,7 @@ function downloadDataUrl(dataUrl: string, filename: string) {
 
 // ---------------- Defaults ----------------
 const DEFAULT_EMAIL_ID = "hello@thebelmontbarber.ca";
-const DEFAULT_PHONE_ID = "403-000-0000";
+const DEFAULT_PHONE_ID = "403-457-0420";
 
 // ---------------- Types ----------------
 type ConsentLog = {
@@ -695,7 +696,7 @@ export default function ReviewKit() {
     return `If you enjoyed your cut today, a quick Google review really helps neighbors in ${neighborhood} find us. May I send you a one‑time ${"email/SMS"} with the review link?`;
   }
 
-  function emailTemplate(firstName = "[First Name]") {
+  const emailTemplate = useCallback((firstName = "[First Name]") => {
     const idLine = includeIdentification
       ? `\n\n— ${bizName} · ${identifyPhone} · ${identifyEmail}`
       : "";
@@ -706,15 +707,15 @@ export default function ReviewKit() {
         aLink ? `Apple Maps: ${aLink}\n` : ""
       }Book again: ${bookingLink}${idLine}${includeStop ? unsub : ""}`,
     };
-  }
+  }, [includeIdentification, bizName, identifyPhone, identifyEmail, gLink, aLink, bookingLink, includeStop, neighborhood]);
 
-  function smsTemplate(firstName = "[First Name]") {
+  const smsTemplate = useCallback((firstName = "[First Name]") => {
     const idLine = includeIdentification ? ` — ${bizName}` : "";
     const stop = includeStop ? " Reply STOP to opt out." : "";
     return `Thanks for visiting ${bizName} in ${neighborhood}, ${firstName}! Review: ${gLink}${
       aLink ? ` | Apple: ${aLink}` : ""
     }. Book: ${bookingLink}.${idLine}${stop}`;
-  }
+  }, [includeIdentification, bizName, neighborhood, gLink, aLink, bookingLink, includeStop]);
 
   function whatsappTemplate(firstName = "[First Name]") {
     // WhatsApp doesn't require STOP, but keep identification; CASL governs the initial send/consent.
@@ -817,7 +818,7 @@ export default function ReviewKit() {
 
   // ---------- Self‑tests ----------
   type Test = { name: string; passed: boolean; details?: string };
-  function runTests(): Test[] {
+  const runTests = useCallback((): Test[] => {
     const tests: Test[] = [];
     // 1) SMS contains STOP when enabled
     const sms = smsTemplate("Alex");
@@ -846,11 +847,11 @@ export default function ReviewKit() {
       details: String(qrSize),
     });
     return tests;
-  }
+  }, [includeStop, includeIdentification, bizName, gLink, qrSize, emailTemplate, smsTemplate]);
 
   const tests = useMemo(
     () => runTests(),
-    [includeStop, includeIdentification, gLink, qrSize, bizName]
+    [runTests]
   );
   const passCount = tests.filter((t) => t.passed).length;
 
@@ -859,17 +860,53 @@ export default function ReviewKit() {
     const e = emailTemplate();
     copy(`Subject: ${e.subject}\n\n${e.body}`, "email");
     addConsentRow("[Name]", "email", "[email]");
+    try { logEvent("review_email_copied"); } catch {}
   }
   function copySMS() {
     copy(smsTemplate(), "sms");
     addConsentRow("[Name]", "sms", "[phone]");
+    try { logEvent("review_sms_copied"); } catch {}
   }
+
+  // Onboarding overrides: use locally set review URL if present
+  useEffect(() => {
+    try {
+      const u = localStorage.getItem("belmont_google_review_url");
+      if (u && /^https?:\/\//.test(u)) setGoogleReviewLink(u);
+      const ph = localStorage.getItem("belmont_onboarding_phone");
+      if (ph) setIdentifyPhone(ph);
+    } catch {}
+  }, []);
 
   return (
     <div className="p-5 md:p-8 space-y-6">
+      {googleReviewLink.includes("REPLACE_WITH_REAL_PLACE_ID") && (
+        <Card className="border-amber-300 bg-amber-50 dark:bg-amber-950/10">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Action required: Set Google review link</CardTitle>
+            <CardDescription>
+              Paste your Google review link (with place ID) below to enable one‑click reviews. You can find your Place ID using Google’s Place ID Finder.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-sm">
+            <div className="flex flex-wrap gap-2">
+              <Button asChild size="sm" variant="outline">
+                <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" rel="noopener noreferrer">
+                  Open Place ID Finder
+                </a>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <a href="https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID" target="_blank" rel="noopener noreferrer">
+                  Review URL format
+                </a>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <PageHeader
-        title="AI Review Studio"
-        subtitle="AI-powered review request management with performance analytics, campaign optimization, and automated follow-ups."
+        title="Review Request Links"
+        subtitle="Create Google/Apple review links, copy CASL-compliant email/SMS, and print QR cards. (Optional: connect AI for optimization)"
         actions={
           <div className="flex gap-2">
             <Button
@@ -878,7 +915,7 @@ export default function ReviewKit() {
               variant="outline"
             >
               <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
+              AI Optimize (optional)
             </Button>
             <Button
               onClick={calculateReviewAnalyticsData}

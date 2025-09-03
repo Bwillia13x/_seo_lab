@@ -75,6 +75,7 @@ import { toCSV } from "@/lib/csv";
 import { todayISO, addDays } from "@/lib/dates";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
+import { BELMONT_CONSTANTS } from "@/lib/constants";
 
 type Prospect = {
   id: string;
@@ -306,10 +307,10 @@ Looking forward to hearing from you!
 
 Best regards,
 [Your Name]
-The Belmont Barbershop
-88 9th St NE, Calgary, AB T2E 7W3
-403-618-6113
-https://thebelmontbarber.ca
+${BELMONT_CONSTANTS.BUSINESS_NAME}
+${BELMONT_CONSTANTS.ADDRESS_STR}
+${BELMONT_CONSTANTS.PHONE_DISPLAY}
+${BELMONT_CONSTANTS.WEBSITE_URL}
 
 ---
 CASL Compliance: You can unsubscribe from future emails at any time.`;

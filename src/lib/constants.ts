@@ -3,16 +3,17 @@ export const BELMONT_CONSTANTS = {
   // Business Info
   BUSINESS_NAME: "The Belmont Barbershop",
   BOOK_URL: "https://thebelmontbarber.ca/book",
-  PHONE_TEL: "tel:403-618-6113",
-  PHONE_DISPLAY: "403-618-6113",
-  ADDRESS_STR: "88 9th St NE, Calgary, Alberta, T2E 7W3",
-  MAP_URL: "https://maps.google.com/?q=88+9th+St+NE,+Calgary,+AB,+T2E+7W3",
+  WEBSITE_URL: "https://thebelmontbarber.ca",
+  PHONE_TEL: "tel:403-457-0420",
+  PHONE_DISPLAY: "403-457-0420",
+  ADDRESS_STR: "915 General Ave NE, Calgary, Alberta, T2E 9E1",
+  MAP_URL: "https://maps.google.com/?q=915+General+Ave+NE,+Calgary,+AB,+T2E+9E1",
 
   // Review Links
   REVIEW_GOOGLE_URL:
-    "https://search.google.com/local/writereview?placeid=ChIJEXAMPLE_BELMONT", // Replace with actual Google Place ID
+    "https://search.google.com/local/writereview?placeid=REPLACE_WITH_REAL_PLACE_ID", // TODO: replace with actual Google Place ID
   REVIEW_APPLE_URL:
-    "https://maps.apple.com/?q=88+9th+St+NE,+Calgary,+AB,+T2E+7W3",
+    "https://maps.apple.com/?q=915+General+Ave+NE,+Calgary,+AB,+T2E+9E1",
 
   // Social & Contact
   INSTAGRAM_URL: "https://instagram.com/thebelmontbarber",
@@ -117,7 +118,7 @@ export const BELMONT_CONTENT_TEMPLATES = {
     "Bridgeland's premier gentlemen's grooming lounge since 2012. Premium services for discerning gentlemen. Book now: [link] #Bridgeland #CalgaryBarber #MensGrooming",
     "From sharp fades to sculpted beards - we deliver precision and excellence. Visit us in Calgary's heart of Bridgeland. #BarberShop #Calgary #BridgelandBarber",
     "Hot towel shaves, precision cuts, and luxury grooming. The Belmont Barbershop - Bridgeland's barber destination. #HotShave #MensHaircut #Calgary",
-    "Planning your wedding? Book our Groomsmen Party Package! Up to 8 guests, premium grooming experience. Call 403-618-6113 #Groomsmen #Wedding #Calgary",
+    "Planning your wedding? Book our Groomsmen Party Package! Up to 8 guests, premium grooming experience. Call 403-457-0420 #Groomsmen #Wedding #Calgary",
   ],
 };
 

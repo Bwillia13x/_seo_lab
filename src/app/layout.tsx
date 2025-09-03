@@ -2,6 +2,8 @@ import "./globals.css";
 import AppShell from "@/components/shell/AppShell";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
+const SITE_BASE = process.env.NEXT_PUBLIC_SITE_BASE || "https://thebelmontbarber.ca";
+
 export const metadata = {
   title: "Belmont SEO Lab - Local SEO Tools for The Belmont Barbershop",
   description:
@@ -29,7 +31,7 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://thebelmontbarber.ca"),
+  metadataBase: new URL(SITE_BASE),
   alternates: {
     canonical: "/",
   },
@@ -48,7 +50,7 @@ export const metadata = {
     title: "Belmont SEO Lab - Professional Local SEO Tools",
     description:
       "Complete SEO toolkit for The Belmont Barbershop in Bridgeland, Calgary",
-    url: "https://thebelmontbarber.ca/",
+    url: SITE_BASE,
     siteName: "The Belmont Barbershop",
     locale: "en_CA",
     type: "website",

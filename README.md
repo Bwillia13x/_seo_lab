@@ -54,6 +54,10 @@ npm install -g vercel
 vercel --prod
 ```
 
+Environment variables:
+- `NEXT_PUBLIC_SITE_BASE`: Set to the deployed base URL (e.g. `https://belmont-seo-lab.vercel.app`). Used for OpenGraph, robots, and sitemap.
+- `NEXT_PUBLIC_ALLOW_INDEXING`: Set to `true` when you want search engines to index the site. Defaults to noindex when unset.
+
 ---
 
 ## 🏪 Belmont-Specific Configuration

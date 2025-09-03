@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -906,7 +906,7 @@ export default function LocalRankGrid() {
 
   // Self tests
   type Test = { name: string; passed: boolean; details?: string };
-  function runTests(): Test[] {
+  const runTests = useCallback((): Test[] => {
     const tests: Test[] = [];
     const g = [
       [1, 3, 5],
@@ -938,7 +938,7 @@ export default function LocalRankGrid() {
       passed: rankBg(null) === "#e5e7eb",
     });
     return tests;
-  }
+  }, []);
 
   // Bulk operations handlers
   function handleBulkImport(e: React.ChangeEvent<HTMLInputElement>) {
@@ -2169,7 +2169,7 @@ export default function LocalRankGrid() {
     saveBlob(blob, `belmont-monthly-summary-${todayISO()}.json`);
   }
 
-  const tests = useMemo(() => runTests(), []);
+  const tests = useMemo(() => runTests(), [runTests]);
   const passCount = tests.filter((t) => t.passed).length;
 
   return (

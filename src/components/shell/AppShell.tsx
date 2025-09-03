@@ -14,6 +14,8 @@ export default function AppShell({
 }) {
   const [dark, setDark] = useState(false);
   const [simple, setSimple] = useState(false);
+  const [phoneTel, setPhoneTel] = useState(BELMONT_CONSTANTS.PHONE_TEL);
+  const [mapUrl, setMapUrl] = useState(BELMONT_CONSTANTS.MAP_URL);
   useEffect(() => {
     if (typeof document !== "undefined") {
       const isDark = document.documentElement.classList.contains("dark");
@@ -31,6 +33,17 @@ export default function AppShell({
           window.localStorage.setItem("belmont_simple_mode", "1");
         } catch {}
       }
+      try {
+        const ph = window.localStorage.getItem("belmont_onboarding_phone");
+        const addr = window.localStorage.getItem("belmont_onboarding_address");
+        if (ph) {
+          const digits = ph.replace(/[^0-9+]/g, "");
+          setPhoneTel(`tel:${digits}`);
+        }
+        if (addr) {
+          setMapUrl(`https://maps.google.com/?q=${encodeURIComponent(addr)}`);
+        }
+      } catch {}
     }
   }, []);
   function toggleTheme() {
@@ -74,7 +87,7 @@ export default function AppShell({
               {/* Quick Actions - Only show on larger screens */}
               <div className="hidden lg:flex items-center gap-1 rounded-full bg-secondary/50 px-1 py-1">
                 <a
-                  href={BELMONT_CONSTANTS.PHONE_TEL}
+                  href={phoneTel}
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-full hover:bg-accent transition-colors"
                   aria-label="Call for assistance"
                 >
@@ -82,7 +95,7 @@ export default function AppShell({
                   <span className="hidden xl:inline">Assistance</span>
                 </a>
                 <a
-                  href={BELMONT_CONSTANTS.MAP_URL}
+                  href={mapUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-full hover:bg-accent transition-colors"
@@ -151,7 +164,7 @@ export default function AppShell({
             </a>
             <div className="flex gap-2">
               <a
-                href="tel:403-618-6113"
+                href={phoneTel}
                 className="inline-flex items-center justify-center h-12 w-12 rounded-full belmont-accent text-white shadow-lg hover:shadow-xl hover:scale-105 focus-ring transition-all duration-200"
                 aria-label="Call for assistance"
                 title="Call for assistance"
@@ -159,7 +172,7 @@ export default function AppShell({
                 <Phone className="h-5 w-5" />
               </a>
               <a
-                href={BELMONT_CONSTANTS.MAP_URL}
+                href={mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-blue-600 text-white shadow-lg hover:shadow-xl hover:scale-105 focus-ring transition-all duration-200"

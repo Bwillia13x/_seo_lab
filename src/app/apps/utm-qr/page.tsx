@@ -552,6 +552,14 @@ export default function UTMBuilder() {
   const [testResults, setTestResults] = useState<QRTestResult | null>(null);
   const [advancedMode, setAdvancedMode] = useState<boolean>(false);
 
+  // Onboarding: prefer locally saved booking URL
+  useEffect(() => {
+    try {
+      const b = localStorage.getItem("belmont_onboarding_booking");
+      if (b && /^https?:\/\//.test(b)) setBaseUrl(b);
+    } catch {}
+  }, []);
+
   // Effects: keep campaign name in sync with selections
   useEffect(() => {
     const c = `belmont-${slugify(service)}-${slugify(area)}-${todayYYYYMM()}`;

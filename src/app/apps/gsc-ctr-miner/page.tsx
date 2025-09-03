@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Card,
@@ -308,7 +308,7 @@ function GSCCtrMiner() {
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  function makeTitle(fam: string, area: string) {
+  const makeTitle = useCallback((fam: string, area: string) => {
     const areaLabel =
       area === "calgary"
         ? "Calgary"
@@ -331,9 +331,9 @@ function GSCCtrMiner() {
       default:
         return `Barbershop in ${areaLabel} — The Belmont`;
     }
-  }
+  }, []);
 
-  function makeMeta(fam: string, area: string) {
+  const makeMeta = useCallback((fam: string, area: string) => {
     const areaLabel =
       area === "calgary"
         ? "Calgary"
@@ -356,7 +356,7 @@ function GSCCtrMiner() {
       default:
         return `Local barbershop in ${areaLabel}. Reliable cuts, fair prices.`;
     }
-  }
+  }, []);
 
   // Import
   function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -779,7 +779,7 @@ Provide:
         impressions: o.impressions,
         potentialClicks: o.missedClicks,
       })),
-    [opps]
+    [opps, makeTitle, makeMeta]
   );
 
   function exportRecsCSV() {
@@ -874,7 +874,7 @@ Provide:
 
   // Self tests
   type Test = { name: string; passed: boolean; details?: string };
-  function runTests(): Test[] {
+  const runTests = useCallback((): Test[] => {
     const tests: Test[] = [];
     // 1) expected CTR monotonic non‑increasing by buckets
     const v1 = [1, 2, 3, 4, 7, 12, 25].map((p) => expectedCTR(p, knobs));
@@ -900,8 +900,8 @@ Provide:
       passed: isBrand("belmont barbershop reviews"),
     });
     return tests;
-  }
-  const tests = useMemo(() => runTests(), [knobs]);
+  }, [knobs]);
+  const tests = useMemo(() => runTests(), [runTests]);
   const passCount = tests.filter((t) => t.passed).length;
 
   return (

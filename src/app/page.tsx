@@ -27,6 +27,8 @@ import {
   MapPin,
   Calendar,
 } from "lucide-react";
+import { OnboardingBanner } from "@/components/ui/onboarding-banner";
+import { BELMONT_CONSTANTS } from "@/lib/constants";
 
 const toolCategories = [
   {
@@ -148,6 +150,7 @@ const toolCategories = [
     title: "Business Insights",
     icon: TrendingUp,
     description: "Understand customer patterns and predict busy times",
+    advanced: true,
     tools: [
       {
         name: "Customer Traffic Predictor",
@@ -173,6 +176,7 @@ const toolCategories = [
     title: "Appointment Protection",
     icon: Shield,
     description: "Reduce no-shows and increase revenue",
+    advanced: true,
     tools: [
       {
         name: "No-Show Predictor",
@@ -308,6 +312,7 @@ export default function Home() {
       </div>
 
       {/* Quick Start Guide */}
+      <OnboardingBanner />
       <Card className="elevated-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -390,16 +395,16 @@ export default function Home() {
       </Card>
 
       {/* Quick Contact Actions */}
-      <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-4">
         <Button asChild size="sm">
-          <a href="tel:403-618-6113" className="flex items-center gap-2">
+          <a href={BELMONT_CONSTANTS.PHONE_TEL} className="flex items-center gap-2">
             <Phone className="h-4 w-4" />
             Call Belmont
           </a>
         </Button>
         <Button asChild size="sm">
           <a
-            href="https://thebelmontbarber.ca/book"
+            href={BELMONT_CONSTANTS.BOOK_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2"
@@ -410,7 +415,7 @@ export default function Home() {
         </Button>
         <Button asChild size="sm">
           <a
-            href="https://maps.google.com/?q=915+General+Ave+NE,+Calgary,+AB,+T2E+9E1"
+            href={BELMONT_CONSTANTS.MAP_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2"
@@ -525,7 +530,9 @@ export default function Home() {
 
         <div className="grid gap-8">
           {toolCategories.map((category, index) => (
-            <Card key={category.title} className="elevated-card">
+            <Card key={category.title} className={`elevated-card ${
+              (category as any).advanced ? "advanced-only" : ""
+            }`}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-xl">
                   <div className="p-2 rounded-lg bg-primary/10">
@@ -604,10 +611,10 @@ export default function Home() {
             <div className="space-y-2">
               <h4 className="font-semibold">Business Information</h4>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Business Name: The Belmont Barbershop</li>
-                <li>• Address: 88 9th St NE, Calgary, AB T2E 7W3</li>
-                <li>• Phone: 403-618-6113</li>
-                <li>• Website: thebelmontbarber.ca</li>
+                <li>• Business Name: {BELMONT_CONSTANTS.BUSINESS_NAME}</li>
+                <li>• Address: {BELMONT_CONSTANTS.ADDRESS_STR}</li>
+                <li>• Phone: {BELMONT_CONSTANTS.PHONE_DISPLAY}</li>
+                <li>• Website: {BELMONT_CONSTANTS.WEBSITE_URL.replace("https://", "")}</li>
               </ul>
             </div>
             <div className="space-y-2">
@@ -694,7 +701,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center gap-4">
             <Button asChild variant="outline">
-              <a href="tel:403-618-6113">
+              <a href={BELMONT_CONSTANTS.PHONE_TEL}>
                 <Phone className="h-4 w-4 mr-2" />
                 Call Support
               </a>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -53,6 +53,7 @@ import {
 } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
 import OpenAI from "openai";
+import { logEvent } from "@/lib/analytics";
 
 // ---------------- Enhanced Types ----------------
 type BaseState = {
@@ -580,7 +581,7 @@ export default function GBPPostComposer() {
     addTags: true,
     addNeighborhood: true,
     autoUtm: true,
-    phone: "403-618-6113",
+  phone: "403-457-0420",
     keywords: ["barber", "haircut", "bridgeland", "calgary"],
     targetAudience: "Local Professionals",
     callToAction: "Book your appointment today",
@@ -696,6 +697,13 @@ export default function GBPPostComposer() {
       setTitle(generatedTitle);
       setBody(generatedBody);
       setAlt(generateImageDescription(state.service, state.area, state.tone));
+      try {
+        logEvent("gbp_post_generated", {
+          service: state.service,
+          area: state.area,
+          type: state.type,
+        });
+      } catch {}
     } catch (error) {
       alert(
         "Failed to generate AI content: " +
@@ -733,6 +741,9 @@ export default function GBPPostComposer() {
     ];
 
     setVariants(newVariants);
+    try {
+      logEvent("gbp_post_variants_generated", { count: newVariants.length });
+    } catch {}
   }
 
   // Load Analytics Data
@@ -765,7 +776,7 @@ export default function GBPPostComposer() {
 
   // Self tests
   type TestResult = { name: string; passed: boolean; details?: string };
-  function runTests(): TestResult[] {
+  const runTests = useCallback((): TestResult[] => {
     const results: TestResult[] = [];
     // 1) Words near target
     const b = buildBody({
@@ -806,7 +817,7 @@ export default function GBPPostComposer() {
       details: a,
     });
     return results;
-  }
+  }, []);
 
   const tests = useMemo(() => runTests(), [runTests]);
   const passCount = tests.filter((t) => t.passed).length;
