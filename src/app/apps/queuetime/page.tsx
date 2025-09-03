@@ -302,8 +302,6 @@ export default function QueueTimeAI() {
   }, [forecast]);
 
   // ---------------- AI Busy Time Optimization Functions ----------------
-  // Function moved to component scope to avoid duplicate definitions
-  /*
 async function generateAIBusyTimeOptimization(
   timeSlot: string,
   dayOfWeek: string,
@@ -421,7 +419,6 @@ Provide:
       };
     }
   }
-*/
 
   // ---------------- Enhanced Analytics Functions ----------------
   function calculateBusyTimeAnalytics(visits: Visit[]): BusyTimeAnalytics {
@@ -575,7 +572,7 @@ Provide:
   }
 
   // ---------------- Enhanced Functions ----------------
-  const generateAIBusyTimeOptimization = async () => {
+  const handleGenerateAIBusyTimeOptimization = async () => {
     if (!selectedTimeSlot || !selectedDayOfWeek || visits.length === 0) return;
 
     const timeSlotVisits = visits.filter((visit) => {
@@ -687,7 +684,7 @@ Provide:
         actions={
           <div className="flex gap-2">
             <Button
-              onClick={generateAIBusyTimeOptimization}
+              onClick={handleGenerateAIBusyTimeOptimization}
               disabled={!selectedTimeSlot || !selectedDayOfWeek || !apiKey}
               variant="outline"
             >

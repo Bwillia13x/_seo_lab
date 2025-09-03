@@ -1002,7 +1002,7 @@ export default function Page() {
   }
 
   // ---------- Enhanced Functions ----------
-  async function generateAIContent() {
+  async function handleGenerateAIContent() {
     if (!apiKey.trim()) {
       alert("Please enter your OpenAI API key first");
       return;
@@ -1760,7 +1760,7 @@ export default function Page() {
                   </div>
 
                   <Button
-                    onClick={generateAIContent}
+                    onClick={handleGenerateAIContent}
                     disabled={isGenerating || !apiKey.trim()}
                     className="w-full"
                   >
@@ -2104,7 +2104,7 @@ export default function Page() {
                                 ✓ Strengths
                               </h4>
                               <ul className="list-disc pl-5 space-y-1 text-sm">
-                                {quality.strengths.map((strength, i) => (
+                                {quality.strengths.map((strength: string, i: number) => (
                                   <li key={i} className="text-green-700">
                                     {strength}
                                   </li>
@@ -2119,7 +2119,7 @@ export default function Page() {
                                 </h4>
                                 <ul className="list-disc pl-5 space-y-1 text-sm">
                                   {quality.improvements.map(
-                                    (improvement, i) => (
+                                    (improvement: string, i: number) => (
                                       <li key={i} className="text-orange-700">
                                         {improvement}
                                       </li>

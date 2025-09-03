@@ -57,7 +57,6 @@ import {
   FileImage,
   Award,
   Gift,
-  TrendingIcon,
   SettingsIcon,
   Calendar,
   Users,
@@ -81,6 +80,210 @@ type Review = {
   replySent?: boolean;
   sentDate?: string;
 };
+
+// ---------------- Enhanced Functions ----------------
+async function generateAIReviewResponse(
+  reviewText: string,
+  rating: number,
+  author: string,
+  platform: string,
+  apiKey?: string
+): Promise<{
+  response: string;
+  confidence: number;
+}> {
+  if (!apiKey) {
+    return {
+      response: "Thank you for your feedback! We appreciate you taking the time to share your experience with us.",
+      confidence: 0.5,
+    };
+  }
+
+  try {
+    const openai = new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true,
+    });
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: `You are a professional customer service representative for Belmont Barbershop. Generate a warm, professional response to customer reviews. Keep responses concise (2-3 sentences) and always thank the customer.`,
+        },
+        {
+          role: "user",
+          content: `Generate a response for this ${platform} review:
+
+Rating: ${rating}/5 stars
+Author: ${author}
+Review: "${reviewText}"
+
+Please provide a professional, warm response that addresses the customer's feedback.`,
+        },
+      ],
+      max_tokens: 150,
+      temperature: 0.7,
+    });
+
+    const generatedResponse = response.choices[0]?.message?.content || "Thank you for your feedback!";
+    
+    return {
+      response: generatedResponse,
+      confidence: 0.8,
+    };
+  } catch (error) {
+    console.error("AI review response generation failed:", error);
+    return {
+      response: "Thank you for your feedback! We appreciate you taking the time to share your experience with us.",
+      confidence: 0.3,
+    };
+  }
+}
+
+function generateBatchResponseDrafts(
+  reviews: Review[],
+  templates: ReviewTemplate[]
+): ReviewResponse[] {
+  const responses: ReviewResponse[] = [];
+  
+  reviews.forEach((review) => {
+    if (review.status === "unreplied") {
+      const template = templates.find((t) => 
+        t.platform === review.platform
+      ) || templates[0];
+      
+      if (template) {
+        const response: ReviewResponse = {
+          id: `response_${Date.now()}_${Math.random()}`,
+          reviewId: review.id,
+          content: template.content.replace("{customerName}", review.author),
+          tone: template.tone,
+          sentiment: review.rating >= 4 ? "positive" : review.rating >= 3 ? "neutral" : "negative",
+          performance: {
+            sent: false,
+            responseTime: 0,
+            customerFollowUp: false,
+          },
+          aiGenerated: true,
+          templateUsed: template.id,
+        };
+        responses.push(response);
+      }
+    }
+  });
+  
+  return responses;
+}
+
+function calculateReviewResponseAnalytics(
+  reviews: Review[],
+  responses: ReviewResponse[]
+): ReviewAnalytics {
+  const totalReviews = reviews.length;
+  const respondedReviews = reviews.filter((r) => r.status === "replied").length;
+  const responseRate = totalReviews > 0 ? (respondedReviews / totalReviews) * 100 : 0;
+  
+  const avgResponseTime = responses.length > 0 
+    ? responses.reduce((sum, r) => sum + r.performance.responseTime, 0) / responses.length 
+    : 0;
+  
+  const avgRating = reviews.length > 0 
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+    : 0;
+
+  const platformBreakdown: Record<string, {
+    total: number;
+    responded: number;
+    avgRating: number;
+    avgResponseTime: number;
+  }> = {};
+
+  reviews.forEach((review) => {
+    if (!platformBreakdown[review.platform]) {
+      platformBreakdown[review.platform] = {
+        total: 0,
+        responded: 0,
+        avgRating: 0,
+        avgResponseTime: 0,
+      };
+    }
+    platformBreakdown[review.platform].total++;
+    if (review.status === "replied") {
+      platformBreakdown[review.platform].responded++;
+    }
+  });
+
+  // Calculate platform averages
+  Object.keys(platformBreakdown).forEach((platform) => {
+    const platformReviews = reviews.filter((r) => r.platform === platform);
+    const platformResponses = responses.filter((r) => 
+      platformReviews.some((pr) => pr.id === r.reviewId)
+    );
+    
+    platformBreakdown[platform].avgRating = platformReviews.length > 0
+      ? platformReviews.reduce((sum, r) => sum + r.rating, 0) / platformReviews.length
+      : 0;
+    
+    platformBreakdown[platform].avgResponseTime = platformResponses.length > 0
+      ? platformResponses.reduce((sum, r) => sum + r.performance.responseTime, 0) / platformResponses.length
+      : 0;
+  });
+
+  const sentimentBreakdown: Record<string, number> = {};
+  responses.forEach((response) => {
+    sentimentBreakdown[response.sentiment] = (sentimentBreakdown[response.sentiment] || 0) + 1;
+  });
+
+  const timeBasedData: Record<string, {
+    reviews: number;
+    responses: number;
+    avgRating: number;
+  }> = {};
+
+  reviews.forEach((review) => {
+    const month = new Date(review.date).toISOString().slice(0, 7);
+    if (!timeBasedData[month]) {
+      timeBasedData[month] = { reviews: 0, responses: 0, avgRating: 0 };
+    }
+    timeBasedData[month].reviews++;
+  });
+
+  responses.forEach((response) => {
+    const review = reviews.find((r) => r.id === response.reviewId);
+    if (review) {
+      const month = new Date(review.date).toISOString().slice(0, 7);
+      if (timeBasedData[month]) {
+        timeBasedData[month].responses++;
+      }
+    }
+  });
+
+  // Calculate monthly averages
+  Object.keys(timeBasedData).forEach((month) => {
+    const monthReviews = reviews.filter((r) => 
+      new Date(r.date).toISOString().slice(0, 7) === month
+    );
+    timeBasedData[month].avgRating = monthReviews.length > 0
+      ? monthReviews.reduce((sum, r) => sum + r.rating, 0) / monthReviews.length
+      : 0;
+  });
+
+  const customerSatisfaction = avgRating >= 4 ? 85 : avgRating >= 3 ? 70 : 50;
+
+  return {
+    totalReviews,
+    respondedReviews,
+    responseRate,
+    avgResponseTime,
+    avgRating,
+    platformBreakdown,
+    sentimentBreakdown,
+    timeBasedData,
+    customerSatisfaction,
+  };
+}
 
 // ---------------- Enhanced Types ----------------
 type ReviewResponse = {
@@ -570,7 +773,7 @@ export default function ReviewComposer() {
   };
 
   const generateBatchResponses = () => {
-    const batchResponses = generateBatchResponses(reviews, reviewTemplates);
+    const batchResponses = generateBatchResponseDrafts(reviews, reviewTemplates);
     setReviewResponses((prev) => [...prev, ...batchResponses]);
     alert(`Generated ${batchResponses.length} response drafts!`);
   };

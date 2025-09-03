@@ -645,7 +645,7 @@ export default function ReviewKit() {
     alert(`Generated ${newRequests.length} review requests!`);
   };
 
-  const calculateReviewAnalytics = () => {
+  const calculateReviewAnalyticsData = () => {
     const analytics = calculateReviewAnalytics(reviewRequests);
     setReviewAnalytics(analytics);
   };
@@ -881,7 +881,7 @@ export default function ReviewKit() {
               AI Optimize
             </Button>
             <Button
-              onClick={calculateReviewAnalytics}
+              onClick={calculateReviewAnalyticsData}
               disabled={reviewRequests.length === 0}
               variant="outline"
             >
@@ -1658,7 +1658,7 @@ export default function ReviewKit() {
               </p>
             </div>
             <Button
-              onClick={calculateReviewAnalytics}
+              onClick={calculateReviewAnalyticsData}
               disabled={reviewRequests.length === 0}
             >
               <BarChart3 className="h-4 w-4 mr-2" />
