@@ -520,32 +520,10 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
     currentPosition: number,
     impressions: number,
     clicks: number,
-    competitors: string[],
-    apiKey?: string
+    competitors: string[]
   ): Promise<SearchOptimization> {
-    if (!apiKey) {
-      return {
-        id: `opt_${Date.now()}`,
-        keyword,
-        currentPosition,
-        targetPosition: Math.max(1, currentPosition - 3),
-        currentCTR: clicks / impressions,
-        potentialCTR: (clicks / impressions) * 1.5,
-        potentialClicks: Math.round((clicks / impressions) * impressions * 1.5),
-        difficulty: "medium",
-        recommendations: [
-          "Optimize title tag with primary keyword",
-          "Improve meta description with compelling call-to-action",
-          "Add structured data markup",
-          "Improve page load speed",
-        ],
-        priority: "high",
-      };
-    }
-
     try {
       const out = await aiChatSafe({
-        apiKey,
         model: "gpt-5-mini-2025-08-07",
         maxTokens: 400,
         messages: [
@@ -810,8 +788,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
       keywordData.position,
       keywordData.impressions,
       keywordData.clicks,
-      ["competitor1", "competitor2"], // Mock competitors
-      apiKey
+      ["competitor1", "competitor2"] // Mock competitors
     );
 
     setSearchLibrary((prev) => ({
