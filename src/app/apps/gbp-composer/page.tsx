@@ -648,7 +648,7 @@ export default function GBPPostComposer() {
   // AI Content Generation
   async function generateAIContent() {
     if (!apiKey) {
-      alert("Please enter your OpenAI API key first");
+      try { (await import("@/lib/toast")).showToast("Please enter your OpenAI API key first", "warn"); } catch {}
       return;
     }
 

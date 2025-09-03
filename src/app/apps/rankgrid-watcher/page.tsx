@@ -215,7 +215,7 @@ export default function RankGridWatcher() {
       }));
       setRankData(mapped);
     } catch (e) {
-      alert("Could not load sample data");
+      try { (await import("@/lib/toast")).showToast("Could not load sample data", "error"); } catch {}
     }
   };
 

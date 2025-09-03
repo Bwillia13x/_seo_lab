@@ -933,9 +933,12 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                   const csvText = await response.text();
                   loadCSV(csvText);
                 } catch (e) {
-                  alert(
-                    "Could not load sample data. Make sure fixtures are available."
-                  );
+                  try {
+                    (await import("@/lib/toast")).showToast(
+                      "Could not load sample data. Make sure fixtures are available.",
+                      "error"
+                    );
+                  } catch {}
                 }
               }}
             >

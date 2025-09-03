@@ -8,6 +8,7 @@ import { BELMONT_CONSTANTS } from "@/lib/constants";
 import Image from "next/image";
 import { AIDiagnostics } from "@/components/ui/ai-diagnostics";
 import { logEvent } from "@/lib/analytics";
+import { ToastProvider } from "@/components/ui/toast";
 
 export default function AppShell({
   children,
@@ -161,6 +162,7 @@ export default function AppShell({
         <main className="p-4 md:p-6 max-w-[1440px] mx-auto w-full">
           {children}
         </main>
+        <ToastProvider />
         {/* Floating Help Actions */}
         <div className="fixed bottom-6 right-6 z-50">
           <div className="flex flex-col items-end gap-3">
