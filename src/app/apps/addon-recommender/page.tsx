@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -226,6 +226,17 @@ export default function AddOnRecommender() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Auto-load AI key from env/localStorage
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
 
   // ---------------- Enhanced Utility Functions ----------------
 
