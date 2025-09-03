@@ -322,7 +322,8 @@ async function generateAdvancedQR(
       // For now, we'll just generate the base QR
     }
 
-    return await QRCode.toDataURL(text, options);
+    const result = await QRCode.toDataURL(text, options);
+    return String(result);
   } catch (error) {
     console.error("Advanced QR generation failed:", error);
     // Fallback to simple ASCII

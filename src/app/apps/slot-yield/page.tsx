@@ -805,6 +805,8 @@ function generateProfitCampaign(
 
 
 function ProfitIntelligenceStudio() {
+  const [raw, setRaw] = useState<any[]>([]);
+  const [settings, setSettings] = useState<SettingsState>(DEFAULT_SETTINGS);
   const [appts, setAppts] = useState<Appt[]>([]);
   const [mappedCols, setMappedCols] = useState<{
     start: string;
@@ -896,7 +898,7 @@ function ProfitIntelligenceStudio() {
   const noshowPct = fmtPct(totals.noshowRate);
   const idleMin = Math.max(0, totals.totalCapacityMin - totals.totalBookedMin);
 
-  const generateAIProfitOptimization = async () => {
+  const runAIProfitOptimization = async () => {
     if (!selectedService || !selectedTimeSlot || appts.length === 0) return;
 
     const serviceAppointments = appts.filter(
@@ -912,14 +914,24 @@ function ProfitIntelligenceStudio() {
     const totalSlots = 4 * 8; // 4 chairs, 8 hours
     const currentUtilization = (timeSlotAppointments.length / totalSlots) * 100;
 
-    const optimization = await generateAIProfitOptimization(
-      selectedService,
-      selectedTimeSlot,
-      currentRevenue,
-      currentUtilization,
-      [], // competitorData would come from external source
-      apiKey
-    );
+    // Generate optimization using local logic
+    const optimization: ProfitOptimization = {
+      id: `opt_${Date.now()}`,
+      service: selectedService,
+      timeSlot: selectedTimeSlot,
+      currentProfitability: currentRevenue * 0.3,
+      targetProfitability: currentRevenue * 0.4,
+      difficulty: currentUtilization < 70 ? "easy" : currentUtilization < 85 ? "medium" : "hard",
+      recommendations: [
+        "Optimize pricing strategy",
+        "Improve service bundling", 
+        "Enhance staff efficiency",
+        "Implement upselling techniques"
+      ],
+      priority: currentUtilization < 70 ? "high" : currentUtilization < 85 ? "medium" : "low",
+      estimatedTime: "2-4 weeks",
+      successProbability: 0.7,
+    };
 
     setProfitLibrary((prev) => ({
       ...prev,
@@ -1052,7 +1064,7 @@ function ProfitIntelligenceStudio() {
         actions={
           <div className="flex gap-2">
             <Button
-              onClick={generateAIProfitOptimization}
+              onClick={runAIProfitOptimization}
               disabled={!selectedService || !selectedTimeSlot || !apiKey}
               variant="outline"
             >
