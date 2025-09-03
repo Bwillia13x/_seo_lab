@@ -1009,7 +1009,7 @@ export default function ReviewComposer() {
             <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     What This Tool Does
                   </h3>
                   <p className="text-muted-foreground">
@@ -1023,7 +1023,7 @@ export default function ReviewComposer() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Why Review Management Matters for Belmont
                   </h3>
                   <p className="text-muted-foreground">
@@ -1055,7 +1055,7 @@ export default function ReviewComposer() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Step-by-Step Instructions
                   </h3>
                   <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
@@ -1103,7 +1103,7 @@ export default function ReviewComposer() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Best Practices for Review Responses
                   </h3>
                   <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
@@ -1144,7 +1144,7 @@ export default function ReviewComposer() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Understanding Review Analysis
                   </h3>
                   <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
@@ -1170,7 +1170,7 @@ export default function ReviewComposer() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     CASL and Privacy Compliance
                   </h3>
                   <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
@@ -1199,7 +1199,7 @@ export default function ReviewComposer() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Data Format Requirements
                   </h3>
                   <p className="text-muted-foreground mb-2">
@@ -1228,7 +1228,7 @@ export default function ReviewComposer() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg mb-2">
+                  <h3 className="h3 mb-2">
                     Response Time Guidelines
                   </h3>
                   <ul className="list-disc pl-5 space-y-1 text-muted-foreground">

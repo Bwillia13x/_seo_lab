@@ -2219,7 +2219,7 @@ export default function ReviewKit() {
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">
+                    <h3 className="h3 mb-2">
                       What This Tool Does
                     </h3>
                     <p className="text-muted-foreground">
@@ -2232,7 +2232,7 @@ export default function ReviewKit() {
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">
+                    <h3 className="h3 mb-2">
                       Why This Matters for Belmont
                     </h3>
                     <p className="text-muted-foreground">
@@ -2261,7 +2261,7 @@ export default function ReviewKit() {
                   </div>
 
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">
+                    <h3 className="h3 mb-2">
                       How to Request Reviews the Right Way
                     </h3>
                     <div className="space-y-3">
