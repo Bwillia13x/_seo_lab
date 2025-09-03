@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -10,13 +10,456 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
-import { Upload, Plus, Info, TrendingUp, Target } from "lucide-react";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import {
+  Upload,
+  Plus,
+  Info,
+  TrendingUp,
+  Target,
+  Sparkles,
+  BarChart3,
+  Users,
+  DollarSign,
+  Brain,
+  FileText,
+  Zap,
+  RefreshCw,
+  Download,
+  Eye,
+  MessageSquare,
+  Star,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Calculator,
+  PieChart,
+  LineChart,
+  Activity,
+} from "lucide-react";
+import { saveBlob } from "@/lib/blob";
+import OpenAI from "openai";
 
+// ---------------- Enhanced Types ----------------
+type Transaction = {
+  id: string;
+  customerId: string;
+  date: string;
+  services: string[];
+  totalAmount: number;
+  staff: string;
+  customerType: "new" | "returning" | "regular";
+};
+
+type Recommendation = {
+  primaryService: string;
+  suggestedAddons: {
+    service: string;
+    confidence: number;
+    revenueImpact: number;
+    frequency: number;
+    customerSegment: string;
+  }[];
+  totalRevenuePotential: number;
+  aiInsight: string;
+};
+
+type CustomerSegment = {
+  name: string;
+  description: string;
+  characteristics: string[];
+  recommendedServices: string[];
+  avgSpend: number;
+};
+
+type PerformanceMetric = {
+  period: string;
+  recommendationsMade: number;
+  recommendationsAccepted: number;
+  additionalRevenue: number;
+  conversionRate: number;
+};
+
+type AITrainingData = {
+  customerQuery: string;
+  context: string;
+  recommendation: string;
+  outcome: "accepted" | "declined" | "modified";
+};
+
+// ---------------- Constants ----------------
+const SAMPLE_TRANSACTIONS: Transaction[] = [
+  {
+    id: "T001",
+    customerId: "C001",
+    date: "2024-09-01",
+    services: ["Men's Haircut", "Beard Trim"],
+    totalAmount: 65,
+    staff: "Mike",
+    customerType: "regular",
+  },
+  {
+    id: "T002",
+    customerId: "C002",
+    date: "2024-09-01",
+    services: ["Skin Fade", "Hot Towel Shave"],
+    totalAmount: 70,
+    staff: "Sarah",
+    customerType: "returning",
+  },
+  {
+    id: "T003",
+    customerId: "C003",
+    date: "2024-09-02",
+    services: ["Men's Haircut"],
+    totalAmount: 35,
+    staff: "Alex",
+    customerType: "new",
+  },
+  {
+    id: "T004",
+    customerId: "C004",
+    date: "2024-09-02",
+    services: ["Beard Trim", "Hot Towel Shave"],
+    totalAmount: 55,
+    staff: "Mike",
+    customerType: "regular",
+  },
+  {
+    id: "T005",
+    customerId: "C005",
+    date: "2024-09-03",
+    services: ["Kids Cut", "Men's Haircut"],
+    totalAmount: 60,
+    staff: "Sarah",
+    customerType: "returning",
+  },
+];
+
+const CUSTOMER_SEGMENTS: CustomerSegment[] = [
+  {
+    name: "Young Professionals",
+    description:
+      "Busy professionals aged 25-35 seeking quick, quality grooming",
+    characteristics: [
+      "Time-conscious",
+      "Brand loyal",
+      "Willing to pay premium",
+    ],
+    recommendedServices: ["Skin Fade", "Beard Trim", "Hot Towel Shave"],
+    avgSpend: 65,
+  },
+  {
+    name: "Families",
+    description: "Parents bringing children for haircuts",
+    characteristics: ["Budget-conscious", "Value-focused", "Loyal customers"],
+    recommendedServices: ["Kids Cut", "Men's Haircut", "Beard Trim"],
+    avgSpend: 55,
+  },
+  {
+    name: "Luxury Clients",
+    description: "High-end clients seeking premium grooming experience",
+    characteristics: [
+      "Quality-focused",
+      "Willing to invest",
+      "Brand ambassadors",
+    ],
+    recommendedServices: ["Hot Towel Shave", "Beard Trim", "Skin Fade"],
+    avgSpend: 85,
+  },
+  {
+    name: "Occasional Visitors",
+    description: "Infrequent visitors needing basic services",
+    characteristics: ["Price-sensitive", "Trial customers", "Need education"],
+    recommendedServices: ["Beard Trim", "Hot Towel Shave"],
+    avgSpend: 45,
+  },
+];
+
+const AI_RECOMMENDATION_PROMPTS = [
+  {
+    name: "Service Bundle Recommendation",
+    prompt:
+      "Based on customer {customerType} with {primaryService}, suggest 2-3 complementary services from {availableServices}. Consider their typical spending pattern of ${avgSpend} and focus on services that increase satisfaction and revenue by 30-50%.",
+  },
+  {
+    name: "Upselling Strategy",
+    prompt:
+      "For a {customerType} customer getting {primaryService}, create a persuasive but natural recommendation script that highlights the benefits of adding {suggestedService}. Include pricing context and value proposition.",
+  },
+  {
+    name: "Customer Education",
+    prompt:
+      "Explain to a customer why {suggestedService} would complement their {primaryService}. Focus on benefits, timing, and how it improves their overall grooming experience.",
+  },
+];
+
+// ---------------- Enhanced Component ----------------
 export default function AddOnRecommender() {
-  const [loaded, setLoaded] = useState(false);
+  // Enhanced State
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [selectedService, setSelectedService] =
+    useState<string>("Men's Haircut");
+  const [customerSegment, setCustomerSegment] = useState<string>(
+    "Young Professionals"
+  );
+  const [apiKey, setApiKey] = useState<string>("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [performanceData, setPerformanceData] = useState<PerformanceMetric[]>(
+    []
+  );
+  const [aiInsights, setAiInsights] = useState<string>("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // ---------------- Enhanced Utility Functions ----------------
+
+  // Parse CSV data into transactions
+  const parseCSV = (csvText: string): Transaction[] => {
+    const lines = csvText.split("\n").filter((line) => line.trim());
+    const headers = lines[0].split(",").map((h) => h.trim());
+
+    return lines.slice(1).map((line, index) => {
+      const values = line.split(",").map((v) => v.trim());
+      return {
+        id: `T${index + 1}`,
+        customerId: values[0] || `C${index + 1}`,
+        date: values[1] || new Date().toISOString().split("T")[0],
+        services: values[2]?.split(";").map((s) => s.trim()) || [],
+        totalAmount: parseFloat(values[3]) || 0,
+        staff: values[4] || "Unknown",
+        customerType: (values[5] as "new" | "returning" | "regular") || "new",
+      };
+    });
+  };
+
+  // Analyze purchase patterns and generate recommendations
+  const analyzePurchasePatterns = (data: Transaction[]): Recommendation[] => {
+    const servicePairs: Record<
+      string,
+      { count: number; revenue: number; customers: Set<string> }
+    > = {};
+
+    // Analyze co-occurrence of services
+    data.forEach((transaction) => {
+      const services = transaction.services;
+      services.forEach((service, i) => {
+        services.slice(i + 1).forEach((otherService) => {
+          const pairKey = `${service}→${otherService}`;
+          if (!servicePairs[pairKey]) {
+            servicePairs[pairKey] = {
+              count: 0,
+              revenue: 0,
+              customers: new Set(),
+            };
+          }
+          servicePairs[pairKey].count++;
+          servicePairs[pairKey].revenue += transaction.totalAmount;
+          servicePairs[pairKey].customers.add(transaction.customerId);
+        });
+      });
+    });
+
+    // Convert to recommendations
+    const recommendations: Recommendation[] = [];
+    const services = Array.from(new Set(data.flatMap((t) => t.services)));
+
+    services.forEach((primaryService) => {
+      const addons = Object.entries(servicePairs)
+        .filter(([pair]) => pair.startsWith(primaryService + "→"))
+        .map(([pair, data]) => {
+          const addonService = pair.split("→")[1];
+          const confidence = (data.count / data.customers.size) * 100;
+          const avgRevenue = data.revenue / data.count;
+
+          return {
+            service: addonService,
+            confidence,
+            revenueImpact: avgRevenue * 0.3, // Estimated 30% uplift
+            frequency: data.count,
+            customerSegment: "General",
+          };
+        })
+        .sort((a, b) => b.confidence - a.confidence)
+        .slice(0, 3);
+
+      if (addons.length > 0) {
+        recommendations.push({
+          primaryService,
+          suggestedAddons: addons,
+          totalRevenuePotential: addons.reduce(
+            (sum, addon) => sum + addon.revenueImpact,
+            0
+          ),
+          aiInsight: `Based on ${data.length} transactions, ${primaryService} customers frequently add ${addons[0]?.service} (${addons[0]?.confidence.toFixed(1)}% confidence)`,
+        });
+      }
+    });
+
+    return recommendations;
+  };
+
+  // AI-powered recommendation generation
+  const generateAIRecommendations = async () => {
+    if (!apiKey) {
+      alert("Please enter your OpenAI API key first");
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const openai = new OpenAI({
+        apiKey: apiKey,
+        dangerouslyAllowBrowser: true,
+      });
+
+      const segment = CUSTOMER_SEGMENTS.find((s) => s.name === customerSegment);
+      const availableServices = [
+        "Beard Trim",
+        "Hot Towel Shave",
+        "Skin Fade",
+        "Kids Cut",
+      ];
+
+      const prompt = AI_RECOMMENDATION_PROMPTS[0].prompt
+        .replace("{customerType}", customerSegment.toLowerCase())
+        .replace("{primaryService}", selectedService)
+        .replace("{availableServices}", availableServices.join(", "))
+        .replace("{avgSpend}", segment?.avgSpend.toString() || "60");
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an expert business consultant specializing in retail add-on sales and customer experience optimization. Provide actionable, data-driven recommendations for service-based businesses.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        max_tokens: 400,
+        temperature: 0.7,
+      });
+
+      const aiResponse = response.choices[0]?.message?.content || "";
+      setAiInsights(aiResponse);
+
+      // Generate mock performance data
+      const mockPerformance: PerformanceMetric[] = [
+        {
+          period: "Last 30 days",
+          recommendationsMade: 145,
+          recommendationsAccepted: 89,
+          additionalRevenue: 2840,
+          conversionRate: 61.4,
+        },
+        {
+          period: "Last 7 days",
+          recommendationsMade: 38,
+          recommendationsAccepted: 25,
+          additionalRevenue: 795,
+          conversionRate: 65.8,
+        },
+        {
+          period: "Today",
+          recommendationsMade: 12,
+          recommendationsAccepted: 8,
+          additionalRevenue: 255,
+          conversionRate: 66.7,
+        },
+      ];
+
+      setPerformanceData(mockPerformance);
+    } catch (error) {
+      console.error("AI Analysis Error:", error);
+      alert(
+        "Failed to generate AI recommendations. Please check your API key and try again."
+      );
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  // Load sample data
+  const loadSampleData = () => {
+    setTransactions(SAMPLE_TRANSACTIONS);
+    const recs = analyzePurchasePatterns(SAMPLE_TRANSACTIONS);
+    setRecommendations(recs);
+  };
+
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const csvText = e.target?.result as string;
+        const parsedTransactions = parseCSV(csvText);
+        setTransactions(parsedTransactions);
+        const recs = analyzePurchasePatterns(parsedTransactions);
+        setRecommendations(recs);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  // Export recommendations
+  const exportRecommendations = () => {
+    const csvContent = [
+      "Primary Service,Suggested Add-on,Confidence %,Revenue Impact,Frequency",
+      ...recommendations.flatMap((rec) =>
+        rec.suggestedAddons.map(
+          (addon) =>
+            `${rec.primaryService},${addon.service},${addon.confidence.toFixed(1)}%,$${addon.revenueImpact.toFixed(2)},${addon.frequency}`
+        )
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "addon-recommendations.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Memoized calculations
+  const totalRevenuePotential = useMemo(
+    () =>
+      recommendations.reduce((sum, rec) => sum + rec.totalRevenuePotential, 0),
+    [recommendations]
+  );
+
+  const avgConversionRate = useMemo(
+    () =>
+      performanceData.length > 0
+        ? performanceData.reduce((sum, p) => sum + p.conversionRate, 0) /
+          performanceData.length
+        : 0,
+    [performanceData]
+  );
 
   return (
     <div className="space-y-6">

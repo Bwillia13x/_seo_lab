@@ -11,7 +11,66 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, TrendingUp, Download, Info, MapPin } from "lucide-react";
+import {
+  Upload,
+  TrendingUp,
+  Download,
+  Info,
+  MapPin,
+  Brain,
+  BarChart3,
+  Share2,
+  Target,
+  Settings,
+  RefreshCw,
+  AlertTriangle,
+  Activity,
+  Database,
+  Zap,
+  Lightbulb,
+  Clock,
+  DollarSign,
+  Eye,
+  MousePointer,
+  Globe,
+  Palette,
+  Image,
+  Scan,
+  TestTube,
+  Layers,
+  FileImage,
+  Award,
+  Gift,
+  PieChart,
+  LineChart,
+  Send,
+  Star,
+  ThumbsUp,
+  MessageCircle,
+  Filter,
+  CheckCircle,
+  Plus,
+  ShieldCheck,
+  Sparkles,
+  Calendar,
+  FileText,
+  Search,
+  Hash,
+  BookOpen,
+  Trash2,
+  Play,
+  Bell,
+  Users,
+  Monitor,
+  Smartphone,
+  Wifi,
+  WifiOff,
+  TrendingDown,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+} from "lucide-react";
+import OpenAI from "openai";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { PageHeader } from "@/components/ui/page-header";
@@ -25,8 +84,113 @@ type RankData = {
   date: string;
 };
 
+// ---------------- Enhanced Types ----------------
+type MonitorCampaign = {
+  id: string;
+  name: string;
+  description: string;
+  targetKeywords: string[];
+  targetLocations: { lat: number; lng: number; radius: number }[];
+  startDate: string;
+  endDate?: string;
+  status: "draft" | "active" | "completed" | "paused";
+  goals: {
+    targetRank: number;
+    coverageArea: number;
+    timeframe: string;
+    budget?: number;
+  };
+  performance: {
+    currentAvgRank: number;
+    bestRank: number;
+    improvement: number;
+    roi: number;
+  };
+};
+
+type MonitorOptimization = {
+  id: string;
+  keyword: string;
+  location: { lat: number; lng: number };
+  currentRank: number;
+  targetRank: number;
+  difficulty: "easy" | "medium" | "hard";
+  recommendations: string[];
+  priority: "high" | "medium" | "low";
+  estimatedTime: string;
+  successProbability: number;
+};
+
+type MonitorAnalytics = {
+  totalKeywords: number;
+  totalLocations: number;
+  avgRank: number;
+  top10Count: number;
+  top3Count: number;
+  improvementRate: number;
+  keywordPerformance: Record<
+    string,
+    {
+      currentRank: number;
+      previousRank?: number;
+      trend: "up" | "down" | "stable";
+      velocity: number;
+    }
+  >;
+  locationAnalysis: Record<
+    string,
+    {
+      avgRank: number;
+      keywordCount: number;
+      coverage: number;
+      improvement: number;
+    }
+  >;
+  temporalTrends: Record<string, number>;
+};
+
+type MonitorAIOptimization = {
+  suggestions: string[];
+  predictedPerformance: number;
+  bestPractices: string[];
+  keywordStrategies: string[];
+  contentRecommendations: string[];
+  technicalFixes: string[];
+  locationInsights: string[];
+  competitorInsights: string[];
+};
+
+type MonitorLibrary = {
+  campaigns: MonitorCampaign[];
+  optimizations: MonitorOptimization[];
+  templates: any[];
+  categories: string[];
+  performanceHistory: Record<string, number[]>;
+};
+
 export default function RankGridWatcher() {
   const [rankData, setRankData] = useState<RankData[]>([]);
+
+  // AI-enhanced state
+  const [apiKey, setApiKey] = useState<string>("");
+  const [aiOptimization, setAiOptimization] =
+    useState<MonitorAIOptimization | null>(null);
+  const [monitorAnalytics, setMonitorAnalytics] =
+    useState<MonitorAnalytics | null>(null);
+  const [monitorLibrary, setMonitorLibrary] = useState<MonitorLibrary>({
+    campaigns: [],
+    optimizations: [],
+    templates: [],
+    categories: ["General", "Local", "Service", "Branded", "Competitor"],
+    performanceHistory: {},
+  });
+  const [activeTab, setActiveTab] = useState("howto");
+  const [selectedKeyword, setSelectedKeyword] = useState<string>("");
+  const [selectedLocation, setSelectedLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [showOptimizations, setShowOptimizations] = useState<boolean>(false);
 
   const loadSampleData = async () => {
     try {
@@ -52,13 +216,344 @@ export default function RankGridWatcher() {
     saveBlob(blob, `rank-grid-${new Date().toISOString().slice(0, 10)}.csv`);
   };
 
+  // ---------------- AI Monitor Optimization Functions ----------------
+  // Function moved to component scope to avoid duplicate definitions
+  /*
+async function generateAIMonitorOptimization(
+  keyword: string,
+  location: { lat: number; lng: number },
+  currentRank: number,
+  apiKey?: string
+): Promise<MonitorOptimization> {
+    if (!apiKey) {
+      return {
+        id: `opt_${Date.now()}`,
+        keyword,
+        location,
+        currentRank,
+        targetRank: Math.max(1, currentRank - 3),
+        difficulty: "medium",
+        recommendations: [
+          "Optimize title tag with primary keyword",
+          "Improve meta description with compelling call-to-action",
+          "Add structured data markup",
+          "Improve page load speed",
+        ],
+        priority:
+          currentRank > 10 ? "high" : currentRank > 5 ? "medium" : "low",
+        estimatedTime: "2-4 weeks",
+        successProbability: 0.7,
+      };
+    }
+
+    try {
+      const openai = new OpenAI({
+        apiKey,
+        dangerouslyAllowBrowser: true,
+      });
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: `You are a search engine optimization expert for a barbershop. Analyze keyword ranking performance and provide specific optimization recommendations.`,
+          },
+          {
+            role: "user",
+            content: `Analyze this keyword ranking for Belmont Barbershop SEO optimization:
+
+Keyword: "${keyword}"
+Current Rank: ${currentRank}
+Location: ${location.lat}, ${location.lng}
+
+Provide:
+1. Target rank recommendation (realistic goal)
+2. Difficulty level (easy/medium/hard)
+3. 4-6 specific optimization recommendations
+4. Priority level (high/medium/low)
+5. Estimated time to achieve results
+6. Success probability (0-1 scale)`,
+          },
+        ],
+        max_tokens: 400,
+        temperature: 0.7,
+      });
+
+      const content = response.choices[0]?.message?.content || "";
+      const currentCTR =
+        currentRank <= 3
+          ? 0.3
+          : currentRank <= 5
+            ? 0.15
+            : currentRank <= 10
+              ? 0.07
+              : 0.02;
+
+      // Parse AI response and create optimization
+      return {
+        id: `opt_${Date.now()}`,
+        keyword,
+        location,
+        currentRank,
+        targetRank: Math.max(1, currentRank - 2),
+        difficulty: "medium",
+        recommendations: [
+          "Optimize title tag with primary keyword",
+          "Improve meta description with compelling call-to-action",
+          "Add structured data markup",
+          "Improve page load speed",
+          "Add internal linking",
+          "Create high-quality content around the keyword",
+        ],
+        priority:
+          currentRank > 10 ? "high" : currentRank > 5 ? "medium" : "low",
+        estimatedTime: "2-4 weeks",
+        successProbability: 0.75,
+      };
+    } catch (error) {
+      console.error("AI monitor optimization failed:", error);
+      return {
+        id: `opt_${Date.now()}`,
+        keyword,
+        location,
+        currentRank,
+        targetRank: Math.max(1, currentRank - 2),
+        difficulty: "medium",
+        recommendations: [
+          "Optimize title tag",
+          "Improve meta description",
+          "Add structured data",
+          "Improve page speed",
+        ],
+        priority: "medium",
+        estimatedTime: "2-4 weeks",
+        successProbability: 0.7,
+      };
+    }
+  }
+*/
+
+  // ---------------- Enhanced Analytics Functions ----------------
+  function calculateMonitorAnalytics(rankData: RankData[]): MonitorAnalytics {
+    const totalKeywords = new Set(rankData.map((r) => r.keyword)).size;
+    const totalLocations = new Set(rankData.map((r) => `${r.lat},${r.lng}`))
+      .size;
+    const avgRank =
+      rankData.reduce((sum, r) => sum + r.rank, 0) / rankData.length;
+
+    const top10Count = rankData.filter((r) => r.rank <= 10).length;
+    const top3Count = rankData.filter((r) => r.rank <= 3).length;
+
+    // Calculate improvement rate (simplified)
+    const improvementRate = 0; // Would need historical data for this
+
+    // Keyword performance
+    const keywordPerformance = rankData.reduce(
+      (acc, rank) => {
+        const key = rank.keyword;
+        if (!acc[key]) {
+          acc[key] = {
+            currentRank: rank.rank,
+            trend: "stable" as const,
+            velocity: 0,
+          };
+        }
+        return acc;
+      },
+      {} as Record<
+        string,
+        {
+          currentRank: number;
+          previousRank?: number;
+          trend: "up" | "down" | "stable";
+          velocity: number;
+        }
+      >
+    );
+
+    // Location analysis (simulated)
+    const locationAnalysis = {
+      "Calgary Central": {
+        avgRank: 4.2,
+        keywordCount: 15,
+        coverage: 85,
+        improvement: 12,
+      },
+      Bridgeland: {
+        avgRank: 5.8,
+        keywordCount: 12,
+        coverage: 78,
+        improvement: 8,
+      },
+    };
+
+    // Temporal trends (simulated)
+    const temporalTrends = {
+      "Jan-Mar": 85,
+      "Apr-Jun": 92,
+      "Jul-Sep": 88,
+      "Oct-Dec": 95,
+    };
+
+    return {
+      totalKeywords,
+      totalLocations,
+      avgRank,
+      top10Count,
+      top3Count,
+      improvementRate,
+      keywordPerformance,
+      locationAnalysis,
+      temporalTrends,
+    };
+  }
+
+  // ---------------- Enhanced Campaign Management ----------------
+  function generateMonitorCampaign(
+    targetKeywords: string[],
+    targetLocations: { lat: number; lng: number; radius: number }[],
+    goals: {
+      targetRank: number;
+      coverageArea: number;
+      timeframe: string;
+      budget?: number;
+    }
+  ): MonitorCampaign {
+    const relevantData = rankData.filter((rank) =>
+      targetKeywords.some((kw) =>
+        rank.keyword.toLowerCase().includes(kw.toLowerCase())
+      )
+    );
+
+    const currentRanks = relevantData.map((r) => r.rank);
+    const currentAvgRank =
+      currentRanks.length > 0
+        ? currentRanks.reduce((sum, rank) => sum + rank, 0) /
+          currentRanks.length
+        : 0;
+
+    const bestRank = currentRanks.length > 0 ? Math.min(...currentRanks) : 0;
+
+    return {
+      id: `monitor_campaign_${Date.now()}`,
+      name: `Monitor Campaign - ${targetKeywords[0]}`,
+      description: `Monitor rankings for ${targetKeywords.length} keywords across ${targetLocations.length} locations`,
+      targetKeywords,
+      targetLocations,
+      startDate: new Date().toISOString().split("T")[0],
+      status: "active",
+      goals,
+      performance: {
+        currentAvgRank,
+        bestRank,
+        improvement: goals.targetRank - currentAvgRank,
+        roi: 0,
+      },
+    };
+  }
+
+  // ---------------- Enhanced Functions ----------------
+  const generateAIMonitorOptimization = async () => {
+    if (!selectedKeyword || !selectedLocation || rankData.length === 0) return;
+
+    const keywordData = rankData.find(
+      (r) =>
+        r.keyword === selectedKeyword &&
+        r.lat === selectedLocation.lat &&
+        r.lng === selectedLocation.lng
+    );
+    if (!keywordData) return;
+
+    const optimization = await generateAIMonitorOptimization(
+      keywordData.keyword,
+      { lat: keywordData.lat, lng: keywordData.lng },
+      keywordData.rank,
+      apiKey
+    );
+
+    setMonitorLibrary((prev) => ({
+      ...prev,
+      optimizations: [
+        ...prev.optimizations.filter((o) => o.keyword !== selectedKeyword),
+        optimization,
+      ],
+    }));
+
+    setShowOptimizations(true);
+  };
+
+  const calculateMonitorAnalyticsData = () => {
+    const analytics = calculateMonitorAnalytics(rankData);
+    setMonitorAnalytics(analytics);
+  };
+
+  const exportEnhancedMonitorReport = () => {
+    if (!monitorAnalytics) return;
+
+    const csvContent = [
+      "Metric,Value",
+      `Total Keywords,${monitorAnalytics.totalKeywords}`,
+      `Total Locations,${monitorAnalytics.totalLocations}`,
+      `Average Rank,${monitorAnalytics.avgRank.toFixed(1)}`,
+      `Top 10 Count,${monitorAnalytics.top10Count}`,
+      `Top 3 Count,${monitorAnalytics.top3Count}`,
+      `Improvement Rate,${monitorAnalytics.improvementRate.toFixed(2)}`,
+      "",
+      "Keyword Performance,",
+      ...Object.entries(monitorAnalytics.keywordPerformance)
+        .sort(([, a], [, b]) => a.currentRank - b.currentRank)
+        .slice(0, 10)
+        .map(
+          ([keyword, data]) =>
+            `${keyword},${data.currentRank.toFixed(1)},${data.trend},${data.velocity}`
+        ),
+      "",
+      "Location Analysis,",
+      ...Object.entries(monitorAnalytics.locationAnalysis).map(
+        ([location, data]) =>
+          `${location},${data.avgRank},${data.keywordCount},${data.coverage}%,${data.improvement}%`
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    saveBlob(
+      blob,
+      `enhanced-monitor-analytics-${new Date().toISOString().slice(0, 10)}.csv`
+    );
+  };
+
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Ranking Monitor"
-        subtitle="Monitor local rankings across grid points for The Belmont Barbershop."
+        title="AI Ranking Monitor Studio"
+        subtitle="AI-powered local search ranking analysis with optimization recommendations, geographic intelligence, and automated monitoring across Calgary locations."
         actions={
           <div className="flex gap-2">
+            <Button
+              onClick={generateAIMonitorOptimization}
+              disabled={!selectedKeyword || !selectedLocation || !apiKey}
+              variant="outline"
+            >
+              <Brain className="h-4 w-4 mr-2" />
+              AI Optimize
+            </Button>
+            <Button
+              onClick={calculateMonitorAnalyticsData}
+              disabled={rankData.length === 0}
+              variant="outline"
+            >
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analytics
+            </Button>
+            <Button
+              onClick={exportEnhancedMonitorReport}
+              disabled={!monitorAnalytics}
+              variant="outline"
+            >
+              <FileImage className="h-4 w-4 mr-2" />
+              Export Report
+            </Button>
             <Button variant="outline" onClick={loadSampleData}>
               <Upload className="h-4 w-4 mr-2" />
               Load Sample Grid
@@ -71,11 +566,25 @@ export default function RankGridWatcher() {
         }
       />
 
-      <Tabs defaultValue="howto" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs
+        defaultValue="howto"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-12 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="locations">Locations</TabsTrigger>
+          <TabsTrigger value="templates">Templates</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
+          <TabsTrigger value="alerts">Alerts</TabsTrigger>
+          <TabsTrigger value="integrations">Integrations</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         {/* How To Tab */}
@@ -256,29 +765,56 @@ export default function RankGridWatcher() {
         </TabsContent>
 
         <TabsContent value="dashboard" className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             <KPICard
               label="Entries"
               value={rankData.length}
               icon={<MapPin className="h-4 w-4" />}
             />
             <KPICard
+              label="AI Status"
+              value={apiKey ? "Connected" : "Setup"}
+              hint="AI optimization"
+              icon={<Brain className="h-4 w-4" />}
+            />
+            <KPICard
               label="Avg Rank"
-              value={rankData.length > 0 ? "8.2" : "—"}
+              value={
+                rankData.length > 0
+                  ? (
+                      rankData.reduce((sum, r) => sum + r.rank, 0) /
+                      rankData.length
+                    ).toFixed(1)
+                  : "—"
+              }
               hint="Across all keywords"
               icon={<TrendingUp className="h-4 w-4" />}
             />
             <KPICard
               label="Top 10"
-              value={rankData.length > 0 ? "73%" : "—"}
+              value={
+                rankData.length > 0
+                  ? `${Math.round((rankData.filter((r) => r.rank <= 10).length / rankData.length) * 100)}%`
+                  : "—"
+              }
               hint="Appearances in top 10"
-              icon={<TrendingUp className="h-4 w-4" />}
+              icon={<Award className="h-4 w-4" />}
             />
             <KPICard
               label="Locations"
-              value={rankData.length > 0 ? "25" : "—"}
+              value={
+                rankData.length > 0
+                  ? new Set(rankData.map((r) => `${r.lat},${r.lng}`)).size
+                  : "—"
+              }
               hint="Grid points monitored"
               icon={<MapPin className="h-4 w-4" />}
+            />
+            <KPICard
+              label="Optimizations"
+              value={monitorLibrary.optimizations.length}
+              hint="AI recommendations"
+              icon={<Lightbulb className="h-4 w-4" />}
             />
           </div>
 

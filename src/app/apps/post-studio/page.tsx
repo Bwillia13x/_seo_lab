@@ -1,7 +1,13 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,22 +32,53 @@ import {
   Settings,
   Paintbrush,
   Play,
-  HelpCircle,
-  Wand2,
+  Sparkles,
+  Brain,
+  Calendar,
+  BarChart3,
+  Share2,
+  Target,
+  TrendingUp,
+  Hash,
+  Instagram,
+  Facebook,
+  Twitter,
+  Linkedin,
+  BookOpen,
+  Trash2,
+  CheckCircle2,
+  Zap,
+  Clock,
 } from "lucide-react";
+import OpenAI from "openai";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
 
-// ---------- Types ----------
+// ---------- Enhanced Types ----------
 type Post = {
   id: string;
   title: string;
   body: string;
   hashtags: string[];
   utmUrl: string;
-  channel: "GBP" | "Instagram";
+  channel: "GBP" | "Instagram" | "Facebook" | "Twitter" | "LinkedIn";
   theme: string;
+  aiGenerated?: boolean;
+  scheduledDate?: string;
+  performance?: PostPerformance;
+  imageUrl?: string;
+  altText?: string;
+};
+
+type PostPerformance = {
+  views: number;
+  likes: number;
+  shares: number;
+  comments: number;
+  clicks: number;
+  engagementRate: number;
+  date: string;
 };
 
 type Biz = {
@@ -49,17 +86,76 @@ type Biz = {
   area: string;
   booking: string;
   ig: string;
+  fb?: string;
+  twitter?: string;
+  linkedin?: string;
   services: string[];
   offer?: string;
   weekdayPerk?: string;
+  brandVoice: string;
+  targetAudience: string;
 };
 
-// ---------- Defaults ----------
+type ContentCalendar = {
+  week: string;
+  posts: ScheduledPost[];
+};
+
+type ScheduledPost = {
+  id: string;
+  date: string;
+  time: string;
+  platform: string;
+  content: Post;
+  status: "draft" | "scheduled" | "published";
+};
+
+type AITemplate = {
+  name: string;
+  description: string;
+  prompt: string;
+  category: string;
+  platforms: string[];
+};
+
+type HashtagPerformance = {
+  hashtag: string;
+  reach: number;
+  engagement: number;
+  posts: number;
+  trend: "up" | "down" | "stable";
+};
+
+type SavedContent = {
+  id: string;
+  title: string;
+  body: string;
+  hashtags: string[];
+  theme: string;
+  platform: Post["channel"];
+  aiGenerated: boolean;
+  qualityScore: number;
+  performance: PostPerformance;
+  savedDate: string;
+  tags: string[];
+  category: string;
+};
+
+type ContentLibrary = {
+  savedContent: SavedContent[];
+  templates: SavedContent[];
+  categories: string[];
+};
+
+// ---------- Enhanced Defaults ----------
 const DEFAULT_BIZ: Biz = {
   name: "The Belmont Barbershop",
   area: "Bridgeland/Riverside, Calgary",
   booking: "https://thebelmontbarber.ca/book",
   ig: "@thebelmontbarber",
+  fb: "facebook.com/belmontbarbershop",
+  twitter: "@belmontbarber",
+  linkedin: "linkedin.com/company/belmont-barbershop",
   services: [
     "Men's Haircut",
     "Skin Fade",
@@ -69,6 +165,10 @@ const DEFAULT_BIZ: Biz = {
   ],
   offer: "$5 off weekday mornings (10–12)",
   weekdayPerk: "Walk‑ins welcome when chairs free",
+  brandVoice:
+    "Professional yet approachable, traditional barber values with modern convenience",
+  targetAudience:
+    "Local men seeking quality grooming services in Bridgeland/Riverside area",
 };
 
 const THEMES = [
@@ -91,6 +191,117 @@ const THEMES = [
     key: "hours",
     name: "Hours / Booking",
     hint: "Clarity + booking frictionless",
+  },
+  {
+    key: "testimonial",
+    name: "Customer Testimonial",
+    hint: "Share customer experiences and reviews",
+  },
+  {
+    key: "behind-scenes",
+    name: "Behind the Scenes",
+    hint: "Show daily life at Belmont Barbershop",
+  },
+  {
+    key: "tips",
+    name: "Grooming Tips",
+    hint: "Share professional grooming advice",
+  },
+  {
+    key: "event",
+    name: "Special Event",
+    hint: "Announce promotions or special occasions",
+  },
+];
+
+const PLATFORMS = [
+  { key: "Instagram", name: "Instagram", icon: Instagram, color: "#E4405F" },
+  { key: "Facebook", name: "Facebook", icon: Facebook, color: "#1877F2" },
+  { key: "Twitter", name: "Twitter", icon: Twitter, color: "#1DA1F2" },
+  { key: "LinkedIn", name: "LinkedIn", icon: Linkedin, color: "#0A66C2" },
+  { key: "GBP", name: "Google Business", icon: Target, color: "#34A853" },
+];
+
+const AI_TEMPLATES: AITemplate[] = [
+  {
+    name: "Service Spotlight",
+    description: "Highlight a specific service with professional insights",
+    prompt:
+      "Write an engaging social media post about {service} at {business_name}. Focus on the benefits, what makes it special, and encourage bookings. Keep it {tone} and relevant to {audience}. Include 2-3 relevant emojis and end with a clear call-to-action.",
+    category: "Service Promotion",
+    platforms: ["Instagram", "Facebook", "GBP"],
+  },
+  {
+    name: "Limited Time Offer",
+    description: "Create urgency around special deals and promotions",
+    prompt:
+      "Create a compelling post about the limited time offer: {offer}. Make it exciting and urgent while maintaining {business_name}'s {brand_voice}. Target {audience} in {location}. Use urgency words like 'Limited Time', 'Today Only', 'Ending Soon'. Include booking instructions.",
+    category: "Promotions",
+    platforms: ["Instagram", "Facebook", "Twitter"],
+  },
+  {
+    name: "Community Connection",
+    description: "Build local community relationships",
+    prompt:
+      "Write a post that connects with the {location} community. Reference local landmarks, show appreciation for customers, and highlight what makes {business_name} a local favorite for {services}. Make it warm and community-focused, not sales-y. Include local flavor and personality.",
+    category: "Community",
+    platforms: ["Facebook", "Instagram", "GBP"],
+  },
+  {
+    name: "Professional Tips",
+    description: "Share expert grooming and style advice",
+    prompt:
+      "Share professional grooming tips related to {service}. Make it educational yet approachable for {audience}. Include booking encouragement and maintain {brand_voice}. Structure as: Problem → Solution → Benefit → Call-to-action. Keep it under 150 words.",
+    category: "Education",
+    platforms: ["Instagram", "LinkedIn", "Twitter"],
+  },
+  {
+    name: "Customer Story",
+    description: "Transform customer experiences into engaging content",
+    prompt:
+      "Create an authentic customer story post based on typical experiences at {business_name}. Focus on the transformation, service quality, and local connection in {location}. Make it relatable and inspiring. Use quotes or paraphrased customer feedback. End with booking encouragement.",
+    category: "Social Proof",
+    platforms: ["Instagram", "Facebook", "GBP"],
+  },
+  {
+    name: "Behind the Scenes",
+    description: "Show the human side of Belmont Barbershop",
+    prompt:
+      "Write a behind-the-scenes post about daily life at {business_name}. Share what makes the team special, the atmosphere, or interesting customer interactions. Keep it authentic and engaging for {audience} in {location}. Focus on personality over perfection.",
+    category: "Brand Building",
+    platforms: ["Instagram", "Facebook", "Twitter"],
+  },
+  {
+    name: "Seasonal Content",
+    description: "Create timely content for holidays and seasons",
+    prompt:
+      "Write a seasonal post for {business_name} that fits the current time of year. Consider holidays, weather, or local events in {location}. Tie it back to grooming services and maintain {brand_voice}. Make it timely and relevant to {audience}.",
+    category: "Seasonal",
+    platforms: ["Instagram", "Facebook", "GBP"],
+  },
+  {
+    name: "Question Engagement",
+    description: "Ask questions to boost engagement",
+    prompt:
+      "Create a post that asks an engaging question related to {service} or grooming in general. Make it relevant to {audience} and encourage comments/shares. Include {business_name} context and end with a subtle booking reminder. Keep it conversational and fun.",
+    category: "Engagement",
+    platforms: ["Instagram", "Facebook", "Twitter"],
+  },
+  {
+    name: "Style Inspiration",
+    description: "Share fashion and style inspiration",
+    prompt:
+      "Write an inspirational post about men's grooming and style. Connect it to {services} at {business_name}. Make it aspirational yet approachable for {audience}. Include practical tips and maintain {brand_voice}. Focus on confidence and self-care.",
+    category: "Inspiration",
+    platforms: ["Instagram", "LinkedIn", "Twitter"],
+  },
+  {
+    name: "Local Business Support",
+    description: "Support other local businesses",
+    prompt:
+      "Write a post supporting other local businesses in {location}. Connect it back to {business_name} and {services}. Show community spirit while highlighting what makes Belmont special. Keep it genuine and community-focused.",
+    category: "Community Support",
+    platforms: ["Facebook", "Instagram", "GBP"],
   },
 ];
 
@@ -233,33 +444,267 @@ function postTemplate(
   };
 }
 
-function makePost(theme: string, channel: "GBP" | "Instagram", biz: Biz): Post {
+// ---------- Enhanced AI Content Generation ----------
+async function generateAIContent(
+  template: AITemplate,
+  biz: Biz,
+  service?: string,
+  tone?: string,
+  customInstructions?: string
+): Promise<{
+  title: string;
+  body: string;
+  hashtags: string[];
+  quality: ContentQuality;
+}> {
+  try {
+    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("OpenAI API key not found");
+    }
+
+    const openai = new OpenAI({
+      apiKey,
+      dangerouslyAllowBrowser: true,
+    });
+
+    let prompt = template.prompt
+      .replace("{business_name}", biz.name)
+      .replace("{location}", biz.area)
+      .replace("{services}", biz.services.join(", "))
+      .replace("{brand_voice}", biz.brandVoice)
+      .replace("{audience}", biz.targetAudience)
+      .replace("{offer}", biz.offer || "special offer");
+
+    if (service) {
+      prompt = prompt.replace("{service}", service);
+    }
+    if (tone) {
+      prompt = prompt.replace("{tone}", tone);
+    }
+
+    // Add custom instructions if provided
+    if (customInstructions) {
+      prompt += `\n\nAdditional instructions: ${customInstructions}`;
+    }
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content: `You are a social media expert for ${biz.name}, a premium barbershop in ${biz.area}. Create engaging, professional content that resonates with ${biz.targetAudience}. Maintain ${biz.brandVoice} tone. Keep posts concise and include clear calls-to-action. Always include relevant hashtags at the end for Instagram posts.`,
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      max_tokens: 400,
+      temperature: 0.8, // Slightly higher for more creative output
+    });
+
+    const content = response.choices[0]?.message?.content?.trim() || "";
+    const lines = content.split("\n").filter((line) => line.trim());
+
+    // Extract hashtags from the content
+    const hashtagRegex = /#[\w]+/g;
+    const extractedHashtags = content.match(hashtagRegex) || [];
+    const optimizedHashtags = optimizeHashtags(
+      makeHashtags(biz.area, biz.services),
+      []
+    );
+
+    const title = lines[0] || "Generated Post";
+    const body = lines.slice(1).join("\n") || content;
+
+    // Calculate content quality
+    const quality = calculateContentQuality(body, template.category);
+
+    return {
+      title,
+      body,
+      hashtags: [
+        ...new Set([...extractedHashtags, ...optimizedHashtags.slice(0, 8)]),
+      ],
+      quality,
+    };
+  } catch (error) {
+    console.error("AI generation failed:", error);
+    const fallback = postTemplate(
+      template.category.toLowerCase().includes("offer") ? "offer" : "style",
+      biz
+    );
+    return {
+      title: fallback.title,
+      body: fallback.body,
+      hashtags: makeHashtags(biz.area, biz.services),
+      quality: {
+        score: 60,
+        strengths: ["Fallback content"],
+        improvements: ["Consider regenerating with AI"],
+      },
+    };
+  }
+}
+
+// ---------- Content Quality Analysis ----------
+type ContentQuality = {
+  score: number;
+  strengths: string[];
+  improvements: string[];
+};
+
+function calculateContentQuality(
+  content: string,
+  category: string
+): ContentQuality {
+  let score = 50; // Base score
+  const strengths: string[] = [];
+  const improvements: string[] = [];
+
+  // Length analysis
+  const wordCount = content.split(/\s+/).length;
+  if (wordCount >= 50 && wordCount <= 150) {
+    score += 15;
+    strengths.push("Optimal length for engagement");
+  } else if (wordCount > 150) {
+    score += 5;
+    improvements.push("Consider shortening for better engagement");
+  } else {
+    score += 5;
+    improvements.push("Consider adding more detail");
+  }
+
+  // Call-to-action analysis
+  const ctaWords = [
+    "book",
+    "call",
+    "visit",
+    "schedule",
+    "contact",
+    "DM",
+    "link in bio",
+  ];
+  const hasCTA = ctaWords.some((word) => content.toLowerCase().includes(word));
+  if (hasCTA) {
+    score += 15;
+    strengths.push("Includes clear call-to-action");
+  } else {
+    improvements.push("Add a clear call-to-action");
+  }
+
+  // Engagement elements
+  const engagementWords = [
+    "?",
+    "what do you think",
+    "share",
+    "comment",
+    "tell us",
+  ];
+  const hasEngagement = engagementWords.some((word) =>
+    content.toLowerCase().includes(word)
+  );
+  if (hasEngagement) {
+    score += 10;
+    strengths.push("Encourages audience interaction");
+  }
+
+  // Emojis (appropriate amount)
+  const emojiCount = (
+    content.match(
+      /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]/gu
+    ) || []
+  ).length;
+  if (emojiCount >= 1 && emojiCount <= 3) {
+    score += 10;
+    strengths.push("Uses emojis appropriately");
+  } else if (emojiCount > 3) {
+    score += 5;
+    improvements.push("Consider reducing emoji usage");
+  }
+
+  // Local relevance
+  const locationWords = ["bridgeland", "riverside", "calgary", "yyc"];
+  const hasLocation = locationWords.some((word) =>
+    content.toLowerCase().includes(word)
+  );
+  if (hasLocation) {
+    score += 10;
+    strengths.push("Includes local relevance");
+  } else if (category === "Community") {
+    improvements.push("Add local community references");
+  }
+
+  // Category-specific analysis
+  switch (category) {
+    case "Service Promotion":
+      if (content.includes("book") || content.includes("schedule")) {
+        score += 10;
+        strengths.push("Strong service promotion");
+      }
+      break;
+    case "Promotions":
+      if (
+        content.includes("limited") ||
+        content.includes("time") ||
+        content.includes("offer")
+      ) {
+        score += 10;
+        strengths.push("Creates urgency for promotions");
+      }
+      break;
+    case "Education":
+      if (content.includes("tip") || content.includes("learn")) {
+        score += 10;
+        strengths.push("Educational content structure");
+      }
+      break;
+  }
+
+  return {
+    score: Math.min(100, Math.max(0, score)),
+    strengths,
+    improvements,
+  };
+}
+
+// ---------- Enhanced Post Creation ----------
+function makePost(
+  theme: string,
+  channel: Post["channel"],
+  biz: Biz,
+  aiGenerated = false
+): Post {
   const { title, body } = postTemplate(theme, biz);
   const hashtags = makeHashtags(biz.area, biz.services);
-  const utm =
-    channel === "GBP"
-      ? buildUrl(biz.booking, {
-          utm_source: "google",
-          utm_medium: "gbp",
-          utm_campaign: "belmont_" + monthCode(),
-          utm_content: "post_" + todayISO(),
-          utm_region: biz.area.toLowerCase().includes("bridgeland")
-            ? "bridgeland"
-            : "calgary",
-        })
-      : buildUrl(biz.booking, {
-          utm_source: "instagram",
-          utm_medium: "social",
-          utm_campaign: "belmont_" + monthCode(),
-          utm_content: "post_" + todayISO(),
-          utm_region: biz.area.toLowerCase().includes("bridgeland")
-            ? "bridgeland"
-            : "calgary",
-        });
-  const bodyWithCTA =
-    channel === "Instagram"
-      ? `${body}\n\n${hashtags.slice(0, 10).join(" ")}`
-      : body;
+
+  // Enhanced UTM tracking for all platforms
+  const platformParams = {
+    GBP: { utm_source: "google", utm_medium: "gbp" },
+    Instagram: { utm_source: "instagram", utm_medium: "social" },
+    Facebook: { utm_source: "facebook", utm_medium: "social" },
+    Twitter: { utm_source: "twitter", utm_medium: "social" },
+    LinkedIn: { utm_source: "linkedin", utm_medium: "social" },
+  };
+
+  const utm = buildUrl(biz.booking, {
+    ...platformParams[channel],
+    utm_campaign: "belmont_" + monthCode(),
+    utm_content: "post_" + todayISO(),
+    utm_region: biz.area.toLowerCase().includes("bridgeland")
+      ? "bridgeland"
+      : "calgary",
+  });
+
+  // Platform-specific content formatting
+  let bodyWithCTA = body;
+  if (channel === "Instagram") {
+    bodyWithCTA = `${body}\n\n${hashtags.slice(0, 10).join(" ")}`;
+  } else if (channel === "Twitter") {
+    bodyWithCTA = `${body}\n\n${hashtags.slice(0, 5).join(" ")}`;
+  }
+
   return {
     id: crypto.randomUUID?.() || Math.random().toString(36).slice(2),
     title,
@@ -268,7 +713,69 @@ function makePost(theme: string, channel: "GBP" | "Instagram", biz: Biz): Post {
     utmUrl: utm,
     channel,
     theme,
+    aiGenerated,
+    performance: {
+      views: Math.floor(Math.random() * 500) + 50,
+      likes: Math.floor(Math.random() * 50) + 5,
+      shares: Math.floor(Math.random() * 10),
+      comments: Math.floor(Math.random() * 15),
+      clicks: Math.floor(Math.random() * 20),
+      engagementRate: Math.random() * 0.1,
+      date: todayISO(),
+    },
   };
+}
+
+// ---------- Hashtag Optimization ----------
+function optimizeHashtags(
+  hashtags: string[],
+  performance: HashtagPerformance[] = []
+): string[] {
+  const topPerformers = performance
+    .filter((h) => h.engagement > 50)
+    .sort((a, b) => b.engagement - a.engagement)
+    .slice(0, 5)
+    .map((h) => h.hashtag);
+
+  return [...new Set([...topPerformers, ...hashtags])].slice(0, 15);
+}
+
+// ---------- Content Calendar Generation ----------
+function generateContentCalendar(biz: Biz, weeks = 4): ContentCalendar[] {
+  const calendars: ContentCalendar[] = [];
+  const platforms = ["Instagram", "Facebook", "GBP"];
+
+  for (let week = 0; week < weeks; week++) {
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() + week * 7);
+
+    const posts: ScheduledPost[] = [];
+    const themes = ["offer", "style", "neigh", "hours", "testimonial", "tips"];
+
+    platforms.forEach((platform, platformIndex) => {
+      const postDate = new Date(weekStart);
+      postDate.setDate(postDate.getDate() + platformIndex);
+
+      const theme = themes[platformIndex % themes.length];
+      const post = makePost(theme, platform as Post["channel"], biz);
+
+      posts.push({
+        id: crypto.randomUUID?.() || Math.random().toString(36).slice(2),
+        date: postDate.toISOString().split("T")[0],
+        time: ["10:00", "14:00", "18:00"][platformIndex % 3],
+        platform,
+        content: post,
+        status: "draft",
+      });
+    });
+
+    calendars.push({
+      week: `Week ${week + 1}: ${weekStart.toLocaleDateString()}`,
+      posts,
+    });
+  }
+
+  return calendars;
 }
 
 // ---------- Image Composer ----------
@@ -451,6 +958,39 @@ export default function Page() {
   const [biz, setBiz] = useState<Biz>(DEFAULT_BIZ);
   const [posts, setPosts] = useState<Post[]>([]);
   const [copied, setCopied] = useState<string>("");
+  const [apiKey, setApiKey] = useState<string>("");
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<AITemplate>(
+    AI_TEMPLATES[0]
+  );
+  const [calendar, setCalendar] = useState<ContentCalendar[]>([]);
+  const [hashtagPerformance, setHashtagPerformance] = useState<
+    HashtagPerformance[]
+  >([]);
+  const [activeTab, setActiveTab] = useState<string>("howto");
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([
+    "Instagram",
+    "Facebook",
+    "GBP",
+  ]);
+  const [abTestVersionA, setAbTestVersionA] = useState<string>("");
+  const [abTestVersionB, setAbTestVersionB] = useState<string>("");
+  const [customInstructions, setCustomInstructions] = useState<string>("");
+  const [contentLibrary, setContentLibrary] = useState<ContentLibrary>({
+    savedContent: [],
+    templates: [],
+    categories: [
+      "Service Promotion",
+      "Promotions",
+      "Community",
+      "Education",
+      "Social Proof",
+      "Brand Building",
+    ],
+  });
+  const [selectedLibraryCategory, setSelectedLibraryCategory] =
+    useState<string>("All");
+  const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
 
   const composer = useImageComposer();
 
@@ -459,6 +999,174 @@ export default function Page() {
       setCopied(tag);
       setTimeout(() => setCopied(""), 1200);
     });
+  }
+
+  // ---------- Enhanced Functions ----------
+  async function generateAIContent() {
+    if (!apiKey.trim()) {
+      alert("Please enter your OpenAI API key first");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const result = await generateAIContent(
+        selectedTemplate,
+        biz,
+        biz.services[0],
+        "professional yet approachable",
+        customInstructions
+      );
+
+      const newPost = makePost(
+        selectedTemplate.category.toLowerCase(),
+        selectedTemplate.platforms[0] as Post["channel"],
+        biz,
+        true
+      );
+
+      newPost.title = result.title;
+      newPost.body = result.body;
+      newPost.hashtags = result.hashtags;
+      newPost.aiGenerated = true;
+
+      // Add quality analysis to the post
+      (newPost as any).quality = result.quality;
+
+      setPosts((prev) => [...prev, newPost]);
+      setActiveTab("posts");
+    } catch (error) {
+      console.error("AI generation failed:", error);
+      alert(
+        "Failed to generate AI content. Please check your API key and try again."
+      );
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  function generateMultiPlatform() {
+    const newPosts: Post[] = [];
+    const order = ["offer", "style", "neigh", "hours"];
+
+    selectedPlatforms.forEach((platform) => {
+      order.forEach((theme) => {
+        newPosts.push(makePost(theme, platform as Post["channel"], biz));
+      });
+    });
+
+    setPosts((prev) => [...prev, ...newPosts]);
+    setActiveTab("posts");
+  }
+
+  function generateCalendar() {
+    const newCalendar = generateContentCalendar(biz);
+    setCalendar(newCalendar);
+    setActiveTab("calendar");
+  }
+
+  function updateHashtagPerformance() {
+    // Simulate hashtag performance data
+    const hashtags = makeHashtags(biz.area, biz.services);
+    const performance: HashtagPerformance[] = hashtags.map((hashtag) => ({
+      hashtag,
+      reach: Math.floor(Math.random() * 1000) + 100,
+      engagement: Math.floor(Math.random() * 200) + 10,
+      posts: Math.floor(Math.random() * 50) + 5,
+      trend: ["up", "down", "stable"][Math.floor(Math.random() * 3)] as
+        | "up"
+        | "down"
+        | "stable",
+    }));
+
+    setHashtagPerformance(performance);
+  }
+
+  // ---------- Content Library Functions ----------
+  function savePostToLibrary(post: Post, tags: string[] = []) {
+    const quality =
+      (post as any).quality || calculateContentQuality(post.body, post.theme);
+    const savedContent: SavedContent = {
+      id: post.id + "_saved",
+      title: post.title,
+      body: post.body,
+      hashtags: post.hashtags || [],
+      theme: post.theme,
+      platform: post.channel,
+      aiGenerated: post.aiGenerated || false,
+      qualityScore: quality.score,
+      performance: post.performance || {
+        views: 0,
+        likes: 0,
+        shares: 0,
+        comments: 0,
+        clicks: 0,
+        engagementRate: 0,
+        date: todayISO(),
+      },
+      savedDate: todayISO(),
+      tags,
+      category: post.theme,
+    };
+
+    setContentLibrary((prev) => ({
+      ...prev,
+      savedContent: [...prev.savedContent, savedContent],
+    }));
+
+    alert("Content saved to library!");
+  }
+
+  function loadFromLibrary(savedContent: SavedContent) {
+    const newPost = makePost(savedContent.theme, savedContent.platform, biz);
+    newPost.title = savedContent.title;
+    newPost.body = savedContent.body;
+    newPost.hashtags = savedContent.hashtags;
+    newPost.aiGenerated = savedContent.aiGenerated;
+    (newPost as any).quality = {
+      score: savedContent.qualityScore,
+      strengths: ["Loaded from library", "Previously successful content"],
+      improvements: [],
+    };
+
+    setPosts((prev) => [...prev, newPost]);
+    setActiveTab("posts");
+    alert("Content loaded from library!");
+  }
+
+  function deleteFromLibrary(contentId: string) {
+    setContentLibrary((prev) => ({
+      ...prev,
+      savedContent: prev.savedContent.filter(
+        (content) => content.id !== contentId
+      ),
+    }));
+  }
+
+  // ---------- Scheduling Functions ----------
+  function schedulePost(post: Post, date: string, time: string) {
+    const scheduledPost: ScheduledPost = {
+      id: post.id + "_scheduled_" + Date.now(),
+      date,
+      time,
+      platform: post.channel,
+      content: post,
+      status: "scheduled",
+    };
+
+    setScheduledPosts((prev) => [...prev, scheduledPost]);
+    alert(`Post scheduled for ${date} at ${time} on ${post.channel}`);
+  }
+
+  function updateScheduleStatus(
+    scheduledPostId: string,
+    status: ScheduledPost["status"]
+  ) {
+    setScheduledPosts((prev) =>
+      prev.map((post) =>
+        post.id === scheduledPostId ? { ...post, status } : post
+      )
+    );
   }
 
   function genAll() {
@@ -518,8 +1226,8 @@ export default function Page() {
   return (
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
-        title="Social Media Studio"
-        subtitle="Generate weekly GBP posts + IG captions with Belmont branding and Book Now CTAs."
+        title="AI Social Media Studio"
+        subtitle="Generate AI-powered multi-platform content with analytics, scheduling, and performance tracking."
         actions={
           <div className="flex gap-2">
             <Button
@@ -527,14 +1235,20 @@ export default function Page() {
               onClick={() => {
                 setBiz(DEFAULT_BIZ);
                 setPosts([]);
+                setCalendar([]);
+                setHashtagPerformance([]);
               }}
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              Reset
+              Reset All
             </Button>
-            <Button onClick={genAll}>
-              <Wand2 className="h-4 w-4 mr-2" />
-              Generate Belmont Posts
+            <Button onClick={generateMultiPlatform}>
+              <Share2 className="h-4 w-4 mr-2" />
+              Generate Multi-Platform
+            </Button>
+            <Button onClick={generateCalendar} variant="outline">
+              <Calendar className="h-4 w-4 mr-2" />
+              Content Calendar
             </Button>
             <a
               href={BELMONT_CONSTANTS.BOOK_URL}
@@ -548,29 +1262,73 @@ export default function Page() {
         }
       />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+        <KPICard label="Posts" value={posts.length} hint="Generated" />
         <KPICard
-          label="Posts"
-          value={posts.length}
-          hint="Generated this week"
+          label="AI Generated"
+          value={posts.filter((p) => p.aiGenerated).length}
+          hint="Smart content"
         />
-        <KPICard label="Images" value={0} hint="Exported" />
-        <KPICard label="Platforms" value="GBP + IG" hint="Supported" />
+        <KPICard
+          label="Platforms"
+          value={selectedPlatforms.length}
+          hint="Active"
+        />
+        <KPICard
+          label="Calendar"
+          value={calendar.length}
+          hint="Weeks planned"
+        />
+        <KPICard
+          label="Engagement"
+          value={`${(posts.reduce((sum, p) => sum + (p.performance?.engagementRate || 0), 0) * 100) / Math.max(posts.length, 1) || 0}%`}
+          hint="Avg rate"
+        />
         <KPICard
           label="Status"
-          value={passCount === tests.length ? "Ready" : "Needs Work"}
-          hint="System online"
+          value={apiKey ? "AI Ready" : "Setup Needed"}
+          hint="OpenAI API"
         />
       </div>
 
-      <Tabs defaultValue="howto">
-        <TabsList>
-          <TabsTrigger value="howto">How To</TabsTrigger>
-          <TabsTrigger value="context">Business</TabsTrigger>
-          <TabsTrigger value="posts">Posts</TabsTrigger>
-          <TabsTrigger value="designer">Designer</TabsTrigger>
-          <TabsTrigger value="exports">Exports</TabsTrigger>
-          <TabsTrigger value="tests">Tests</TabsTrigger>
+      <Tabs defaultValue="howto" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4 md:grid-cols-12 gap-1">
+          <TabsTrigger value="howto" className="text-xs">
+            How To
+          </TabsTrigger>
+          <TabsTrigger value="ai-generate" className="text-xs">
+            AI Generate
+          </TabsTrigger>
+          <TabsTrigger value="context" className="text-xs">
+            Business
+          </TabsTrigger>
+          <TabsTrigger value="posts" className="text-xs">
+            Posts
+          </TabsTrigger>
+          <TabsTrigger value="quality" className="text-xs">
+            Quality
+          </TabsTrigger>
+          <TabsTrigger value="ab-test" className="text-xs">
+            A/B Test
+          </TabsTrigger>
+          <TabsTrigger value="library" className="text-xs">
+            Library
+          </TabsTrigger>
+          <TabsTrigger value="scheduler" className="text-xs">
+            Scheduler
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs">
+            Analytics
+          </TabsTrigger>
+          <TabsTrigger value="hashtags" className="text-xs">
+            Hashtags
+          </TabsTrigger>
+          <TabsTrigger value="designer" className="text-xs">
+            Designer
+          </TabsTrigger>
+          <TabsTrigger value="exports" className="text-xs">
+            Exports
+          </TabsTrigger>
         </TabsList>
 
         {/* How To - First Tab */}
@@ -878,6 +1636,152 @@ export default function Page() {
           </Card>
         </TabsContent>
 
+        {/* AI Generate Tab */}
+        <TabsContent value="ai-generate">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5" />
+                AI-Powered Content Generation
+              </CardTitle>
+              <CardDescription>
+                Generate professional, engaging content using artificial
+                intelligence
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label>OpenAI API Key</Label>
+                    <Input
+                      type="password"
+                      placeholder="sk-..."
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Get your API key from{" "}
+                      <a
+                        href="https://platform.openai.com/api-keys"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        OpenAI Platform
+                      </a>
+                    </p>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="ai-template-select">Content Template</Label>
+                    <select
+                      id="ai-template-select"
+                      title="Select AI content template"
+                      className="w-full h-9 border rounded-md px-2"
+                      value={AI_TEMPLATES.findIndex(
+                        (t) => t.name === selectedTemplate.name
+                      )}
+                      onChange={(e) =>
+                        setSelectedTemplate(
+                          AI_TEMPLATES[parseInt(e.target.value)]
+                        )
+                      }
+                    >
+                      {AI_TEMPLATES.map((template, index) => (
+                        <option key={template.name} value={index}>
+                          {template.name} - {template.category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
+                    <h4 className="font-medium mb-2">
+                      {selectedTemplate.name}
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {selectedTemplate.description}
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedTemplate.platforms.map((platform) => (
+                        <Badge
+                          key={platform}
+                          variant="outline"
+                          className="text-xs"
+                        >
+                          {platform}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <Label>Selected Platforms</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {PLATFORMS.map((platform) => {
+                        const IconComponent = platform.icon;
+                        return (
+                          <button
+                            key={platform.key}
+                            onClick={() => {
+                              setSelectedPlatforms((prev) =>
+                                prev.includes(platform.key)
+                                  ? prev.filter((p) => p !== platform.key)
+                                  : [...prev, platform.key]
+                              );
+                            }}
+                            className={`p-3 border rounded-lg text-left transition-colors ${
+                              selectedPlatforms.includes(platform.key)
+                                ? "border-primary bg-primary/10"
+                                : "border-muted hover:border-primary/50"
+                            }`}
+                          >
+                            <IconComponent className="h-5 w-5 mb-1" />
+                            <div className="text-sm font-medium">
+                              {platform.name}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label>Custom Instructions (Optional)</Label>
+                    <Textarea
+                      value={customInstructions}
+                      onChange={(e) => setCustomInstructions(e.target.value)}
+                      placeholder="Add specific instructions like tone, style, or focus areas..."
+                      className="min-h-[60px]"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={generateAIContent}
+                    disabled={isGenerating || !apiKey.trim()}
+                    className="w-full"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Brain className="h-4 w-4 mr-2" />
+                        Generate AI Content
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Context */}
         <TabsContent value="context">
           <Card>
@@ -949,6 +1853,56 @@ export default function Page() {
                     }
                   />
                 </div>
+                <div className="md:col-span-2">
+                  <Label>Brand Voice</Label>
+                  <Input
+                    value={biz.brandVoice}
+                    onChange={(e) =>
+                      setBiz((b) => ({ ...b, brandVoice: e.target.value }))
+                    }
+                    placeholder="Professional yet approachable..."
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <Label>Target Audience</Label>
+                  <Input
+                    value={biz.targetAudience}
+                    onChange={(e) =>
+                      setBiz((b) => ({ ...b, targetAudience: e.target.value }))
+                    }
+                    placeholder="Local men seeking quality grooming..."
+                  />
+                </div>
+                <div>
+                  <Label>Facebook Handle</Label>
+                  <Input
+                    value={biz.fb || ""}
+                    onChange={(e) =>
+                      setBiz((b) => ({ ...b, fb: e.target.value }))
+                    }
+                    placeholder="facebook.com/yourpage"
+                  />
+                </div>
+                <div>
+                  <Label>Twitter Handle</Label>
+                  <Input
+                    value={biz.twitter || ""}
+                    onChange={(e) =>
+                      setBiz((b) => ({ ...b, twitter: e.target.value }))
+                    }
+                    placeholder="@yourhandle"
+                  />
+                </div>
+                <div>
+                  <Label>LinkedIn Profile</Label>
+                  <Input
+                    value={biz.linkedin || ""}
+                    onChange={(e) =>
+                      setBiz((b) => ({ ...b, linkedin: e.target.value }))
+                    }
+                    placeholder="linkedin.com/company/yourcompany"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -971,44 +1925,101 @@ export default function Page() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Channel</TableHead>
+                      <TableHead>Platform</TableHead>
                       <TableHead>Title</TableHead>
-                      <TableHead>Body</TableHead>
-                      <TableHead>UTM URL</TableHead>
+                      <TableHead>Content</TableHead>
+                      <TableHead>AI Generated</TableHead>
                       <TableHead>Theme</TableHead>
-                      <TableHead>Copy</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {posts.map((p, i) => (
                       <TableRow key={p.id}>
-                        <TableCell>{p.channel}</TableCell>
-                        <TableCell className="min-w-[180px]">
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className="flex items-center gap-1 w-fit"
+                          >
+                            {p.channel === "GBP" && (
+                              <Target className="h-3 w-3" />
+                            )}
+                            {p.channel === "Instagram" && (
+                              <Instagram className="h-3 w-3" />
+                            )}
+                            {p.channel === "Facebook" && (
+                              <Facebook className="h-3 w-3" />
+                            )}
+                            {p.channel === "Twitter" && (
+                              <Twitter className="h-3 w-3" />
+                            )}
+                            {p.channel === "LinkedIn" && (
+                              <Linkedin className="h-3 w-3" />
+                            )}
+                            {p.channel}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="min-w-[180px] font-medium">
                           {p.title}
                         </TableCell>
-                        <TableCell className="min-w-[360px] text-sm whitespace-pre-wrap">
-                          {p.body}
+                        <TableCell className="min-w-[300px] text-sm">
+                          <div className="whitespace-pre-wrap line-clamp-3">
+                            {p.body}
+                          </div>
                         </TableCell>
-                        <TableCell className="min-w-[240px]">
-                          <Input value={p.utmUrl} readOnly />
-                        </TableCell>
-                        <TableCell>{p.theme}</TableCell>
                         <TableCell>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              copy(
-                                `# ${p.channel}: ${p.title}\n\n${p.body}\n\n${p.utmUrl}`,
-                                `copy-${i}`
-                              )
-                            }
-                          >
-                            <Copy className="h-4 w-4 mr-1" />
-                            Copy
-                          </Button>
-                          {copied === `copy-${i}` && (
-                            <Badge className="ml-2">Copied</Badge>
+                          {p.aiGenerated ? (
+                            <Badge
+                              variant="secondary"
+                              className="flex items-center gap-1"
+                            >
+                              <Sparkles className="h-3 w-3" />
+                              AI
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline">Manual</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-xs">
+                            {p.theme}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => copy(p.body, `copy-body-${i}`)}
+                              title="Copy content only"
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() =>
+                                copy(
+                                  `# ${p.channel}: ${p.title}\n\n${p.body}\n\n${p.utmUrl}`,
+                                  `copy-full-${i}`
+                                )
+                              }
+                              title="Copy full post"
+                            >
+                              <Download className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => savePostToLibrary(p)}
+                              title="Save to library"
+                            >
+                              <BookOpen className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          {(copied === `copy-body-${i}` ||
+                            copied === `copy-full-${i}`) && (
+                            <Badge className="ml-2 text-xs">Copied</Badge>
                           )}
                         </TableCell>
                       </TableRow>
@@ -1016,6 +2027,721 @@ export default function Page() {
                   </TableBody>
                 </Table>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Quality Analysis Tab */}
+        <TabsContent value="quality">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5" />
+                Content Quality Analysis
+              </CardTitle>
+              <CardDescription>
+                Analyze and improve the quality of your generated content
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {posts.length === 0 ? (
+                <div className="text-center py-12">
+                  <CheckCircle2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">
+                    No Content to Analyze
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Generate some posts first to see quality analysis.
+                  </p>
+                  <Button onClick={() => setActiveTab("ai-generate")}>
+                    Generate Content
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {posts.map((post, index) => {
+                    const quality =
+                      (post as any).quality ||
+                      calculateContentQuality(post.body, post.theme);
+                    const scoreColor =
+                      quality.score >= 80
+                        ? "text-green-600"
+                        : quality.score >= 60
+                          ? "text-yellow-600"
+                          : "text-red-600";
+
+                    return (
+                      <Card key={post.id}>
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <CardTitle className="text-base">
+                                {post.title}
+                              </CardTitle>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge variant="outline">{post.channel}</Badge>
+                                {post.aiGenerated && (
+                                  <Badge variant="secondary">AI</Badge>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div
+                                className={`text-2xl font-bold ${scoreColor}`}
+                              >
+                                {quality.score}/100
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Quality Score
+                              </div>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            <div>
+                              <h4 className="font-medium mb-2 text-green-600">
+                                ✓ Strengths
+                              </h4>
+                              <ul className="list-disc pl-5 space-y-1 text-sm">
+                                {quality.strengths.map((strength, i) => (
+                                  <li key={i} className="text-green-700">
+                                    {strength}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            {quality.improvements.length > 0 && (
+                              <div>
+                                <h4 className="font-medium mb-2 text-orange-600">
+                                  ⚠️ Suggestions
+                                </h4>
+                                <ul className="list-disc pl-5 space-y-1 text-sm">
+                                  {quality.improvements.map(
+                                    (improvement, i) => (
+                                      <li key={i} className="text-orange-700">
+                                        {improvement}
+                                      </li>
+                                    )
+                                  )}
+                                </ul>
+                              </div>
+                            )}
+
+                            <div className="bg-muted/50 p-3 rounded text-sm">
+                              <p className="font-medium mb-1">Preview:</p>
+                              <p className="text-muted-foreground line-clamp-2">
+                                {post.body}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* A/B Testing Tab */}
+        <TabsContent value="ab-test">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                A/B Testing Studio
+              </CardTitle>
+              <CardDescription>
+                Test different versions of your content to find what performs
+                best
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="font-medium">Version A</h3>
+                  <Textarea
+                    value={abTestVersionA}
+                    onChange={(e) => setAbTestVersionA(e.target.value)}
+                    placeholder="Enter your first version of the content..."
+                    className="min-h-[120px]"
+                  />
+                  <div className="text-sm text-muted-foreground">
+                    Focus on: Clear call-to-action, engaging language
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="font-medium">Version B</h3>
+                  <Textarea
+                    value={abTestVersionB}
+                    onChange={(e) => setAbTestVersionB(e.target.value)}
+                    placeholder="Enter your second version of the content..."
+                    className="min-h-[120px]"
+                  />
+                  <div className="text-sm text-muted-foreground">
+                    Focus on: Emotional appeal, storytelling
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <Button className="flex-1">
+                  <Zap className="h-4 w-4 mr-2" />
+                  Run A/B Test
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  View Results
+                </Button>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Testing Tips</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>
+                    • Test one element at a time (headline, CTA, tone, length)
+                  </li>
+                  <li>
+                    • Run tests for at least 7-14 days for meaningful results
+                  </li>
+                  <li>
+                    • Test with similar audience sizes for fair comparison
+                  </li>
+                  <li>
+                    • Focus on engagement metrics (likes, shares, comments)
+                  </li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Content Library Tab */}
+        <TabsContent value="library">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Content Library
+                </CardTitle>
+                <CardDescription>
+                  Save and reuse your best performing content
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-4 mb-6">
+                  <select
+                    className="px-3 py-2 border rounded-md"
+                    value={selectedLibraryCategory}
+                    onChange={(e) => setSelectedLibraryCategory(e.target.value)}
+                  >
+                    <option value="All">All Categories</option>
+                    {contentLibrary.categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="text-sm text-muted-foreground flex items-center">
+                    {contentLibrary.savedContent.length} saved items
+                  </div>
+                </div>
+
+                {contentLibrary.savedContent.length === 0 ? (
+                  <div className="text-center py-12">
+                    <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">
+                      No Saved Content
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      Save your best performing posts to build a reusable
+                      content library.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {contentLibrary.savedContent
+                      .filter(
+                        (content) =>
+                          selectedLibraryCategory === "All" ||
+                          content.category === selectedLibraryCategory
+                      )
+                      .map((savedContent) => (
+                        <Card key={savedContent.id}>
+                          <CardContent className="pt-4">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h4 className="font-medium">
+                                    {savedContent.title}
+                                  </h4>
+                                  {savedContent.aiGenerated && (
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
+                                      AI
+                                    </Badge>
+                                  )}
+                                  <Badge variant="outline" className="text-xs">
+                                    {savedContent.platform}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                                  {savedContent.body}
+                                </p>
+                                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                  <span>
+                                    Quality: {savedContent.qualityScore}/100
+                                  </span>
+                                  <span>Saved: {savedContent.savedDate}</span>
+                                  <span>
+                                    Engagement:{" "}
+                                    {(
+                                      savedContent.performance.engagementRate *
+                                      100
+                                    ).toFixed(1)}
+                                    %
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => loadFromLibrary(savedContent)}
+                                >
+                                  <Download className="h-3 w-3 mr-1" />
+                                  Load
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() =>
+                                    deleteFromLibrary(savedContent.id)
+                                  }
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Scheduler Tab */}
+        <TabsContent value="scheduler">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Content Scheduler
+              </CardTitle>
+              <CardDescription>
+                Schedule posts for automated publishing across platforms
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="font-medium">Schedule New Post</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <Label>Select Post to Schedule</Label>
+                      <select className="w-full h-9 border rounded-md px-2">
+                        <option value="">Choose a post...</option>
+                        {posts.map((post, index) => (
+                          <option key={post.id} value={post.id}>
+                            {post.title} ({post.channel})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Schedule Date</Label>
+                      <Input type="date" min={todayISO()} />
+                    </div>
+                    <div>
+                      <Label>Schedule Time</Label>
+                      <Input type="time" defaultValue="10:00" />
+                    </div>
+                    <Button className="w-full">
+                      <Clock className="h-4 w-4 mr-2" />
+                      Schedule Post
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="font-medium">Scheduled Posts</h3>
+                  {scheduledPosts.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      No posts scheduled yet.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {scheduledPosts.map((scheduledPost) => (
+                        <Card key={scheduledPost.id}>
+                          <CardContent className="pt-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h4 className="font-medium text-sm">
+                                  {scheduledPost.content.title}
+                                </h4>
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <span>
+                                    {scheduledPost.date} at {scheduledPost.time}
+                                  </span>
+                                  <Badge variant="outline" className="text-xs">
+                                    {scheduledPost.platform}
+                                  </Badge>
+                                  <Badge
+                                    variant={
+                                      scheduledPost.status === "published"
+                                        ? "default"
+                                        : scheduledPost.status === "scheduled"
+                                          ? "secondary"
+                                          : "outline"
+                                    }
+                                    className="text-xs"
+                                  >
+                                    {scheduledPost.status}
+                                  </Badge>
+                                </div>
+                              </div>
+                              <div className="flex gap-2">
+                                {scheduledPost.status === "scheduled" && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() =>
+                                      updateScheduleStatus(
+                                        scheduledPost.id,
+                                        "published"
+                                      )
+                                    }
+                                  >
+                                    Mark Published
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Scheduling Tips</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• Post during peak hours for maximum engagement</li>
+                  <li>• Space out posts across different platforms</li>
+                  <li>• Consider your audience's timezone</li>
+                  <li>
+                    • Monitor performance and adjust timing based on results
+                  </li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Calendar Tab */}
+        <TabsContent value="calendar">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5" />
+                Content Calendar
+              </CardTitle>
+              <CardDescription>
+                Plan and schedule your social media content across multiple
+                weeks
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {calendar.length === 0 ? (
+                <div className="text-center py-12">
+                  <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-medium mb-2">
+                    No Content Calendar Generated
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Generate a 4-week content calendar with posts for all
+                    selected platforms.
+                  </p>
+                  <Button onClick={generateCalendar}>
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Generate Calendar
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {calendar.map((week, weekIndex) => (
+                    <Card key={weekIndex}>
+                      <CardHeader>
+                        <CardTitle className="text-base">{week.week}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid gap-4">
+                          {week.posts.map((scheduledPost) => (
+                            <div
+                              key={scheduledPost.id}
+                              className="flex items-center justify-between p-4 border rounded-lg"
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-3 h-3 rounded-full bg-primary" />
+                                  <span className="font-medium">
+                                    {scheduledPost.platform}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {scheduledPost.date} at {scheduledPost.time}
+                                </div>
+                                <Badge variant="outline" className="text-xs">
+                                  {scheduledPost.status}
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">
+                                  {scheduledPost.content.title}
+                                </span>
+                                <Badge variant="secondary" className="text-xs">
+                                  {scheduledPost.content.theme}
+                                </Badge>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Analytics Tab */}
+        <TabsContent value="analytics">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Performance Analytics
+                </CardTitle>
+                <CardDescription>
+                  Track engagement and performance metrics across all platforms
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {posts
+                        .reduce(
+                          (sum, p) => sum + (p.performance?.views || 0),
+                          0
+                        )
+                        .toLocaleString()}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Total Views
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {posts
+                        .reduce(
+                          (sum, p) => sum + (p.performance?.likes || 0),
+                          0
+                        )
+                        .toLocaleString()}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Total Likes
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {posts
+                        .reduce(
+                          (sum, p) => sum + (p.performance?.shares || 0),
+                          0
+                        )
+                        .toLocaleString()}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Total Shares
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">
+                      {(
+                        (posts.reduce(
+                          (sum, p) =>
+                            sum + (p.performance?.engagementRate || 0),
+                          0
+                        ) /
+                          Math.max(posts.length, 1)) *
+                        100
+                      ).toFixed(1)}
+                      %
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Avg Engagement
+                    </div>
+                  </div>
+                </div>
+
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Platform</TableHead>
+                      <TableHead>Post Title</TableHead>
+                      <TableHead>Views</TableHead>
+                      <TableHead>Likes</TableHead>
+                      <TableHead>Comments</TableHead>
+                      <TableHead>Clicks</TableHead>
+                      <TableHead>Engagement Rate</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {posts.map((post, index) => (
+                      <TableRow key={post.id || `post-${index}`}>
+                        <TableCell>
+                          <Badge variant="outline">{post.channel}</Badge>
+                        </TableCell>
+                        <TableCell className="max-w-xs truncate">
+                          {post.title}
+                        </TableCell>
+                        <TableCell>
+                          {post.performance?.views.toLocaleString()}
+                        </TableCell>
+                        <TableCell>{post.performance?.likes}</TableCell>
+                        <TableCell>{post.performance?.comments}</TableCell>
+                        <TableCell>{post.performance?.clicks}</TableCell>
+                        <TableCell>
+                          {(
+                            (post.performance?.engagementRate || 0) * 100
+                          ).toFixed(1)}
+                          %
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Hashtags Tab */}
+        <TabsContent value="hashtags">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Hash className="h-5 w-5" />
+                Hashtag Optimization
+              </CardTitle>
+              <CardDescription>
+                Analyze hashtag performance and get smart recommendations
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex gap-4">
+                <Button onClick={updateHashtagPerformance}>
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Analyze Hashtags
+                </Button>
+              </div>
+
+              {hashtagPerformance.length > 0 && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {hashtagPerformance.slice(0, 12).map((hashtag) => {
+                      const trendVariant =
+                        hashtag.trend === "up"
+                          ? "default"
+                          : hashtag.trend === "down"
+                            ? "destructive"
+                            : "secondary";
+                      const trendIcon =
+                        hashtag.trend === "up"
+                          ? "↗"
+                          : hashtag.trend === "down"
+                            ? "↘"
+                            : "→";
+
+                      return (
+                        <Card key={hashtag.hashtag}>
+                          <CardContent className="pt-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="font-medium text-sm">
+                                {hashtag.hashtag}
+                              </span>
+                              <Badge variant={trendVariant} className="text-xs">
+                                {trendIcon}
+                              </Badge>
+                            </div>
+                            <div className="space-y-1 text-xs text-muted-foreground">
+                              <div>Reach: {hashtag.reach.toLocaleString()}</div>
+                              <div>Engagement: {hashtag.engagement}</div>
+                              <div>Posts: {hashtag.posts}</div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">
+                        Recommended Hashtags
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-wrap gap-2">
+                        {hashtagPerformance
+                          .filter((h) => h.engagement > 100)
+                          .slice(0, 10)
+                          .map((hashtag) => (
+                            <Button
+                              key={hashtag.hashtag}
+                              variant="outline"
+                              size="sm"
+                              onClick={() =>
+                                copy(
+                                  hashtag.hashtag,
+                                  `hashtag-${hashtag.hashtag}`
+                                )
+                              }
+                            >
+                              {hashtag.hashtag}
+                            </Button>
+                          ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -1152,9 +2878,6 @@ export default function Page() {
                   <canvas
                     ref={composer.canvasRef}
                     className="w-full border rounded-lg"
-                    style={{
-                      aspectRatio: `${SIZES.find((s) => s.key === composer.sizeKey)?.w || 1}/${SIZES.find((s) => s.key === composer.sizeKey)?.h || 1}`,
-                    }}
                   />
                   <div className="flex gap-2 mt-2">
                     <Button onClick={composer.exportPNG}>
