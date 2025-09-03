@@ -65,6 +65,7 @@ import OpenAI from "openai";
 import { logEvent } from "@/lib/analytics";
 
 import { saveBlob } from "@/lib/blob";
+import { showToast } from "@/lib/toast";
 import { toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
 import { BELMONT_CONSTANTS, BELMONT_UTM_PRESETS } from "@/lib/constants";
@@ -538,7 +539,7 @@ function UTMDashboard() {
       savedCampaigns: [...prev.savedCampaigns, savedCampaign],
     }));
 
-    alert("Campaign saved to library!");
+    showToast("Campaign saved to library!", "success");
   };
 
   const scheduleCampaign = (row: Row, date: string, time: string) => {
@@ -553,7 +554,7 @@ function UTMDashboard() {
     };
 
     setScheduledCampaigns((prev) => [...prev, scheduledCampaign]);
-    alert(`Campaign scheduled for ${date} at ${time}`);
+    showToast(`Campaign scheduled for ${date} at ${time}`, "success");
   };
 
   const createABTest = (
@@ -1463,7 +1464,7 @@ function UTMDashboard() {
                       currentAbTest.variants[1].utmUrl
                     ) {
                       setAbTests((prev) => [...prev, currentAbTest]);
-                      alert("A/B test created successfully!");
+                      showToast("A/B test created successfully!", "success");
                     }
                   }}
                   disabled={
@@ -1626,7 +1627,7 @@ function UTMDashboard() {
                                 navigator.clipboard.writeText(
                                   savedCampaign.utmUrl
                                 );
-                                alert("UTM URL copied!");
+                                showToast("UTM URL copied!", "success");
                               }}
                             >
                               <Copy className="h-3 w-3 mr-1" />

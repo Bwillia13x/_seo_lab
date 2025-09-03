@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import OpenAI from "openai";
 import { saveBlob } from "@/lib/blob";
+import { showToast } from "@/lib/toast";
 import { addDays, todayISO } from "@/lib/dates";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -273,7 +274,7 @@ export default function PostOracle() {
   // ---------- AI Content Generation ----------
   async function generateAIContent() {
     if (!apiKey.trim()) {
-      alert("Please enter your OpenAI API key first");
+      showToast("Please enter your OpenAI API key first", "warn");
       return;
     }
 
@@ -294,12 +295,10 @@ export default function PostOracle() {
       );
 
       setPosts((prev) => [...prev, newPost]);
-      alert("AI content generated successfully!");
+      showToast("AI content generated successfully!", "success");
     } catch (error) {
       console.error("AI generation failed:", error);
-      alert(
-        "Failed to generate AI content. Please check your API key and try again."
-      );
+      showToast("Failed to generate AI content. Please check your API key and try again.", "error");
     } finally {
       setIsGenerating(false);
     }
@@ -584,7 +583,7 @@ export default function PostOracle() {
       ...prev,
       savedContent: [...prev.savedContent, savedContent],
     }));
-    alert("Content saved to library!");
+    import("@/lib/toast").then((m) => m.showToast("Content saved to library!", "success")).catch(() => {});
   }
 
   function loadFromLibrary(savedContent: SavedContent) {
@@ -605,7 +604,7 @@ export default function PostOracle() {
     );
 
     setPosts((prev) => [...prev, newPost]);
-    alert("Content loaded from library!");
+    import("@/lib/toast").then((m) => m.showToast("Content loaded from library!", "success")).catch(() => {});
   }
 
   function deleteFromLibrary(contentId: string) {
@@ -629,7 +628,7 @@ export default function PostOracle() {
     };
 
     setScheduledPosts((prev) => [...prev, scheduledPost]);
-    alert(`Post scheduled for ${date} at ${time} on ${post.platform}`);
+    import("@/lib/toast").then((m) => m.showToast(`Post scheduled for ${date} at ${time} on ${post.platform}`, "success")).catch(() => {});
   }
 
   const generatePosts = () => {

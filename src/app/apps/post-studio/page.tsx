@@ -1014,7 +1014,7 @@ export default function Page() {
   // ---------- Enhanced Functions ----------
   async function handleGenerateAIContent() {
     if (!apiKey.trim()) {
-      alert("Please enter your OpenAI API key first");
+      try { (await import("@/lib/toast")).showToast("Please enter your OpenAI API key first", "warn"); } catch {}
       return;
     }
 
@@ -1047,9 +1047,7 @@ export default function Page() {
       setActiveTab("posts");
     } catch (error) {
       console.error("AI generation failed:", error);
-      alert(
-        "Failed to generate AI content. Please check your API key and try again."
-      );
+      try { (await import("@/lib/toast")).showToast("Failed to generate AI content. Please check your API key and try again.", "error"); } catch {}
     } finally {
       setIsGenerating(false);
     }
@@ -1124,7 +1122,8 @@ export default function Page() {
       savedContent: [...prev.savedContent, savedContent],
     }));
 
-    alert("Content saved to library!");
+    // Toast notification
+    import("@/lib/toast").then((m) => m.showToast("Content saved to library!", "success")).catch(() => {});
   }
 
   function loadFromLibrary(savedContent: SavedContent) {
@@ -1141,7 +1140,7 @@ export default function Page() {
 
     setPosts((prev) => [...prev, newPost]);
     setActiveTab("posts");
-    alert("Content loaded from library!");
+    import("@/lib/toast").then((m) => m.showToast("Content loaded from library!", "success")).catch(() => {});
   }
 
   function deleteFromLibrary(contentId: string) {
@@ -1165,7 +1164,7 @@ export default function Page() {
     };
 
     setScheduledPosts((prev) => [...prev, scheduledPost]);
-    alert(`Post scheduled for ${date} at ${time} on ${post.channel}`);
+    import("@/lib/toast").then((m) => m.showToast(`Post scheduled for ${date} at ${time} on ${post.channel}`, "success")).catch(() => {});
   }
 
   function updateScheduleStatus(

@@ -317,7 +317,7 @@ export default function AddOnRecommender() {
   // AI-powered recommendation generation
   const generateAIRecommendations = async () => {
     if (!apiKey) {
-      alert("Please enter your OpenAI API key first");
+      try { (await import("@/lib/toast")).showToast("Please enter your OpenAI API key first", "warn"); } catch {}
       return;
     }
 
@@ -390,9 +390,7 @@ export default function AddOnRecommender() {
       setPerformanceData(mockPerformance);
     } catch (error) {
       console.error("AI Analysis Error:", error);
-      alert(
-        "Failed to generate AI recommendations. Please check your API key and try again."
-      );
+      try { (await import("@/lib/toast")).showToast("Failed to generate AI recommendations. Please check your API key and try again.", "error"); } catch {}
     } finally {
       setIsAnalyzing(false);
     }

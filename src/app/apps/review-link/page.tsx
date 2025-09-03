@@ -85,6 +85,7 @@ import { saveBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
+import { showToast } from "@/lib/toast";
 import { logEvent } from "@/lib/analytics";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -617,7 +618,7 @@ export default function ReviewKit() {
       templates: [...prev.templates, newTemplate],
     }));
 
-    alert("Template saved to library!");
+    showToast("Template saved to library!", "success");
   };
 
   const generateBatchRequests = () => {
@@ -652,7 +653,7 @@ export default function ReviewKit() {
       campaign
     );
     setReviewRequests((prev) => [...prev, ...newRequests]);
-    alert(`Generated ${newRequests.length} review requests!`);
+    showToast(`Generated ${newRequests.length} review requests!`, "success");
   };
 
   const calculateReviewAnalyticsData = () => {
@@ -2140,7 +2141,7 @@ export default function ReviewKit() {
                         document.getElementById("c_addr") as HTMLInputElement
                       )?.value?.trim();
                       if (!name || !addr) {
-                        alert("Enter name and address");
+                        showToast("Enter name and address", "warn");
                         return;
                       }
                       addConsentRow(name, channel, addr);

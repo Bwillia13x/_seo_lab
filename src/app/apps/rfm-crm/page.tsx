@@ -766,7 +766,7 @@ export default function RFMMicroCRM() {
         const parsed = parseCSV(csv);
         setRaw(parsed);
       } catch (err) {
-        alert("CSV parse error: " + String(err));
+        (async () => { try { (await import("@/lib/toast")).showToast("CSV parse error: " + String(err), "error"); } catch {} })();
       }
     };
     reader.readAsText(f);
@@ -931,7 +931,7 @@ export default function RFMMicroCRM() {
     const emails = filtered.map((s) => s.email).filter(Boolean) as string[];
     navigator.clipboard
       .writeText(emails.join(", "))
-      .then(() => alert(`Copied ${emails.length} emails`));
+      .then(async () => { try { (await import("@/lib/toast")).showToast(`Copied ${emails.length} emails`, "success"); } catch {} });
   }
 
   // ---------------- Enhanced Functions ----------------

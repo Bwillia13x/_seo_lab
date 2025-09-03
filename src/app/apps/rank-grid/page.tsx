@@ -1323,16 +1323,14 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         (position) => {
           const { latitude, longitude } = position.coords;
           setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-          alert(
-            `Location updated: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
-          );
+          (async () => { try { (await import("@/lib/toast")).showToast(`Location updated: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`, "success"); } catch {} })();
         },
         (error) => {
-          alert("Unable to get location. Please enable GPS and try again.");
+          (async () => { try { (await import("@/lib/toast")).showToast("Unable to get location. Please enable GPS and try again.", "error"); } catch {} })();
         }
       );
     } else {
-      alert("Geolocation is not supported by this browser.");
+      (async () => { try { (await import("@/lib/toast")).showToast("Geolocation is not supported by this browser.", "error"); } catch {} })();
     }
   }
 

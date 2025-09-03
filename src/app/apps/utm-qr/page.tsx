@@ -64,6 +64,7 @@ import {
   FileImage,
 } from "lucide-react";
 import OpenAI from "openai";
+import { showToast } from "@/lib/toast";
 import { saveBlob } from "@/lib/blob";
 import { logEvent } from "@/lib/analytics";
 import { toCSV } from "@/lib/csv";
@@ -628,7 +629,7 @@ export default function UTMBuilder() {
       overwrite
     );
     if (error) {
-      alert(error);
+      showToast(String(error), "error");
       return;
     }
     setBuiltUrl(url);
@@ -708,7 +709,7 @@ export default function UTMBuilder() {
       designs: [...prev.designs, savedDesign],
     }));
 
-    alert("QR design saved to library!");
+    showToast("QR design saved to library!", "success");
   };
 
   const testQR = () => {
@@ -1478,7 +1479,7 @@ export default function UTMBuilder() {
                               variant="outline"
                               onClick={() => {
                                 setQrDesign(design);
-                                alert("Design loaded!");
+                                showToast("Design loaded!", "success");
                               }}
                             >
                               <Download className="h-3 w-3 mr-1" />

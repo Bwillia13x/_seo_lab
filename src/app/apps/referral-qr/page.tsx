@@ -59,6 +59,7 @@ import {
 } from "lucide-react";
 import OpenAI from "openai";
 import { saveBlob } from "@/lib/blob";
+import { showToast } from "@/lib/toast";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
 import QRCode from "qrcode";
@@ -548,13 +549,13 @@ export default function ReferralQR() {
       templates: [...prev.templates, template],
     }));
 
-    alert("Referral template saved to library!");
+    showToast("Referral template saved to library!", "success");
   };
 
   const generateBatchReferrals = () => {
     const newCodes = generateBatchCodes(batchOptions);
     setCodes((prev) => [...prev, ...newCodes]);
-    alert(`Generated ${batchOptions.count} referral codes!`);
+    showToast(`Generated ${batchOptions.count} referral codes!`, "success");
   };
 
   const calculateAnalytics = () => {
@@ -1618,7 +1619,7 @@ export default function ReferralQR() {
                                 setNewName(template.name);
                                 setNewType(template.type);
                                 setActiveTab("generator");
-                                alert("Template loaded!");
+                                showToast("Template loaded!", "success");
                               }}
                             >
                               <Download className="h-3 w-3 mr-1" />
