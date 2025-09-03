@@ -252,7 +252,8 @@ async function generateAdvancedReferralQR(
   }
 ): Promise<string> {
   try {
-    const options: any = {
+    const canvas = document.createElement("canvas");
+    await QRCode.toCanvas(canvas, text, {
       width: design.size,
       margin: 2,
       errorCorrectionLevel: design.errorCorrection,
@@ -260,9 +261,8 @@ async function generateAdvancedReferralQR(
         dark: design.foregroundColor,
         light: design.backgroundColor,
       },
-    };
-
-    return await QRCode.toDataURL(text, options);
+    });
+    return canvas.toDataURL("image/png");
   } catch (error) {
     console.error("Advanced QR generation failed:", error);
     throw error;
@@ -395,7 +395,7 @@ export default function ReferralQR() {
     useState<ReferralAnalytics | null>(null);
   const [qrDesign, setQrDesign] = useState({
     size: 512,
-    errorCorrection: "M" as const,
+    errorCorrection: "M" as "L" | "M" | "Q" | "H",
     foregroundColor: "#000000",
     backgroundColor: "#FFFFFF",
     logoUrl: "",
@@ -468,6 +468,7 @@ export default function ReferralQR() {
       clicks: 0,
       bookings: 0,
       revenue: 0,
+      createdDate: new Date().toISOString(),
     };
 
     setCodes([...codes, newCode]);

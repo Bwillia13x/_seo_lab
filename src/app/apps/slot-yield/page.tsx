@@ -789,162 +789,20 @@ function generateProfitCampaign(
 }
 
 // ---------------- Enhanced Functions ----------------
-const generateAIProfitOptimization = async () => {
-  if (!selectedService || !selectedTimeSlot || appts.length === 0) return;
 
-  const serviceAppointments = appts.filter(
-    (appt) => appt.service === selectedService
-  );
-  const timeSlotAppointments = serviceAppointments.filter((appt) => {
-    const hour = appt.start.getHours();
-    const timeSlot = `${hour.toString().padStart(2, "0")}:00`;
-    return timeSlot === selectedTimeSlot;
-  });
 
-  const currentRevenue = timeSlotAppointments.length * 65;
-  const totalSlots = 4 * 8; // 4 chairs, 8 hours
-  const currentUtilization = (timeSlotAppointments.length / totalSlots) * 100;
 
-  const optimization = await generateAIProfitOptimization(
-    selectedService,
-    selectedTimeSlot,
-    currentRevenue,
-    currentUtilization,
-    [], // competitorData would come from external source
-    apiKey
-  );
 
-  setProfitLibrary((prev) => ({
-    ...prev,
-    optimizations: [
-      ...prev.optimizations.filter((o) => o.service !== selectedService),
-      optimization,
-    ],
-  }));
-
-  setShowOptimizations(true);
-};
-
-const calculateProfitAnalyticsData = () => {
-  const analytics = calculateProfitAnalytics(appts);
-  setProfitAnalytics(analytics);
-};
-
-const exportEnhancedProfitReport = () => {
-  if (!profitAnalytics) return;
-
-  const csvContent = [
-    "Metric,Value",
-    `Total Revenue,$${profitAnalytics.totalRevenue}`,
-    `Total Appointments,${profitAnalytics.totalAppointments}`,
-    `Avg Revenue per Appointment,$${profitAnalytics.avgRevenuePerAppointment.toFixed(2)}`,
-    `Top Services,${profitAnalytics.topServices}`,
-    `Top Time Slots,${profitAnalytics.topTimeSlots}`,
-    `Improvement Rate,${profitAnalytics.improvementRate.toFixed(2)}`,
-    "",
-    "Service Performance,",
-    ...Object.entries(profitAnalytics.servicePerformance)
-      .sort(([, a], [, b]) => b.revenue - a.revenue)
-      .slice(0, 10)
-      .map(
-        ([service, data]) =>
-          `${service},$${data.revenue},${data.appointments},$${data.profitability.toFixed(2)},${data.trend},${data.velocity}`
-      ),
-    "",
-    "Time Slot Analysis,",
-    ...Object.entries(profitAnalytics.timeSlotAnalysis)
-      .sort(([, a], [, b]) => b.revenue - a.revenue)
-      .slice(0, 10)
-      .map(
-        ([timeSlot, data]) =>
-          `${timeSlot},$${data.revenue},${data.appointments},${data.utilization.toFixed(1)}%,$${data.profitability.toFixed(2)}`
-      ),
-  ].join("\n");
-
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  saveBlob(
-    blob,
-    `enhanced-profit-analytics-${new Date().toISOString().slice(0, 10)}.csv`
-  );
-};
 
 // ---------- Main Component ----------
 
-function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-  const f = e.target.files?.[0];
-  if (!f) return;
-  setLoadState("Parsing CSV...");
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    const csv = ev.target?.result as string;
-    try {
-      const parsed = parseCSV(csv);
-      setRaw(parsed);
-      setLoadState(`Parsed ${parsed.length} rows.`);
-    } catch (err) {
-      setLoadState(`Parse error: ${String(err)}`);
-    }
-  };
-  reader.readAsText(f);
-}
 
-function loadDemo() {
-  const csv = buildDemoCSV(480);
-  try {
-    const parsed = parseCSV(csv);
-    setRaw(parsed);
-    setLoadState(`Loaded demo with ${parsed.length} rows.`);
-  } catch (err) {
-    setLoadState(`Parse error: ${String(err)}`);
-  }
-}
 
 // Map rows → Appt[]
 
-// Derived KPIs
-const utilPct = fmtPct(totals.util);
-const noshowPct = fmtPct(totals.noshowRate);
-const idleMin = Math.max(0, totals.totalCapacityMin - totals.totalBookedMin);
 
-// Handlers for settings
-function setBusinessHour(
-  day: number,
-  key: "open" | "close" | "openEnabled",
-  value: any
-) {
-  setSettings((prev) => ({
-    ...prev,
-    week: { ...prev.week, [day]: { ...prev.week[day], [key]: value } },
-  }));
-}
 
-function exportRecs() {
-  const rows = recs.map((r) => ({
-    window: r.window,
-    utilization: (r.utilization * 100).toFixed(0) + "%",
-    suggestion: r.suggestion,
-  }));
-  const csv = toCSV(rows);
-  saveBlob(
-    new Blob([csv], { type: "text/csv;charset=utf-8;" }),
-    `belmont-off-peak-suggestions.csv`
-  );
-}
 
-function exportMetricsJSON() {
-  const payload = {
-    settings,
-    totals,
-    perDay,
-    generatedAt: new Date().toISOString(),
-  };
-  saveBlob(
-    new Blob([JSON.stringify(payload, null, 2)], {
-      type: "application/json",
-    }),
-    "belmont-slot-yield-metrics.json"
-  );
-}
 
 function ProfitIntelligenceStudio() {
   const [appts, setAppts] = useState<Appt[]>([]);
@@ -1032,6 +890,158 @@ function ProfitIntelligenceStudio() {
     () => recommendWindows(grid, capacity, 8),
     [grid, capacity]
   );
+
+  // Derived KPIs
+  const utilPct = fmtPct(totals.util);
+  const noshowPct = fmtPct(totals.noshowRate);
+  const idleMin = Math.max(0, totals.totalCapacityMin - totals.totalBookedMin);
+
+  const generateAIProfitOptimization = async () => {
+    if (!selectedService || !selectedTimeSlot || appts.length === 0) return;
+
+    const serviceAppointments = appts.filter(
+      (appt) => appt.service === selectedService
+    );
+    const timeSlotAppointments = serviceAppointments.filter((appt) => {
+      const hour = appt.start.getHours();
+      const timeSlot = `${hour.toString().padStart(2, "0")}:00`;
+      return timeSlot === selectedTimeSlot;
+    });
+
+    const currentRevenue = timeSlotAppointments.length * 65;
+    const totalSlots = 4 * 8; // 4 chairs, 8 hours
+    const currentUtilization = (timeSlotAppointments.length / totalSlots) * 100;
+
+    const optimization = await generateAIProfitOptimization(
+      selectedService,
+      selectedTimeSlot,
+      currentRevenue,
+      currentUtilization,
+      [], // competitorData would come from external source
+      apiKey
+    );
+
+    setProfitLibrary((prev) => ({
+      ...prev,
+      optimizations: [
+        ...prev.optimizations.filter((o) => o.service !== selectedService),
+        optimization,
+      ],
+    }));
+
+    setShowOptimizations(true);
+  };
+
+  const calculateProfitAnalyticsData = () => {
+    const analytics = calculateProfitAnalytics(appts);
+    setProfitAnalytics(analytics);
+  };
+
+  const exportEnhancedProfitReport = () => {
+    if (!profitAnalytics) return;
+
+    const csvContent = [
+      "Metric,Value",
+      `Total Revenue,$${profitAnalytics.totalRevenue}`,
+      `Total Appointments,${profitAnalytics.totalAppointments}`,
+      `Avg Revenue per Appointment,$${profitAnalytics.avgRevenuePerAppointment.toFixed(2)}`,
+      `Top Services,${profitAnalytics.topServices}`,
+      `Top Time Slots,${profitAnalytics.topTimeSlots}`,
+      `Improvement Rate,${profitAnalytics.improvementRate.toFixed(2)}`,
+      "",
+      "Service Performance,",
+      ...Object.entries(profitAnalytics.servicePerformance)
+        .sort(([, a], [, b]) => b.revenue - a.revenue)
+        .slice(0, 10)
+        .map(
+          ([service, data]) =>
+            `${service},$${data.revenue},${data.appointments},$${data.profitability.toFixed(2)},${data.trend},${data.velocity}`
+        ),
+      "",
+      "Time Slot Analysis,",
+      ...Object.entries(profitAnalytics.timeSlotAnalysis)
+        .sort(([, a], [, b]) => b.revenue - a.revenue)
+        .slice(0, 10)
+        .map(
+          ([timeSlot, data]) =>
+            `${timeSlot},$${data.revenue},${data.appointments},${data.utilization.toFixed(1)}%,$${data.profitability.toFixed(2)}`
+        ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    saveBlob(
+      blob,
+      `enhanced-profit-analytics-${new Date().toISOString().slice(0, 10)}.csv`
+    );
+  };
+
+  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setLoadState("Parsing CSV...");
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const csv = ev.target?.result as string;
+      try {
+        const parsed = parseCSV(csv);
+        setRaw(parsed);
+        setLoadState(`Parsed ${parsed.length} rows.`);
+      } catch (err) {
+        setLoadState(`Parse error: ${String(err)}`);
+      }
+    };
+    reader.readAsText(f);
+  };
+
+  const loadDemo = () => {
+    const csv = buildDemoCSV(480);
+    try {
+      const parsed = parseCSV(csv);
+      setRaw(parsed);
+      setLoadState(`Loaded demo with ${parsed.length} rows.`);
+    } catch (err) {
+      setLoadState(`Parse error: ${String(err)}`);
+    }
+  };
+
+  const setBusinessHour = (
+    day: number,
+    key: "open" | "close" | "openEnabled",
+    value: any
+  ) => {
+    setSettings((prev) => ({
+      ...prev,
+      week: { ...prev.week, [day]: { ...prev.week[day], [key]: value } },
+    }));
+  };
+
+  const exportRecs = () => {
+    const rows = recs.map((r) => ({
+      window: r.window,
+      utilization: (r.utilization * 100).toFixed(0) + "%",
+      suggestion: r.suggestion,
+    }));
+    const csv = toCSV(rows);
+    saveBlob(
+      new Blob([csv], { type: "text/csv;charset=utf-8;" }),
+      `belmont-off-peak-suggestions.csv`
+    );
+  };
+
+  const exportMetricsJSON = () => {
+    const payload = {
+      settings,
+      totals,
+      perDay,
+      generatedAt: new Date().toISOString(),
+    };
+    saveBlob(
+      new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json",
+      }),
+      "belmont-slot-yield-metrics.json"
+    );
+  };
 
   return (
     <div className="p-5 md:p-8 space-y-6">

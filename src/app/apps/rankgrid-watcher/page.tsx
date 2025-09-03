@@ -217,8 +217,6 @@ export default function RankGridWatcher() {
   };
 
   // ---------------- AI Monitor Optimization Functions ----------------
-  // Function moved to component scope to avoid duplicate definitions
-  /*
 async function generateAIMonitorOptimization(
   keyword: string,
   location: { lat: number; lng: number },
@@ -332,7 +330,6 @@ Provide:
       };
     }
   }
-*/
 
   // ---------------- Enhanced Analytics Functions ----------------
   function calculateMonitorAnalytics(rankData: RankData[]): MonitorAnalytics {
@@ -454,7 +451,7 @@ Provide:
   }
 
   // ---------------- Enhanced Functions ----------------
-  const generateAIMonitorOptimization = async () => {
+  const handleGenerateAIMonitorOptimization = async () => {
     if (!selectedKeyword || !selectedLocation || rankData.length === 0) return;
 
     const keywordData = rankData.find(
@@ -531,7 +528,7 @@ Provide:
         actions={
           <div className="flex gap-2">
             <Button
-              onClick={generateAIMonitorOptimization}
+              onClick={handleGenerateAIMonitorOptimization}
               disabled={!selectedKeyword || !selectedLocation || !apiKey}
               variant="outline"
             >
