@@ -656,18 +656,7 @@ export default function LocalRankGrid() {
 
   const m = useMemo(() => metrics(grid), [grid]);
 
-  // Improve demo experience: when keyword changes and no snapshots exist yet,
-  // regenerate the demo grid automatically so users see immediate feedback.
-  useEffect(() => {
-    try {
-      if (snapshots.length === 0) {
-        const t = setTimeout(() => {
-          loadDemo();
-        }, 200);
-        return () => clearTimeout(t);
-      }
-    } catch {}
-  }, [keyword]);
+  // (moved below loadDemo)
 
   function setCell(r: number, c: number, value: string) {
     setGrid((prev) =>
@@ -686,12 +675,25 @@ export default function LocalRankGrid() {
     setGrid(makeGrid(rows, cols, null));
   }
 
-  function loadDemo() {
-    const s = demoSnapshot(keyword, rows, cols);
-    setGrid(s.grid);
-    setDate(s.date);
-    setNotes("Demo grid — tweak and save as snapshot");
-  }
+const loadDemo = useCallback(() => {
+  const s = demoSnapshot(keyword, rows, cols);
+  setGrid(s.grid);
+  setDate(s.date);
+  setNotes("Demo grid — tweak and save as snapshot");
+}, [keyword, rows, cols]);
+
+  // Improve demo experience: when keyword changes and no snapshots exist yet,
+  // regenerate the demo grid automatically so users see immediate feedback.
+  useEffect(() => {
+    try {
+      if (snapshots.length === 0) {
+        const t = setTimeout(() => {
+          loadDemo();
+        }, 200);
+        return () => clearTimeout(t);
+      }
+    } catch {}
+  }, [keyword, snapshots.length, loadDemo]);
 
   function saveSnapshot() {
     const snap: Snapshot = {

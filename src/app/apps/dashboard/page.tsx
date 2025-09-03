@@ -33,16 +33,16 @@ export default function Dashboard() {
     "review_email_copied",
     "review_sms_copied",
     "gbp_post_generated",
-  ], 1), [now]);
+  ], 1), [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const weekCounts = useMemo(() => countByType([
     "utm_link_built",
     "review_email_copied",
     "review_sms_copied",
     "gbp_post_generated",
-  ], 7), [now]);
+  ], 7), [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const ob = useMemo(() => (typeof window !== "undefined" ? getOnboardingStatus() : { placeIdSet:false,bookingSet:false,phoneSet:false,addressSet:false,complete:false }), [now]);
+  const ob = useMemo(() => (typeof window !== "undefined" ? getOnboardingStatus() : { placeIdSet:false,bookingSet:false,phoneSet:false,addressSet:false,complete:false }), [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function exportEvents() {
     try {
@@ -65,7 +65,7 @@ export default function Dashboard() {
       days.push({ day: key.slice(5), count });
     }
     return days;
-  }, [now]);
+  }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-6">
