@@ -681,6 +681,7 @@ export default function ReviewComposer() {
         status: "unreplied" as const,
       }));
       setReviews(reviewsWithIds);
+      setActiveTab('reviews');
     };
     reader.readAsText(file);
   };
@@ -703,6 +704,7 @@ export default function ReviewComposer() {
         status: "unreplied" as const,
       }));
       setReviews(reviewsWithIds);
+      setActiveTab('reviews');
     } catch (e) {
       try { (await import("@/lib/toast")).showToast("Could not load sample data", "error"); } catch {}
     }
@@ -1511,6 +1513,7 @@ export default function ReviewComposer() {
                       status: "unreplied",
                     };
                     setReviews((prev) => [r, ...prev]);
+                    setActiveTab('reviews');
                     try { logEvent("review_added", { platform: r.platform, rating: r.rating }); } catch {}
                     setNewReview({ date: todayISO(), rating: 5, author: "", text: "", platform: "google" });
                   }}

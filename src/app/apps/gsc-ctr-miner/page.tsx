@@ -933,6 +933,10 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                   const response = await fetchWithRetry("/fixtures/gsc-sample.csv");
                   const csvText = await response.text();
                   loadCSV(csvText);
+                  setActiveTab('analytics');
+                  setTimeout(() => {
+                    try { calculateSearchAnalyticsData(); } catch {}
+                  }, 0);
                 } catch (e) {
                   try {
                     (await import("@/lib/toast")).showToast(

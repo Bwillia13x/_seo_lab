@@ -49,11 +49,21 @@ export default function Onboarding() {
 
   function resetOnboarding() {
     try {
+      // Clear known keys
       localStorage.removeItem("belmont_onboarding_place_id");
       localStorage.removeItem("belmont_google_review_url");
       localStorage.removeItem("belmont_onboarding_booking");
       localStorage.removeItem("belmont_onboarding_phone");
       localStorage.removeItem("belmont_onboarding_address");
+      // Defensive: clear any belmont_ scoped keys to avoid stale values
+      const keys: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith("belmont_")) keys.push(k);
+      }
+      keys.forEach((k) => {
+        try { localStorage.removeItem(k); } catch {}
+      });
       setPlaceId("");
       setReviewUrl("");
       setBooking("");

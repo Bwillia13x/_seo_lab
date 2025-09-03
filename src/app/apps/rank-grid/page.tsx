@@ -656,6 +656,19 @@ export default function LocalRankGrid() {
 
   const m = useMemo(() => metrics(grid), [grid]);
 
+  // Improve demo experience: when keyword changes and no snapshots exist yet,
+  // regenerate the demo grid automatically so users see immediate feedback.
+  useEffect(() => {
+    try {
+      if (snapshots.length === 0) {
+        const t = setTimeout(() => {
+          loadDemo();
+        }, 200);
+        return () => clearTimeout(t);
+      }
+    } catch {}
+  }, [keyword]);
+
   function setCell(r: number, c: number, value: string) {
     setGrid((prev) =>
       prev.map((row, ri) =>
