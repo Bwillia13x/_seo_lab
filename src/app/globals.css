@@ -124,6 +124,18 @@ html.simple .advanced-only {
 }
 
 @layer components {
+  /* Typographic utilities */
+  .h1 { @apply text-3xl font-semibold tracking-tight; }
+  .h2 { @apply text-xl font-semibold tracking-tight; }
+  .h3 { @apply text-lg font-semibold tracking-tight; }
+  .h4 { @apply text-base font-medium tracking-tight; }
+  .lead { @apply text-muted-foreground; }
+
+  /* Normalize common heading combos for consistency */
+  .font-semibold.text-xl { @apply tracking-tight leading-snug; }
+  .font-semibold.text-lg { @apply tracking-tight leading-snug; }
+  .font-semibold.text-base { @apply tracking-tight leading-snug; }
+
   .elevated-card {
     @apply bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80 border border-border/50 shadow-[0_8px_25px_-12px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_35px_-12px_rgba(0,0,0,0.2)] transition-shadow duration-300;
   }
