@@ -292,7 +292,7 @@ async function generateAIContent(
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt5-mini",
       messages: [
         {
           role: "system",
@@ -601,6 +601,15 @@ export default function GBPPostComposer() {
   const [seoScore, setSeoScore] = useState<SEOScore | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [apiKey, setApiKey] = useState("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [performanceData, setPerformanceData] = useState<PostPerformance[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<AITemplate | null>(
     null
@@ -669,7 +678,7 @@ export default function GBPPostComposer() {
         });
 
         const response = await openai.chat.completions.create({
-          model: "gpt-4",
+          model: "gpt5-mini",
           messages: [
             {
               role: "system",

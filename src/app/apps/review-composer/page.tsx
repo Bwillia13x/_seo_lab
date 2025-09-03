@@ -64,6 +64,7 @@ import {
   Filter,
 } from "lucide-react";
 import OpenAI from "openai";
+import { logEvent } from "@/lib/analytics";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { todayISO, addDays } from "@/lib/dates";
@@ -106,7 +107,7 @@ async function generateAIReviewResponse(
     });
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt5-mini",
       messages: [
         {
           role: "system",
@@ -495,7 +496,7 @@ const getAIOptimization = async (
     });
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt5-mini",
       messages: [
         {
           role: "system",
@@ -618,6 +619,37 @@ export default function ReviewComposer() {
   );
   const [aiGeneratedResponse, setAiGeneratedResponse] = useState<string>("");
   const [aiConfidence, setAiConfidence] = useState<number>(0);
+
+  // Load/persist API key from/to localStorage or env
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        localStorage.getItem("belmont_openai_key") ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
+  useEffect(() => {
+    try {
+      if (apiKey) localStorage.setItem("belmont_openai_key", apiKey);
+    } catch {}
+  }, [apiKey]);
+
+  // Manual review input (for quick testing without CSV/API)
+  const [newReview, setNewReview] = useState<{
+    date: string;
+    rating: number;
+    author: string;
+    text: string;
+    platform: string;
+  }>({
+    date: todayISO(),
+    rating: 5,
+    author: "",
+    text: "",
+    platform: "google",
+  });
 
   // Template management
   const [reviewTemplates, setReviewTemplates] = useState<ReviewTemplate[]>([
@@ -1441,6 +1473,60 @@ export default function ReviewComposer() {
         </TabsContent>
 
         <TabsContent value="reviews" className="space-y-4">
+          {/* Quick add + guidance */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Add a Review</CardTitle>
+              <CardDescription>
+                Paste or type a review to generate replies immediately. You can also Load Sample or Import CSV.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid md:grid-cols-5 gap-3">
+              <div>
+                <Label>Date</Label>
+                <Input value={newReview.date} onChange={(e)=>setNewReview({...newReview, date: e.target.value})} />
+              </div>
+              <div>
+                <Label>Rating (1-5)</Label>
+                <Input type="number" min={1} max={5} value={newReview.rating} onChange={(e)=>setNewReview({...newReview, rating: Math.max(1, Math.min(5, parseInt(e.target.value||"5")))})} />
+              </div>
+              <div>
+                <Label>Author</Label>
+                <Input value={newReview.author} onChange={(e)=>setNewReview({...newReview, author: e.target.value})} />
+              </div>
+              <div className="md:col-span-2">
+                <Label>Text</Label>
+                <Input value={newReview.text} onChange={(e)=>setNewReview({...newReview, text: e.target.value})} placeholder="Type the review text" />
+              </div>
+              <div>
+                <Label>Platform</Label>
+                <Input value={newReview.platform} onChange={(e)=>setNewReview({...newReview, platform: e.target.value})} placeholder="google" />
+              </div>
+              <div className="md:col-span-4 flex items-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (!newReview.text.trim()) return;
+                    const r: Review = {
+                      id: crypto.randomUUID?.() || `${Date.now()}_${Math.random()}`,
+                      date: newReview.date,
+                      rating: newReview.rating,
+                      author: newReview.author || "Customer",
+                      text: newReview.text,
+                      platform: newReview.platform || "google",
+                      status: "unreplied",
+                    };
+                    setReviews((prev) => [r, ...prev]);
+                    try { logEvent("review_added", { platform: r.platform, rating: r.rating }); } catch {}
+                    setNewReview({ date: todayISO(), rating: 5, author: "", text: "", platform: "google" });
+                  }}
+                >
+                  Add Review
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="space-y-4">
             {reviews.map((review) => (
               <Card
@@ -1597,6 +1683,7 @@ export default function ReviewComposer() {
                       onClick={() => {
                         const draft = generateReplyDrafts(selectedReview)[0];
                         markAsReplied(selectedReview.id, draft);
+                        try { logEvent("review_replied", { platform: selectedReview.platform, rating: selectedReview.rating }); } catch {}
                         setSelectedReview(null);
                       }}
                     >

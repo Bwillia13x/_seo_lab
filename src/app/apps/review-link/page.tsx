@@ -265,7 +265,7 @@ async function generateAIReviewOptimization(
     });
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt5-mini",
       messages: [
         {
           role: "system",
@@ -530,6 +530,15 @@ export default function ReviewKit() {
 
   // Enhanced state for new features
   const [apiKey, setApiKey] = useState<string>("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [aiOptimization, setAiOptimization] = useState<AIOptimization | null>(
     null
   );
@@ -875,6 +884,8 @@ export default function ReviewKit() {
       if (u && /^https?:\/\//.test(u)) setGoogleReviewLink(u);
       const ph = localStorage.getItem("belmont_onboarding_phone");
       if (ph) setIdentifyPhone(ph);
+      const b = localStorage.getItem("belmont_onboarding_booking");
+      if (b && /^https?:\/\//.test(b)) setBookingLink(b);
     } catch {}
   }, []);
 

@@ -280,6 +280,15 @@ function GSCCtrMiner() {
 
   // Enhanced state for new features
   const [apiKey, setApiKey] = useState<string>("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [aiOptimization, setAiOptimization] = useState<AIOptimization | null>(
     null
   );
@@ -535,7 +544,7 @@ function GSCCtrMiner() {
       });
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt5-mini",
         messages: [
           {
             role: "system",
@@ -834,6 +843,16 @@ Provide:
     const analytics = calculateSearchAnalytics(rows);
     setSearchAnalytics(analytics);
   };
+
+  // Auto-calc analytics when data is loaded
+  useEffect(() => {
+    if (rows.length > 0) {
+      try {
+        const analytics = calculateSearchAnalytics(rows);
+        setSearchAnalytics(analytics);
+      } catch {}
+    }
+  }, [rows]);
 
   const exportEnhancedSearchReport = () => {
     if (!searchAnalytics) return;
@@ -1195,6 +1214,49 @@ Provide:
           </div>
         </TabsContent>
 
+        {/* Analytics */}
+        <TabsContent value="analytics">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Search Analytics Summary
+              </CardTitle>
+              <CardDescription>
+                Run analytics after loading sample data or importing your CSV.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={calculateSearchAnalyticsData} disabled={rows.length === 0}>
+                  <Play className="h-4 w-4 mr-2" />
+                  Run Analytics
+                </Button>
+                <Button variant="outline" onClick={exportEnhancedSearchReport} disabled={!searchAnalytics}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </Button>
+              </div>
+
+              {rows.length === 0 && (
+                <div className="text-sm text-muted-foreground">
+                  Load sample data or import your GSC CSV to populate analytics.
+                </div>
+              )}
+
+              {searchAnalytics && (
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <KPICard label="Queries" value={searchAnalytics.totalQueries} hint="terms" icon={<Search className="h-4 w-4" />} />
+                  <KPICard label="Impressions" value={searchAnalytics.totalImpressions.toLocaleString()} hint="last period" icon={<Eye className="h-4 w-4" />} />
+                  <KPICard label="Clicks" value={searchAnalytics.totalClicks.toLocaleString()} hint="last period" icon={<MousePointer className="h-4 w-4" />} />
+                  <KPICard label="Avg CTR" value={(searchAnalytics.avgCTR * 100).toFixed(1) + "%"} hint="click-through" icon={<TrendingUp className="h-4 w-4" />} />
+                  <KPICard label="Avg Pos" value={searchAnalytics.avgPosition.toFixed(1)} hint="lower is better" icon={<Target className="h-4 w-4" />} />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Settings */}
         <TabsContent value="settings">
           <Card>
@@ -1325,7 +1387,7 @@ Provide:
         </TabsContent>
 
         {/* Opportunities */}
-        <TabsContent value="opps">
+        <TabsContent value="opportunities">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">
@@ -1391,7 +1453,7 @@ Provide:
         </TabsContent>
 
         {/* Page Experiments */}
-        <TabsContent value="pages">
+        <TabsContent value="experiments">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">

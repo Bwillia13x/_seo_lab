@@ -201,6 +201,15 @@ export default function LinkMap() {
 
   // AI-enhanced state
   const [apiKey, setApiKey] = useState<string>("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [aiOptimization, setAiOptimization] =
     useState<PartnershipAIOptimization | null>(null);
   const [partnershipAnalytics, setPartnershipAnalytics] =
@@ -375,7 +384,7 @@ async function generateAIPartnershipOptimization(
       });
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt5-mini",
         messages: [
           {
             role: "system",
@@ -623,7 +632,7 @@ Provide:
           });
 
           const response = await openai.chat.completions.create({
-            model: "gpt-4",
+            model: "gpt5-mini",
             messages: [
               {
                 role: "system",

@@ -343,7 +343,7 @@ export default function AddOnRecommender() {
         .replace("{avgSpend}", segment?.avgSpend.toString() || "60");
 
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt5-mini",
         messages: [
           {
             role: "system",

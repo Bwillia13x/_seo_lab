@@ -231,6 +231,15 @@ export default function PostOracle() {
 
   // Enhanced State for AI Features
   const [apiKey, setApiKey] = useState<string>("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AITemplate>(
     AI_TEMPLATES[0]
@@ -330,7 +339,7 @@ export default function PostOracle() {
       }
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt5-mini",
         messages: [
           {
             role: "system",

@@ -588,7 +588,7 @@ async function generateAIProfitOptimization(
     });
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt5-mini",
       messages: [
         {
           role: "system",
@@ -830,6 +830,15 @@ function ProfitIntelligenceStudio() {
 
   // AI-enhanced state
   const [apiKey, setApiKey] = useState<string>("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [aiOptimization, setAiOptimization] =
     useState<ProfitAIOptimization | null>(null);
   const [profitAnalytics, setProfitAnalytics] =

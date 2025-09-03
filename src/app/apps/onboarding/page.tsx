@@ -14,9 +14,10 @@ import { ArrowRight, CheckCircle } from "lucide-react";
 export default function Onboarding() {
   const [placeId, setPlaceId] = useState("");
   const [reviewUrl, setReviewUrl] = useState("");
-  const [booking, setBooking] = useState(BELMONT_CONSTANTS.BOOK_URL);
-  const [phone, setPhone] = useState(BELMONT_CONSTANTS.PHONE_DISPLAY);
-  const [address, setAddress] = useState(BELMONT_CONSTANTS.ADDRESS_STR);
+  // Start empty; show defaults as placeholders so Reset truly clears
+  const [booking, setBooking] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -55,9 +56,9 @@ export default function Onboarding() {
       localStorage.removeItem("belmont_onboarding_address");
       setPlaceId("");
       setReviewUrl("");
-      setBooking(BELMONT_CONSTANTS.BOOK_URL);
-      setPhone(BELMONT_CONSTANTS.PHONE_DISPLAY);
-      setAddress(BELMONT_CONSTANTS.ADDRESS_STR);
+      setBooking("");
+      setPhone("");
+      setAddress("");
       setSaved(true);
       setTimeout(() => setSaved(false), 1500);
     } catch {}
@@ -123,11 +124,11 @@ export default function Onboarding() {
         <CardContent className="grid md:grid-cols-2 gap-3">
           <div>
             <Label>Phone</Label>
-            <Input value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="403-457-0420" />
+            <Input value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder={BELMONT_CONSTANTS.PHONE_DISPLAY} />
           </div>
           <div>
             <Label>Address</Label>
-            <Input value={address} onChange={(e)=>setAddress(e.target.value)} placeholder="915 General Ave NE, Calgary, AB T2E 9E1" />
+            <Input value={address} onChange={(e)=>setAddress(e.target.value)} placeholder={BELMONT_CONSTANTS.ADDRESS_STR} />
           </div>
           <div className="md:col-span-2">
             <Button onClick={saveStep}>Save</Button> {saved && <span className="text-green-600 inline-flex items-center gap-1 text-sm"><CheckCircle className="h-4 w-4"/>Saved</span>}
@@ -143,7 +144,7 @@ export default function Onboarding() {
         <CardContent className="space-y-3">
           <div>
             <Label>Booking URL</Label>
-            <Input value={booking} onChange={(e)=>setBooking(e.target.value)} placeholder="https://thebelmontbarber.ca/book" />
+            <Input value={booking} onChange={(e)=>setBooking(e.target.value)} placeholder={BELMONT_CONSTANTS.BOOK_URL} />
           </div>
           <Button onClick={saveStep}>Save</Button> {saved && <span className="text-green-600 inline-flex items-center gap-1 text-sm"><CheckCircle className="h-4 w-4"/>Saved</span>}
           <Separator className="my-3" />

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -197,6 +197,15 @@ export default function QueueTimeAI() {
 
   // AI-enhanced state
   const [apiKey, setApiKey] = useState<string>("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [aiOptimization, setAiOptimization] =
     useState<BusyTimeAIOptimization | null>(null);
   const [busyTimeAnalytics, setBusyTimeAnalytics] =
@@ -342,7 +351,7 @@ async function generateAIBusyTimeOptimization(
       });
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt5-mini",
         messages: [
           {
             role: "system",

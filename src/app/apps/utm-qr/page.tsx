@@ -65,6 +65,7 @@ import {
 } from "lucide-react";
 import OpenAI from "openai";
 import { saveBlob } from "@/lib/blob";
+import { logEvent } from "@/lib/analytics";
 import { toCSV } from "@/lib/csv";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -238,7 +239,7 @@ async function generateAIQROptimization(
     });
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt5-mini",
       messages: [
         {
           role: "system",
@@ -478,7 +479,12 @@ type PresetKey =
   | "instagram_post"
   | "reels"
   | "email"
-  | "sms";
+  | "sms"
+  // Referral/offer presets to match UTM builder
+  | "groomsmen_party"
+  | "veterans_discount"
+  | "first_responders"
+  | "seniors_kids";
 
 const PRESETS: Record<
   PresetKey,
@@ -499,6 +505,27 @@ const PRESETS: Record<
   reels: { label: "Instagram Reels", source: "instagram", medium: "reel" },
   email: { label: "Email", source: "email", medium: "newsletter" },
   sms: { label: "SMS", source: "sms", medium: "text" },
+  // Referral & special offers
+  groomsmen_party: {
+    label: "Groomsmen Party",
+    source: "organic",
+    medium: "referral",
+  },
+  veterans_discount: {
+    label: "Veterans Discount",
+    source: "organic",
+    medium: "referral",
+  },
+  first_responders: {
+    label: "First Responders",
+    source: "organic",
+    medium: "referral",
+  },
+  seniors_kids: {
+    label: "Seniors & Kids",
+    source: "organic",
+    medium: "referral",
+  },
 };
 
 // ---------------- Main Component ----------------
@@ -525,6 +552,15 @@ export default function UTMBuilder() {
 
   // Enhanced state for new features
   const [apiKey, setApiKey] = useState<string>("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [aiSuggestions, setAiSuggestions] = useState<{
     suggestions: string[];
     bestPractices: string[];
@@ -598,6 +634,15 @@ export default function UTMBuilder() {
     setBuiltUrl(url);
     // Generate simple QR pattern
     setQrGrid(generateSimpleQR(url, 16));
+    try {
+      logEvent("utm_link_built", {
+        source: p.source,
+        medium: p.medium,
+        preset,
+        service,
+        area,
+      });
+    } catch {}
   }
 
   function copyLink() {

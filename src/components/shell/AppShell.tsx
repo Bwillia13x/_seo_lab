@@ -2,10 +2,12 @@
 
 import { Sidebar } from "./Sidebar";
 import Link from "next/link";
-import { Search, Sun, MoonStar, Phone, MapPin } from "lucide-react";
+import { Search, Sun, MoonStar, Phone, MapPin, Brain, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
 import Image from "next/image";
+import { AIDiagnostics } from "@/components/ui/ai-diagnostics";
+import { logEvent } from "@/lib/analytics";
 
 export default function AppShell({
   children,
@@ -16,6 +18,7 @@ export default function AppShell({
   const [simple, setSimple] = useState(false);
   const [phoneTel, setPhoneTel] = useState(BELMONT_CONSTANTS.PHONE_TEL);
   const [mapUrl, setMapUrl] = useState(BELMONT_CONSTANTS.MAP_URL);
+  const [showAI, setShowAI] = useState(false);
   useEffect(() => {
     if (typeof document !== "undefined") {
       const isDark = document.documentElement.classList.contains("dark");
@@ -36,6 +39,11 @@ export default function AppShell({
       try {
         const ph = window.localStorage.getItem("belmont_onboarding_phone");
         const addr = window.localStorage.getItem("belmont_onboarding_address");
+        const storedKey = window.localStorage.getItem("belmont_openai_key");
+        const envKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string | undefined;
+        if (!storedKey && envKey) {
+          try { window.localStorage.setItem("belmont_openai_key", envKey); } catch {}
+        }
         if (ph) {
           const digits = ph.replace(/[^0-9+]/g, "");
           setPhoneTel(`tel:${digits}`);
@@ -59,6 +67,13 @@ export default function AppShell({
       try {
         window.localStorage.setItem("belmont_simple_mode", next ? "1" : "0");
       } catch {}
+      return next;
+    });
+  }
+  function toggleAI() {
+    setShowAI((s) => {
+      const next = !s;
+      try { logEvent(next ? "ai_diag_open" : "ai_diag_close"); } catch {}
       return next;
     });
   }
@@ -112,6 +127,7 @@ export default function AppShell({
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <input
                     placeholder="Search tools…"
+                    aria-label="Search tools"
                     className="h-10 w-[220px] pl-9 pr-3 rounded-full border bg-background/60 focus:bg-background transition-colors focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   />
                 </div>
@@ -163,6 +179,14 @@ export default function AppShell({
               Need help? Email support
             </a>
             <div className="flex gap-2">
+              <button
+                onClick={toggleAI}
+                aria-label="Open AI diagnostics"
+                title="AI diagnostics"
+                className="inline-flex items-center justify-center h-12 w-12 rounded-full bg-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 focus-ring transition-all duration-200"
+              >
+                <Brain className="h-5 w-5" />
+              </button>
               <a
                 href={phoneTel}
                 className="inline-flex items-center justify-center h-12 w-12 rounded-full belmont-accent text-white shadow-lg hover:shadow-xl hover:scale-105 focus-ring transition-all duration-200"
@@ -183,6 +207,20 @@ export default function AppShell({
               </a>
             </div>
           </div>
+          {showAI && (
+            <div className="mt-3 w-[360px] max-w-[92vw]">
+              <div className="relative">
+                <button
+                  onClick={toggleAI}
+                  aria-label="Close AI diagnostics"
+                  className="absolute -top-2 -right-2 h-8 w-8 rounded-full bg-background border shadow flex items-center justify-center"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+                <AIDiagnostics />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

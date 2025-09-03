@@ -1,6 +1,8 @@
+"use client";
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { AIBadge } from "@/components/ui/ai-badge";
 
 type PageHeaderProps = {
   title: React.ReactNode;
@@ -36,7 +38,10 @@ export function PageHeader({
           )}
         </div>
       </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
+      <div className="flex items-center gap-2">
+        <AIBadge />
+        {actions}
+      </div>
     </div>
   );
 }

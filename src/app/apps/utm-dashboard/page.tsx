@@ -200,7 +200,7 @@ async function generateAICampaignSuggestion(
     });
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt5-mini",
       messages: [
         {
           role: "system",
@@ -395,6 +395,15 @@ function UTMDashboard() {
 
   // Enhanced state for new features
   const [apiKey, setApiKey] = useState<string>("");
+  useEffect(() => {
+    try {
+      const k =
+        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
+        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
+        "";
+      if (k) setApiKey(k);
+    } catch {}
+  }, []);
   const [aiSuggestions, setAiSuggestions] = useState<{
     suggestion: string;
     expectedPerformance: string;
