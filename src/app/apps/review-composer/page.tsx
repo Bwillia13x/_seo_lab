@@ -63,7 +63,6 @@ import {
   DollarSign,
   Filter,
 } from "lucide-react";
-import OpenAI from "openai";
 import { aiChatSafe } from "@/lib/ai";
 import { logEvent } from "@/lib/analytics";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
@@ -95,17 +94,9 @@ async function generateAIReviewResponse(
   response: string;
   confidence: number;
 }> {
-  if (!apiKey) {
-    return {
-      response: "Thank you for your feedback! We appreciate you taking the time to share your experience with us.",
-      confidence: 0.5,
-    };
-  }
-
   try {
     const out = await aiChatSafe({
-      apiKey,
-      model: "gpt5-mini",
+      model: "gpt-5-mini-2025-08-07",
       maxTokens: 150,
       messages: [
         {
@@ -448,70 +439,21 @@ const getAIOptimization = async (
   apiKey?: string
 ) => {
   const analytics = calculateReviewResponseAnalytics(reviews, responses);
-
-  if (!apiKey) {
-    return {
-      suggestions: [
-        "Connect OpenAI API key for intelligent response optimization",
-        "Use personalized customer names in responses",
-        "Address specific feedback mentioned in reviews",
-      ],
-      predictedPerformance: 75,
-      bestPractices: [
-        "Respond within 24 hours for best results",
-        "Personalize responses with customer details",
-        "Use warm, professional tone",
-      ],
-      toneRecommendations: ["Warm and welcoming", "Professional yet friendly"],
-      timingSuggestions: [
-        "Respond within 24 hours",
-        "Prioritize negative reviews",
-      ],
-      templateImprovements: [
-        "Add more personalized elements",
-        "Include specific service mentions",
-      ],
-    };
-  }
-
   try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
+    const out = await aiChatSafe({
+      model: "gpt-5-mini-2025-08-07",
+      maxTokens: 300,
+      temperature: 0.7,
       messages: [
-        {
-          role: "system",
-          content: `You are a review management expert for Belmont Barbershop. Analyze the current review response performance and provide specific recommendations for improvement.`,
-        },
+        { role: "system", content: `You are a review management expert for Belmont Barbershop. Analyze the current review response performance and provide specific recommendations for improvement.` },
         {
           role: "user",
-          content: `Analyze this review response performance for Belmont Barbershop:
-
-Current Metrics:
-- Total Reviews: ${analytics.totalReviews}
-- Response Rate: ${analytics.responseRate.toFixed(1)}%
-- Average Rating: ${analytics.avgRating.toFixed(1)}/5
-- Average Response Time: ${analytics.avgResponseTime.toFixed(0)} hours
-- Customer Satisfaction: ${analytics.customerSatisfaction.toFixed(1)}%
-
-Provide:
-1. Specific optimization suggestions
-2. Predicted performance improvement score (0-100)
-3. Best practices for review responses
-4. Tone recommendations
-5. Timing suggestions
-6. Template improvements`,
+          content: `Analyze this review response performance for Belmont Barbershop:\n\nCurrent Metrics:\n- Total Reviews: ${analytics.totalReviews}\n- Response Rate: ${analytics.responseRate.toFixed(1)}%\n- Average Rating: ${analytics.avgRating.toFixed(1)}/5\n- Average Response Time: ${analytics.avgResponseTime.toFixed(0)} hours\n- Customer Satisfaction: ${analytics.customerSatisfaction.toFixed(1)}%\n\nProvide:\n1. Specific optimization suggestions\n2. Predicted performance improvement score (0-100)\n3. Best practices for review responses\n4. Tone recommendations\n5. Timing suggestions\n6. Template improvements`,
         },
       ],
-      max_tokens: 300,
-      temperature: 0.7,
     });
 
-    const content = response.choices[0]?.message?.content || "";
+    const content = out.ok ? out.content : "";
     const lines = content.split("\n");
 
     return {
@@ -582,8 +524,7 @@ export default function ReviewComposer() {
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [replyTone, setReplyTone] = useState<"warm" | "concise">("warm");
 
-  // Enhanced state for new features
-  const [apiKey, setApiKey] = useState<string>("");
+  // Enhanced state for new features (server-managed AI; no client key)
   const [aiOptimization, setAiOptimization] = useState<AIOptimization | null>(
     null
   );
@@ -605,21 +546,7 @@ export default function ReviewComposer() {
   const [aiGeneratedResponse, setAiGeneratedResponse] = useState<string>("");
   const [aiConfidence, setAiConfidence] = useState<number>(0);
 
-  // Load/persist API key from/to localStorage or env
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        localStorage.getItem("belmont_openai_key") ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
-  useEffect(() => {
-    try {
-      if (apiKey) localStorage.setItem("belmont_openai_key", apiKey);
-    } catch {}
-  }, [apiKey]);
+  // No client API key workflow needed
 
   // Manual review input (for quick testing without CSV/API)
   const [newReview, setNewReview] = useState<{
@@ -1270,18 +1197,7 @@ export default function ReviewComposer() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>OpenAI API Key</Label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Required for AI response generation and optimization
-                  </p>
-                </div>
+                {/* No API key input needed – server-managed */}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -1366,13 +1282,7 @@ export default function ReviewComposer() {
                   </div>
                 )}
 
-                <Button
-                  onClick={() =>
-                    getAIOptimization(reviews, reviewResponses, apiKey)
-                  }
-                  disabled={!apiKey}
-                  className="w-full"
-                >
+                <Button onClick={() => getAIOptimization(reviews, reviewResponses)} className="w-full">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Generate AI Optimization
                 </Button>

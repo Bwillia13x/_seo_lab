@@ -63,7 +63,7 @@ import {
   Layers,
   FileImage,
 } from "lucide-react";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import { showToast } from "@/lib/toast";
 import { saveBlob } from "@/lib/blob";
 import { logEvent } from "@/lib/analytics";
@@ -210,55 +210,24 @@ function isLikelyValidUrl(u: string) {
 // ---------------- AI QR Optimization ----------------
 async function generateAIQROptimization(
   url: string,
-  context: string,
-  apiKey?: string
+  context: string
 ): Promise<{
   suggestions: string[];
   bestPractices: string[];
   designTips: string[];
 }> {
-  if (!apiKey) {
-    return {
-      suggestions: ["Connect OpenAI API key for intelligent QR optimization"],
-      bestPractices: [
-        "Use high contrast colors",
-        "Test scan readability",
-        "Include clear call-to-action",
-      ],
-      designTips: [
-        "Use Belmont branding colors",
-        "Add logo for brand recognition",
-        "Ensure adequate size",
-      ],
-    };
-  }
-
   try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a QR code design expert for The Belmont Barbershop. Provide specific, actionable recommendations for QR code design, placement, and optimization.`,
-        },
-        {
-          role: "user",
-          content: `Analyze this URL and context for QR code optimization: ${url}. Context: ${context}. Provide:
-          1. Design optimization suggestions
-          2. Best practices for this specific use case
-          3. Technical design tips for maximum scan success`,
-        },
-      ],
-      max_tokens: 250,
+    const out = await aiChatSafe({
+      model: "gpt-5-mini-2025-08-07",
+      maxTokens: 250,
       temperature: 0.6,
+      messages: [
+        { role: "system", content: "You are a QR code design expert for The Belmont Barbershop. Provide specific, actionable recommendations for QR code design, placement, and optimization." },
+        { role: "user", content: `Analyze this URL and context for QR code optimization: ${url}. Context: ${context}. Provide:\n1. Design optimization suggestions\n2. Best practices for this specific use case\n3. Technical design tips for maximum scan success` },
+      ],
     });
 
-    const content = response.choices[0]?.message?.content || "";
+    const content = out.ok ? out.content : "";
     const lines = content.split("\n");
 
     return {
@@ -552,16 +521,7 @@ export default function UTMBuilder() {
   const [qrGrid, setQrGrid] = useState<string[][]>([]);
 
   // Enhanced state for new features
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // No client API key; server-managed
   const [aiSuggestions, setAiSuggestions] = useState<{
     suggestions: string[];
     bestPractices: string[];
@@ -690,8 +650,7 @@ export default function UTMBuilder() {
   const getAISuggestions = async () => {
     const suggestions = await generateAIQROptimization(
       builtUrl || baseUrl,
-      `${preset} for ${service} in ${area}`,
-      apiKey
+      `${preset} for ${service} in ${area}`
     );
     setAiSuggestions(suggestions);
   };
@@ -799,11 +758,7 @@ export default function UTMBuilder() {
         subtitle="Generate intelligent, optimized QR codes with AI-powered design suggestions and performance analytics."
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={getAISuggestions}
-              disabled={!apiKey}
-              variant="outline"
-            >
+            <Button onClick={getAISuggestions} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize
             </Button>
@@ -847,12 +802,7 @@ export default function UTMBuilder() {
           hint="Generated"
           icon={<LinkIcon className="h-4 w-4" />}
         />
-        <KPICard
-          label="AI Status"
-          value={apiKey ? "Connected" : "Setup"}
-          hint="Optimization"
-          icon={<Brain className="h-4 w-4" />}
-        />
+        <KPICard label="AI Status" value="Server-managed" hint="Optimization" icon={<Brain className="h-4 w-4" />} />
         <KPICard
           label="QR Ready"
           value={qrGrid.length > 0 ? 1 : 0}
@@ -1063,18 +1013,7 @@ export default function UTMBuilder() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>OpenAI API Key</Label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Required for AI optimization features
-                  </p>
-                </div>
+                {/* No API key input needed – server-managed */}
 
                 {aiSuggestions && (
                   <div className="space-y-4">

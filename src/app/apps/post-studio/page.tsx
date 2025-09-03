@@ -50,7 +50,8 @@ import {
   Zap,
   Clock,
 } from "lucide-react";
-import OpenAI from "openai";
+// Using server-managed AI via aiChatSafe
+import { aiChatSafe } from "@/lib/ai";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
@@ -458,15 +459,6 @@ async function generateAIContent(
   quality: ContentQuality;
 }> {
   try {
-    const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error("OpenAI API key not found");
-    }
-
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
 
     let prompt = template.prompt
       .replace("{business_name}", biz.name)
@@ -488,23 +480,17 @@ async function generateAIContent(
       prompt += `\n\nAdditional instructions: ${customInstructions}`;
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
+    const out = await aiChatSafe({
+      model: "gpt-5-mini-2025-08-07",
+      maxTokens: 400,
+      temperature: 0.8,
       messages: [
-        {
-          role: "system",
-          content: `You are a social media expert for ${biz.name}, a premium barbershop in ${biz.area}. Create engaging, professional content that resonates with ${biz.targetAudience}. Maintain ${biz.brandVoice} tone. Keep posts concise and include clear calls-to-action. Always include relevant hashtags at the end for Instagram posts.`,
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
+        { role: "system", content: `You are a social media expert for ${biz.name}, a premium barbershop in ${biz.area}. Create engaging, professional content that resonates with ${biz.targetAudience}. Maintain ${biz.brandVoice} tone. Keep posts concise and include clear calls-to-action. Always include relevant hashtags at the end for Instagram posts.` },
+        { role: "user", content: prompt },
       ],
-      max_tokens: 400,
-      temperature: 0.8, // Slightly higher for more creative output
     });
 
-    const content = response.choices[0]?.message?.content?.trim() || "";
+    const content = (out.ok ? out.content : "").trim();
     const lines = content.split("\n").filter((line) => line.trim());
 
     // Extract hashtags from the content
@@ -959,16 +945,7 @@ export default function Page() {
   const [biz, setBiz] = useState<Biz>(DEFAULT_BIZ);
   const [posts, setPosts] = useState<Post[]>([]);
   const [copied, setCopied] = useState<string>("");
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // No client API key; server-managed
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AITemplate>(
     AI_TEMPLATES[0]
@@ -1013,11 +990,6 @@ export default function Page() {
 
   // ---------- Enhanced Functions ----------
   async function handleGenerateAIContent() {
-    if (!apiKey.trim()) {
-      try { (await import("@/lib/toast")).showToast("Please enter your OpenAI API key first", "warn"); } catch {}
-      return;
-    }
-
     setIsGenerating(true);
     try {
       const result = await generateAIContent(
@@ -1047,7 +1019,7 @@ export default function Page() {
       setActiveTab("posts");
     } catch (error) {
       console.error("AI generation failed:", error);
-      try { (await import("@/lib/toast")).showToast("Failed to generate AI content. Please check your API key and try again.", "error"); } catch {}
+      try { (await import("@/lib/toast")).showToast("Failed to generate AI content.", "error"); } catch {}
     } finally {
       setIsGenerating(false);
     }
@@ -1661,26 +1633,7 @@ export default function Page() {
             <CardContent className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div>
-                    <Label>OpenAI API Key</Label>
-                    <Input
-                      type="password"
-                      placeholder="sk-..."
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Get your API key from{" "}
-                      <a
-                        href="https://platform.openai.com/api-keys"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        OpenAI Platform
-                      </a>
-                    </p>
-                  </div>
+                  {/* No API key input needed – server-managed */}
 
                   <div>
                     <Label htmlFor="ai-template-select">Content Template</Label>

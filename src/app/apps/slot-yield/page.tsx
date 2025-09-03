@@ -92,7 +92,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import OpenAI from "openai";
+// AI features are server-managed via /api/ai
 import { saveBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { PageHeader } from "@/components/ui/page-header";
@@ -550,116 +550,7 @@ function buildCopy(dow: number, hour: number) {
   return `${t} on ${day}. Offer: ${p}. Add to GBP Posts + IG story with booking link.`;
 }
 
-// ---------------- AI Profit Optimization Functions ----------------
-// Function moved to component scope to avoid duplicate definitions
-/*
-async function generateAIProfitOptimization(
-  service: string,
-  timeSlot: string,
-  currentRevenue: number,
-  currentUtilization: number,
-  competitorData: any[],
-  apiKey?: string
-): Promise<ProfitOptimization> {
-  if (!apiKey) {
-    return {
-      id: `opt_${Date.now()}`,
-      service,
-      timeSlot,
-      currentProfitability: currentRevenue * 0.3, // Estimated profitability
-      targetProfitability: currentRevenue * 0.4,
-      difficulty: "medium",
-      recommendations: [
-        "Optimize pricing strategy",
-        "Improve service bundling",
-        "Enhance staff efficiency",
-        "Implement upselling techniques"
-      ],
-      priority: currentUtilization < 70 ? "high" : currentUtilization < 85 ? "medium" : "low",
-      estimatedTime: "2-4 weeks",
-      successProbability: 0.7,
-    };
-  }
-
-  try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a business optimization expert for a barbershop. Analyze service profitability and provide specific optimization recommendations.`,
-        },
-        {
-          role: "user",
-          content: `Analyze this service profitability for Belmont Barbershop optimization:
-
-Service: "${service}"
-Time Slot: ${timeSlot}
-Current Revenue: $${currentRevenue}
-Current Utilization: ${currentUtilization}%
-
-Provide:
-1. Target profitability goal (realistic objective)
-2. Difficulty level (easy/medium/hard)
-3. 4-6 specific optimization recommendations
-4. Priority level (high/medium/low)
-5. Estimated time to achieve results
-6. Success probability (0-1 scale)`,
-        },
-      ],
-      max_tokens: 400,
-      temperature: 0.7,
-    });
-
-    const content = response.choices[0]?.message?.content || "";
-
-    // Parse AI response and create optimization
-    return {
-      id: `opt_${Date.now()}`,
-      service,
-      timeSlot,
-      currentProfitability: currentRevenue * 0.35,
-      targetProfitability: currentRevenue * 0.45,
-      difficulty: "medium",
-      recommendations: [
-        "Optimize pricing strategy",
-        "Improve service bundling",
-        "Enhance staff efficiency",
-        "Implement upselling techniques",
-        "Optimize scheduling",
-        "Enhance marketing efforts"
-      ],
-      priority: currentUtilization < 70 ? "high" : currentUtilization < 85 ? "medium" : "low",
-      estimatedTime: "2-4 weeks",
-      successProbability: 0.75,
-    };
-  } catch (error) {
-    console.error("AI profit optimization failed:", error);
-    return {
-      id: `opt_${Date.now()}`,
-      service,
-      timeSlot,
-      currentProfitability: currentRevenue * 0.3,
-      targetProfitability: currentRevenue * 0.4,
-      difficulty: "medium",
-      recommendations: [
-        "Optimize pricing",
-        "Improve bundling",
-        "Enhance efficiency",
-        "Implement upselling"
-      ],
-      priority: "medium",
-      estimatedTime: "2-4 weeks",
-      successProbability: 0.7,
-    };
-  }
-}
-*/
+// (Removed legacy client-key AI function)
 
 // ---------------- Enhanced Analytics Functions ----------------
 function calculateProfitAnalytics(appts: Appt[]): ProfitAnalytics {
@@ -828,17 +719,7 @@ function ProfitIntelligenceStudio() {
   const [loadState, setLoadState] = useState<string>("");
   const heatRef = useRef<HTMLDivElement>(null);
 
-  // AI-enhanced state
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // AI is server-managed; no client key needed
   const [aiOptimization, setAiOptimization] =
     useState<ProfitAIOptimization | null>(null);
   const [profitAnalytics, setProfitAnalytics] =
@@ -1072,11 +953,7 @@ function ProfitIntelligenceStudio() {
         showLogo={true}
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={runAIProfitOptimization}
-              disabled={!selectedService || !selectedTimeSlot || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={runAIProfitOptimization} disabled={!selectedService || !selectedTimeSlot} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize
             </Button>

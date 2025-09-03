@@ -106,7 +106,7 @@ import {
   ArrowDown,
   Minus,
 } from "lucide-react";
-import OpenAI from "openai";
+// Using server-managed AI via aiChatSafe
 import { aiChatSafe } from "@/lib/ai";
 import { saveBlob } from "@/lib/blob";
 import { toCSV, fromCSV } from "@/lib/csv";
@@ -414,7 +414,7 @@ async function generateAIRankingOptimization(
 
     const out = await aiChatSafe({
       apiKey,
-      model: "gpt5-mini",
+      model: "gpt-5-mini-2025-08-07",
       maxTokens: 400,
       messages: [
         {
@@ -617,17 +617,7 @@ export default function LocalRankGrid() {
   const [mobileQuickEntry, setMobileQuickEntry] = useState<boolean>(false);
   const [selectedMobileRanks, setSelectedMobileRanks] = useState<number[]>([]);
 
-  // AI-enhanced state
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // AI is server-managed; no client key workflow
   const [aiOptimization, setAiOptimization] = useState<AIOptimization | null>(
     null
   );
@@ -2667,12 +2657,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                   hint="Current position"
                   icon={<TrendingUp className="h-4 w-4" />}
                 />
-                <KPICard
-                  label="AI Status"
-                  value={apiKey ? "Connected" : "Setup"}
-                  hint="AI optimization"
-                  icon={<Brain className="h-4 w-4" />}
-                />
+                <KPICard label="AI Status" value="Server-managed" hint="AI optimization" icon={<Brain className="h-4 w-4" />} />
                 <KPICard
                   label="Top‑3 Coverage"
                   value={`${m.top3}/${m.filled}`}

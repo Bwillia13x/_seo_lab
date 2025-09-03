@@ -40,11 +40,7 @@ export default function AppShell({
       try {
         const ph = window.localStorage.getItem("belmont_onboarding_phone");
         const addr = window.localStorage.getItem("belmont_onboarding_address");
-        const storedKey = window.localStorage.getItem("belmont_openai_key");
-        const envKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY as string | undefined;
-        if (!storedKey && envKey) {
-          try { window.localStorage.setItem("belmont_openai_key", envKey); } catch {}
-        }
+        // No client API key storage; server-managed
         if (ph) {
           const digits = ph.replace(/[^0-9+]/g, "");
           setPhoneTel(`tel:${digits}`);

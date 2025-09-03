@@ -43,7 +43,8 @@ import {
   Clock,
   Play,
 } from "lucide-react";
-import OpenAI from "openai";
+// Using server-managed AI via aiChatSafe
+import { aiChatSafe } from "@/lib/ai";
 import { saveBlob } from "@/lib/blob";
 import { showToast } from "@/lib/toast";
 import { addDays, todayISO } from "@/lib/dates";
@@ -231,16 +232,7 @@ export default function PostOracle() {
   const [customEvent, setCustomEvent] = useState("");
 
   // Enhanced State for AI Features
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // No client API key; server-managed
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<AITemplate>(
     AI_TEMPLATES[0]
@@ -273,11 +265,6 @@ export default function PostOracle() {
 
   // ---------- AI Content Generation ----------
   async function generateAIContent() {
-    if (!apiKey.trim()) {
-      showToast("Please enter your OpenAI API key first", "warn");
-      return;
-    }
-
     setIsGenerating(true);
     try {
       const result = await generateAIContentWithOpenAI(
@@ -298,7 +285,7 @@ export default function PostOracle() {
       showToast("AI content generated successfully!", "success");
     } catch (error) {
       console.error("AI generation failed:", error);
-      showToast("Failed to generate AI content. Please check your API key and try again.", "error");
+      showToast("Failed to generate AI content.", "error");
     } finally {
       setIsGenerating(false);
     }
@@ -315,15 +302,6 @@ export default function PostOracle() {
     quality: ContentQuality;
   }> {
     try {
-      const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-      if (!apiKey) {
-        throw new Error("OpenAI API key not found");
-      }
-
-      const openai = new OpenAI({
-        apiKey,
-        dangerouslyAllowBrowser: true,
-      });
 
       let prompt = template.prompt
         .replace("{service}", service)
@@ -337,23 +315,17 @@ export default function PostOracle() {
         prompt += `\n\nAdditional instructions: ${customInstructions}`;
       }
 
-      const response = await openai.chat.completions.create({
-        model: "gpt5-mini",
-        messages: [
-          {
-            role: "system",
-            content: `You are a social media expert for The Belmont Barbershop in Bridgeland/Riverside, Calgary. Create engaging, professional content that resonates with local men seeking quality grooming services. Maintain a professional yet approachable tone. Keep posts concise and include clear calls-to-action.`,
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        max_tokens: 400,
+      const out = await aiChatSafe({
+        model: "gpt-5-mini-2025-08-07",
+        maxTokens: 400,
         temperature: 0.8,
+        messages: [
+          { role: "system", content: `You are a social media expert for The Belmont Barbershop in Bridgeland/Riverside, Calgary. Create engaging, professional content that resonates with local men seeking quality grooming services. Maintain a professional yet approachable tone. Keep posts concise and include clear calls-to-action.` },
+          { role: "user", content: prompt },
+        ],
       });
 
-      const content = response.choices[0]?.message?.content?.trim() || "";
+      const content = (out.ok ? out.content : "").trim();
       const lines = content.split("\n").filter((line) => line.trim());
 
       const title = lines[0] || `Premium ${service} at Belmont`;
@@ -1144,15 +1116,7 @@ export default function PostOracle() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>API Key</Label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                </div>
+                {/* No API key input needed – server-managed */}
 
                 <div>
                   <Label>Content Template</Label>

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belmont SEO Lab - Codebase Knowledge Graph</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .graph-container {
+            padding: 30px;
+        }
+
+        .graph-section {
+            margin-bottom: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .file-tree {
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .tree-node {
+            position: relative;
+            padding-left: 25px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        .tree-node:hover {
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin: 5px -10px;
+        }
+
+        .tree-node::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 15px;
+            height: 2px;
+            background: #3498db;
+        }
+
+        .tree-node::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: -5px;
+            width: 2px;
+            height: 20px;
+            background: #3498db;
+        }
+
+        .tree-node.root::before,
+        .tree-node.root::after {
+            display: none;
+        }
+
+        .tree-node.folder {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .tree-node.file {
+            color: #7f8c8d;
+        }
+
+        .tree-node.config {
+            color: #e74c3c;
+        }
+
+        .tree-node.component {
+            color: #27ae60;
+        }
+
+        .tree-node.page {
+            color: #f39c12;
+        }
+
+        .tree-node.lib {
+            color: #9b59b6;
+        }
+
+        .tree-node.test {
+            color: #e67e22;
+        }
+
+        .file-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .folder-icon {
+            background: #f1c40f;
+            clip-path: polygon(0 0, 75% 0, 100% 50%, 75% 100%, 0 100%);
+        }
+
+        .file-icon::before {
+            content: '📄';
+        }
+
+        .config-icon::before {
+            content: '⚙️';
+        }
+
+        .component-icon::before {
+            content: '🧩';
+        }
+
+        .page-icon::before {
+            content: '📄';
+        }
+
+        .lib-icon::before {
+            content: '📚';
+        }
+
+        .test-icon::before {
+            content: '🧪';
+        }
+
+        .description {
+            background: #ecf0f1;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 5px solid #3498db;
+        }
+
+        .description h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .description p {
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tech-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .architecture-diagram {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .layer {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ecf0f1;
+            transition: all 0.3s ease;
+        }
+
+        .layer:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .layer-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .frontend-layer .layer-icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .backend-layer .layer-icon { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .data-layer .layer-icon { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .infrastructure-layer .layer-icon { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+
+        .layer-content h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .layer-content p {
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .interactive-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .interactive-toggle:hover {
+            background: #2980b9;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .graph-container {
+                padding: 15px;
+            }
+
+            .tech-stack {
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="interactive-toggle" onclick="toggleDetails()">Toggle Details</button>
+
+    <div class="container">
+        <div class="header">
+            <h1>🏗️ Belmont SEO Lab</h1>
+            <p>Codebase Architecture & Knowledge Graph</p>
+        </div>
+
+        <div class="graph-container">
+            <!-- Project Statistics -->
+            <div class="graph-section">
+                <div class="section-header">📊 Project Overview</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">28</div>
+                        <div class="stat-label">App Modules</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">15+</div>
+                        <div class="stat-label">UI Components</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">20+</div>
+                        <div class="stat-label">Utility Libraries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">TypeScript</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technology Stack -->
+            <div class="graph-section">
+                <div class="section-header">⚡ Technology Stack</div>
+                <div class="tech-stack">
+                    <div class="tech-item">Next.js 14</div>
+                    <div class="tech-item">TypeScript</div>
+                    <div class="tech-item">Tailwind CSS</div>
+                    <div class="tech-item">React 18</div>
+                    <div class="tech-item">Vite</div>
+                    <div class="tech-item">Playwright</div>
+                    <div class="tech-item">Vitest</div>
+                    <div class="tech-item">OpenAI API</div>
+                    <div class="tech-item">Vercel</div>
+                </div>
+            </div>
+
+            <!-- Architecture Layers -->
+            <div class="graph-section">
+                <div class="section-header">🏛️ Architecture Layers</div>
+                <div class="architecture-diagram">
+                    <div class="layer frontend-layer">
+                        <div class="layer-icon">🎨</div>
+                        <div class="layer-content">
+                            <h3>Frontend Layer (React/Next.js)</h3>
+                            <p>App Router, Client Components, UI Components, Page Templates, Interactive Features</p>
+                        </div>
+                    </div>
+
+                    <div class="layer backend-layer">
+                        <div class="layer-icon">⚙️</div>
+                        <div class="layer-content">
+                            <h3>Application Layer (API Routes)</h3>
+                            <p>Server Components, API Endpoints, Data Processing, Business Logic</p>
+                        </div>
+                    </div>
+
+                    <div class="layer data-layer">
+                        <div class="layer-icon">💾</div>
+                        <div class="layer-content">
+                            <h3>Data Layer (Libraries & Utils)</h3>
+                            <p>AI Integration, Analytics, CSV Processing, Storage, Authentication</p>
+                        </div>
+                    </div>
+
+                    <div class="layer infrastructure-layer">
+                        <div class="layer-icon">🏗️</div>
+                        <div class="layer-content">
+                            <h3>Infrastructure Layer</h3>
+                            <p>Build System, Testing, Deployment, Configuration, CI/CD</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Directory Structure -->
+            <div class="graph-section">
+                <div class="section-header">📁 Root Directory Structure</div>
+                <div class="file-tree">
+                    <div class="tree-node root folder">📁 / (Root)</div>
+
+                    <!-- Configuration Files -->
+                    <div class="tree-node config">⚙️ package.json - Dependencies & Scripts</div>
+                    <div class="tree-node config">⚙️ package-lock.json - Lockfile</div>
+                    <div class="tree-node config">⚙️ next.config.js - Next.js Configuration</div>
+                    <div class="tree-node config">⚙️ tailwind.config.ts - Tailwind CSS Config</div>
+                    <div class="tree-node config">⚙️ tsconfig.json - TypeScript Config</div>
+                    <div class="tree-node config">⚙️ vitest.config.ts - Testing Config</div>
+                    <div class="tree-node config">⚙️ playwright.config.ts - E2E Testing Config</div>
+                    <div class="tree-node config">⚙️ components.json - shadcn/ui Config</div>
+                    <div class="tree-node config">⚙️ postcss.config.js - PostCSS Config</div>
+
+                    <!-- Documentation -->
+                    <div class="tree-node file">📄 README.md - Project Documentation</div>
+                    <div class="tree-node file">📄 QUICK_START.md - Quick Start Guide</div>
+                    <div class="tree-node file">📄 TOOL_GUIDE.md - Tool Usage Guide</div>
+                    <div class="tree-node file">📄 TOOL_INTERPRETATION_GUIDE.md - Tool Guide</div>
+
+                    <!-- Source Code -->
+                    <div class="tree-node folder">📁 src/</div>
+                    <div class="tree-node folder">📁 node_modules/</div>
+                    <div class="tree-node folder">📁 public/</div>
+                    <div class="tree-node folder">📁 tests/</div>
+                    <div class="tree-node folder">📁 test-results/</div>
+                </div>
+            </div>
+
+            <!-- Source Directory Deep Dive -->
+            <div class="graph-section">
+                <div class="section-header">🔍 src/ Directory Structure</div>
+                <div class="file-tree">
+                    <div class="tree-node root folder">📁 src/</div>
+
+                    <!-- App Directory -->
+                    <div class="tree-node folder">📁 app/ - Next.js App Router</div>
+                    <div class="tree-node page">📄 layout.tsx - Root Layout</div>
+                    <div class="tree-node page">📄 page.tsx - Home Page</div>
+                    <div class="tree-node page">📄 loading.tsx - Loading UI</div>
+                    <div class="tree-node page">📄 error.tsx - Error Boundary</div>
+                    <div class="tree-node page">📄 not-found.tsx - 404 Page</div>
+                    <div class="tree-node page">📄 globals.css - Global Styles</div>
+
+                    <!-- API Routes -->
+                    <div class="tree-node folder">📁 api/ - API Routes</div>
+                    <div class="tree-node file">📄 health/route.ts - Health Check</div>
+
+                    <!-- App Modules -->
+                    <div class="tree-node folder">📁 apps/ - Feature Modules (28 total)</div>
+                    <div class="tree-node page">📄 dashboard/page.tsx - Main Dashboard</div>
+                    <div class="tree-node page">📄 onboarding/page.tsx - Onboarding Flow</div>
+                    <div class="tree-node page">📄 addon-recommender/page.tsx - AI Add-on Recommender</div>
+                    <div class="tree-node page">📄 citation-tracker/page.tsx - Citation Tracking</div>
+                    <div class="tree-node page">📄 gbp-composer/page.tsx - GBP Content Composer</div>
+                    <div class="tree-node page">📄 gsc-ctr-miner/page.tsx - GSC CTR Analytics</div>
+                    <div class="tree-node page">📄 link-map/page.tsx - Link Analysis</div>
+                    <div class="tree-node page">📄 link-prospect-kit/page.tsx - Link Prospecting</div>
+                    <div class="tree-node page">📄 meta-planner/page.tsx - Meta Planning</div>
+                    <div class="tree-node page">📄 neighbor-signal/page.tsx - Local Signal Analysis</div>
+                    <div class="tree-node page">📄 noshow-shield/page.tsx - No-show Prevention</div>
+                    <div class="tree-node page">📄 post-oracle/page.tsx - Social Media Oracle</div>
+                    <div class="tree-node page">📄 post-studio/page.tsx - Social Media Studio</div>
+                    <div class="tree-node page">📄 queuetime/page.tsx - Queue Time Analysis</div>
+                    <div class="tree-node page">📄 rank-grid/page.tsx - Ranking Grid Tool</div>
+                    <div class="tree-node page">📄 rankgrid-watcher/page.tsx - Rank Grid Watcher</div>
+                    <div class="tree-node page">📄 referral-qr/page.tsx - Referral QR Codes</div>
+                    <div class="tree-node page">📄 review-composer/page.tsx - Review Response Composer</div>
+                    <div class="tree-node page">📄 review-link/page.tsx - Review Request Links</div>
+                    <div class="tree-node page">📄 rfm-crm/page.tsx - RFM CRM Analysis</div>
+                    <div class="tree-node page">📄 seo-brief/page.tsx - SEO Brief Generator</div>
+                    <div class="tree-node page">📄 slot-yield/page.tsx - Slot Yield Calculator</div>
+                    <div class="tree-node page">📄 utm-dashboard/page.tsx - UTM Dashboard</div>
+                    <div class="tree-node page">📄 utm-qr/page.tsx - UTM QR Generator</div>
+
+                    <!-- Components -->
+                    <div class="tree-node folder">📁 components/ - Reusable Components</div>
+                    <div class="tree-node folder">📁 ui/ - UI Component Library</div>
+                    <div class="tree-node component">📄 button.tsx - Button Component</div>
+                    <div class="tree-node component">📄 card.tsx - Card Component</div>
+                    <div class="tree-node component">📄 input.tsx - Input Component</div>
+                    <div class="tree-node component">📄 table.tsx - Table Component</div>
+                    <div class="tree-node component">📄 tabs.tsx - Tabs Component</div>
+                    <div class="tree-node component">📄 toast.tsx - Toast Notifications</div>
+                    <div class="tree-node component">📄 loading-indicator.tsx - Loading Spinner</div>
+
+                    <!-- Charts -->
+                    <div class="tree-node folder">📁 charts/ - Chart Components</div>
+                    <div class="tree-node component">📄 LineExpected.tsx - Line Chart</div>
+                    <div class="tree-node component">📄 MultiLine.tsx - Multi-Line Chart</div>
+                    <div class="tree-node component">📄 ScatterCTR.tsx - Scatter Plot</div>
+
+                    <!-- Shell -->
+                    <div class="tree-node folder">📁 shell/ - App Shell</div>
+                    <div class="tree-node component">📄 AppShell.tsx - Main App Layout</div>
+                    <div class="tree-node component">📄 Sidebar.tsx - Navigation Sidebar</div>
+
+                    <!-- Libraries -->
+                    <div class="tree-node folder">📁 lib/ - Utility Libraries</div>
+                    <div class="tree-node lib">📄 ai.ts - OpenAI Integration</div>
+                    <div class="tree-node lib">📄 analytics.ts - Analytics Tracking</div>
+                    <div class="tree-node lib">📄 csv.ts - CSV Processing</div>
+                    <div class="tree-node lib">📄 storage.ts - Local Storage Utils</div>
+                    <div class="tree-node lib">📄 toast.ts - Toast System</div>
+                    <div class="tree-node lib">📄 utils.ts - General Utilities</div>
+                    <div class="tree-node lib">📄 net.ts - Network Utilities</div>
+                    <div class="tree-node lib">📄 math.ts - Mathematical Functions</div>
+                    <div class="tree-node lib">📄 dates.ts - Date Utilities</div>
+                    <div class="tree-node lib">📄 geo.ts - Geolocation Utils</div>
+                    <div class="tree-node lib">📄 gsc.ts - Google Search Console</div>
+                    <div class="tree-node lib">📄 constants.ts - App Constants</div>
+                </div>
+            </div>
+
+            <!-- Key Features & Integrations -->
+            <div class="graph-section">
+                <div class="section-header">🚀 Key Features & Integrations</div>
+
+                <div class="description">
+                    <h3>AI-Powered Features</h3>
+                    <p>The application integrates OpenAI's GPT models for intelligent content generation, analysis, and recommendations across multiple modules including Review Composer, Add-on Recommender, and SEO Brief Generator.</p>
+                </div>
+
+                <div class="description">
+                    <h3>Advanced Analytics</h3>
+                    <p>Comprehensive analytics capabilities for SEO performance, local search rankings, citation tracking, and business intelligence with interactive charts and data visualization.</p>
+                </div>
+
+                <div class="description">
+                    <h3>Marketing Automation</h3>
+                    <p>Complete marketing toolkit including UTM tracking, QR code generation, referral systems, review management, and social media content creation.</p>
+                </div>
+
+                <div class="description">
+                    <h3>Testing & Quality Assurance</h3>
+                    <p>Robust testing setup with Vitest for unit tests, Playwright for E2E testing, and comprehensive test coverage across all major features.</p>
+                </div>
+            </div>
+
+            <!-- Development Workflow -->
+            <div class="graph-section">
+                <div class="section-header">🔄 Development Workflow</div>
+                <div class="description">
+                    <h3>Build & Deployment</h3>
+                    <p>• <strong>Development:</strong> Next.js dev server with hot reloading<br>• <strong>Build:</strong> Optimized production build with code splitting<br>• <strong>Testing:</strong> Parallel test execution with Vitest + Playwright<br>• <strong>Deployment:</strong> Automated Vercel deployments from GitHub</p>
+                </div>
+
+                <div class="description">
+                    <h3>Code Quality</h3>
+                    <p>• <strong>TypeScript:</strong> 100% type coverage<br>• <strong>ESLint:</strong> Code linting and formatting<br>• <strong>Prettier:</strong> Automated code formatting<br>• <strong>Husky:</strong> Git hooks for quality checks</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDetails() {
+            const descriptions = document.querySelectorAll('.description');
+            const button = document.querySelector('.interactive-toggle');
+
+            descriptions.forEach(desc => {
+                desc.classList.toggle('hidden');
+            });
+
+            button.textContent = button.textContent === 'Toggle Details' ? 'Show Details' : 'Toggle Details';
+        }
+
+        // Add some interactive hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const treeNodes = document.querySelectorAll('.tree-node');
+
+            treeNodes.forEach(node => {
+                node.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(10px)';
+                });
+
+                node.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

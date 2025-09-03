@@ -86,7 +86,7 @@ import {
   FileText,
   Info,
 } from "lucide-react";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import { saveBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
@@ -382,84 +382,23 @@ async function generateAICustomerInsights(
   interactions: CustomerInteraction[],
   apiKey?: string
 ): Promise<CustomerInsight[]> {
-  if (!apiKey) {
-    return [
-      {
-        id: `insight_${customer.id}_1`,
-        customerId: customer.id,
-        type: "behavior",
-        title: "Visit Pattern Analysis",
-        description: "Customer shows consistent weekly visit patterns",
-        confidence: 85,
-        recommendation:
-          "Schedule recurring appointments to maintain consistency",
-        priority: "medium",
-      },
-      {
-        id: `insight_${customer.id}_2`,
-        customerId: customer.id,
-        type: "opportunity",
-        title: "Service Expansion Opportunity",
-        description: "Customer may be interested in premium grooming services",
-        confidence: 70,
-        recommendation: "Offer complimentary consultation for premium services",
-        priority: "low",
-      },
-    ];
-  }
-
   try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
     const interactionSummary = interactions
       .slice(-10)
       .map((i) => `${i.type}: ${i.content.substring(0, 100)}`)
       .join("\n");
 
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a customer insights analyst for a barbershop. Analyze customer data and generate actionable insights about their behavior, preferences, risks, and opportunities.`,
-        },
-        {
-          role: "user",
-          content: `Analyze this customer for Belmont Barbershop:
-
-Customer Profile:
-- Name: ${customer.name}
-- Visits: ${customer.visits}
-- Total Spend: $${customer.spend}
-- Last Visit: ${customer.lastVisit.toISOString().split("T")[0]}
-- Days Since Last Visit: ${Math.floor((new Date().getTime() - customer.lastVisit.getTime()) / (1000 * 60 * 60 * 24))}
-
-Recent Interactions:
-${interactionSummary}
-
-Generate 3-5 specific insights about this customer covering:
-1. Behavioral patterns
-2. Service preferences
-3. Risk factors
-4. Business opportunities
-
-Format each insight with:
-- Type (behavior/preference/risk/opportunity)
-- Title
-- Description
-- Confidence score (0-100)
-- Specific recommendation
-- Priority level (high/medium/low)`,
-        },
-      ],
-      max_tokens: 400,
+    const out = await aiChatSafe({
+      model: "gpt-5-mini-2025-08-07",
+      maxTokens: 400,
       temperature: 0.7,
+      messages: [
+        { role: "system", content: "You are a customer insights analyst for a barbershop. Analyze customer data and generate actionable insights about their behavior, preferences, risks, and opportunities." },
+        { role: "user", content: `Analyze this customer for Belmont Barbershop:\n\nCustomer Profile:\n- Name: ${customer.name}\n- Visits: ${customer.visits}\n- Total Spend: $${customer.spend}\n- Last Visit: ${customer.lastVisit.toISOString().split("T")[0]}\n- Days Since Last Visit: ${Math.floor((new Date().getTime() - customer.lastVisit.getTime()) / (1000 * 60 * 60 * 24))}\n\nRecent Interactions:\n${interactionSummary}\n\nGenerate 3-5 specific insights about this customer covering:\n1. Behavioral patterns\n2. Service preferences\n3. Risk factors\n4. Business opportunities\n\nFormat each insight with:\n- Type (behavior/preference/risk/opportunity)\n- Title\n- Description\n- Confidence score (0-100)\n- Specific recommendation\n- Priority level (high/medium/low)` },
+      ],
     });
 
-    const content = response.choices[0]?.message?.content || "";
+    const content = out.ok ? out.content : "";
     const insights: CustomerInsight[] = [];
 
     // Parse the AI response and create structured insights
@@ -722,16 +661,7 @@ export default function RFMMicroCRM() {
   const [selectedSeg, setSelectedSeg] = useState<string>("ALL");
 
   // Enhanced state for new features
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  const [apiKey] = useState<string>(""); // no client key needed
   const [aiOptimization, setAiOptimization] = useState<AIOptimization | null>(
     null
   );
@@ -1755,18 +1685,7 @@ export default function RFMMicroCRM() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>OpenAI API Key</Label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Required for AI-powered customer insights
-                  </p>
-                </div>
+                {/* No API key input needed – server-managed */}
 
                 {selectedCustomer && (
                   <div className="space-y-4">
@@ -1794,11 +1713,7 @@ export default function RFMMicroCRM() {
                       </div>
                     </div>
 
-                    <Button
-                      onClick={generateAIInsights}
-                      disabled={!apiKey}
-                      className="w-full"
-                    >
+                    <Button onClick={generateAIInsights} className="w-full">
                       <Sparkles className="h-4 w-4 mr-2" />
                       Generate AI Insights
                     </Button>
@@ -2778,44 +2693,15 @@ export default function RFMMicroCRM() {
                 <CardDescription>Configure AI-powered features</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>OpenAI API Key</Label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Required for AI insights and optimization features
-                  </p>
-                </div>
+                {/* Server-managed AI; no client key needed */}
 
                 <div className="space-y-3">
                   <h4 className="font-medium">AI Features</h4>
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" checked={!!apiKey} readOnly />
-                      <span className="text-sm">
-                        Customer insights generation
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" checked={!!apiKey} readOnly />
-                      <span className="text-sm">
-                        Campaign optimization suggestions
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" checked={!!apiKey} readOnly />
-                      <span className="text-sm">Predictive churn analysis</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input type="checkbox" checked={!!apiKey} readOnly />
-                      <span className="text-sm">
-                        Personalized message generation
-                      </span>
-                    </div>
+                    <div className="flex items-center gap-2"><input type="checkbox" checked readOnly /><span className="text-sm">Customer insights generation</span></div>
+                    <div className="flex items-center gap-2"><input type="checkbox" checked readOnly /><span className="text-sm">Campaign optimization suggestions</span></div>
+                    <div className="flex items-center gap-2"><input type="checkbox" checked readOnly /><span className="text-sm">Predictive churn analysis</span></div>
+                    <div className="flex items-center gap-2"><input type="checkbox" checked readOnly /><span className="text-sm">Personalized message generation</span></div>
                   </div>
                 </div>
 

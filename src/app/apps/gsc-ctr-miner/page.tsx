@@ -75,7 +75,7 @@ import {
   Zap as ZapIcon,
   Search,
 } from "lucide-react";
-import OpenAI from "openai";
+// Using server-managed AI via aiChatSafe
 import { aiChatSafe } from "@/lib/ai";
 import { fetchWithRetry } from "@/lib/net";
 
@@ -281,17 +281,7 @@ function GSCCtrMiner() {
   );
   const [copied, setCopied] = useState<string>("");
 
-  // Enhanced state for new features
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // AI is server-managed; no client key workflow
   const [aiOptimization, setAiOptimization] = useState<AIOptimization | null>(
     null
   );
@@ -556,7 +546,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
     try {
       const out = await aiChatSafe({
         apiKey,
-        model: "gpt5-mini",
+        model: "gpt-5-mini-2025-08-07",
         maxTokens: 400,
         messages: [
           {
@@ -999,12 +989,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
           hint="Search terms analyzed"
           icon={<Search className="h-4 w-4" />}
         />
-        <KPICard
-          label="AI Status"
-          value={apiKey ? "Connected" : "Setup"}
-          hint="AI optimization"
-          icon={<Brain className="h-4 w-4" />}
-        />
+        <KPICard label="AI Status" value="Server-managed" hint="AI optimization" icon={<Brain className="h-4 w-4" />} />
         <KPICard
           label="Avg Position"
           value={

@@ -51,7 +51,7 @@ import {
   Activity,
 } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 
 // ---------------- Enhanced Types ----------------
 type Transaction = {
@@ -217,7 +217,7 @@ export default function AddOnRecommender() {
   const [customerSegment, setCustomerSegment] = useState<string>(
     "Young Professionals"
   );
-  const [apiKey, setApiKey] = useState<string>("");
+  // Server-managed AI; no client key needed
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [performanceData, setPerformanceData] = useState<PerformanceMetric[]>(
     []
@@ -227,16 +227,7 @@ export default function AddOnRecommender() {
   const [loaded, setLoaded] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Auto-load AI key from env/localStorage
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  useEffect(() => {}, []);
 
   // ---------------- Enhanced Utility Functions ----------------
 
@@ -327,18 +318,8 @@ export default function AddOnRecommender() {
 
   // AI-powered recommendation generation
   const generateAIRecommendations = async () => {
-    if (!apiKey) {
-      try { (await import("@/lib/toast")).showToast("Please enter your OpenAI API key first", "warn"); } catch {}
-      return;
-    }
-
     setIsAnalyzing(true);
     try {
-      const openai = new OpenAI({
-        apiKey: apiKey,
-        dangerouslyAllowBrowser: true,
-      });
-
       const segment = CUSTOMER_SEGMENTS.find((s) => s.name === customerSegment);
       const availableServices = [
         "Beard Trim",
@@ -352,25 +333,16 @@ export default function AddOnRecommender() {
         .replace("{primaryService}", selectedService)
         .replace("{availableServices}", availableServices.join(", "))
         .replace("{avgSpend}", segment?.avgSpend.toString() || "60");
-
-      const response = await openai.chat.completions.create({
-        model: "gpt5-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are an expert business consultant specializing in retail add-on sales and customer experience optimization. Provide actionable, data-driven recommendations for service-based businesses.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        max_tokens: 400,
+      const out = await aiChatSafe({
+        model: "gpt-5-mini-2025-08-07",
+        maxTokens: 400,
         temperature: 0.7,
+        messages: [
+          { role: "system", content: "You are an expert business consultant specializing in retail add-on sales and customer experience optimization. Provide actionable, data-driven recommendations for service-based businesses." },
+          { role: "user", content: prompt },
+        ],
       });
-
-      const aiResponse = response.choices[0]?.message?.content || "";
+      const aiResponse = out.ok ? out.content : "";
       setAiInsights(aiResponse);
 
       // Generate mock performance data
@@ -401,7 +373,7 @@ export default function AddOnRecommender() {
       setPerformanceData(mockPerformance);
     } catch (error) {
       console.error("AI Analysis Error:", error);
-      try { (await import("@/lib/toast")).showToast("Failed to generate AI recommendations. Please check your API key and try again.", "error"); } catch {}
+      try { (await import("@/lib/toast")).showToast("Failed to generate AI recommendations.", "error"); } catch {}
     } finally {
       setIsAnalyzing(false);
     }

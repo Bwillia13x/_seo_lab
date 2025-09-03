@@ -71,7 +71,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import {
   ResponsiveContainer,
   BarChart,
@@ -196,17 +196,7 @@ export default function QueueTimeAI() {
   const [gamma, setGamma] = useState(0.1);
   const [season, setSeason] = useState(24);
 
-  // AI-enhanced state
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // AI is server-managed; no client key needed
   const [aiOptimization, setAiOptimization] =
     useState<BusyTimeAIOptimization | null>(null);
   const [busyTimeAnalytics, setBusyTimeAnalytics] =
@@ -317,73 +307,24 @@ async function generateAIBusyTimeOptimization(
   dayOfWeek: string,
   currentBusyness: number,
   currentWaitTime: number,
-  forecastData: number[],
-  apiKey?: string
+  forecastData: number[]
 ): Promise<BusyTimeOptimization> {
-    if (!apiKey) {
-      return {
-        id: `opt_${Date.now()}`,
-        timeSlot,
-        dayOfWeek,
-        currentBusyness,
-        targetBusyness: Math.max(0, currentBusyness - 2),
-        difficulty: "medium",
-        recommendations: [
-          "Optimize staff scheduling for this time slot",
-          "Implement customer flow management",
-          "Consider pricing adjustments",
-          "Improve appointment booking system",
-        ],
-        priority:
-          currentWaitTime > 15
-            ? "high"
-            : currentWaitTime > 10
-              ? "medium"
-              : "low",
-        estimatedTime: "2-4 weeks",
-        successProbability: 0.7,
-      };
-    }
-
     try {
-      const openai = new OpenAI({
-        apiKey,
-        dangerouslyAllowBrowser: true,
-      });
-
-      const response = await openai.chat.completions.create({
-        model: "gpt5-mini",
+      const out = await aiChatSafe({
+        model: "gpt-5-mini-2025-08-07",
+        maxTokens: 400,
+        temperature: 0.7,
         messages: [
-          {
-            role: "system",
-            content: `You are a business optimization expert for a barbershop. Analyze busy time patterns and provide specific optimization recommendations.`,
-          },
+          { role: "system", content: "You are a business optimization expert for a barbershop. Analyze busy time patterns and provide specific optimization recommendations." },
           {
             role: "user",
-            content: `Analyze this busy time pattern for Belmont Barbershop optimization:
-
-Time Slot: ${timeSlot}
-Day of Week: ${dayOfWeek}
-Current Busyness Level: ${currentBusyness}/10
-Current Wait Time: ${currentWaitTime} minutes
-Forecast Data: ${forecastData.slice(0, 5).join(", ")}
-
-Provide:
-1. Target busyness level (realistic goal)
-2. Difficulty level (easy/medium/hard)
-3. 4-6 specific optimization recommendations
-4. Priority level (high/medium/low)
-5. Estimated time to achieve results
-6. Success probability (0-1 scale)`,
+            content: `Analyze this busy time pattern for Belmont Barbershop optimization:\n\nTime Slot: ${timeSlot}\nDay of Week: ${dayOfWeek}\nCurrent Busyness Level: ${currentBusyness}/10\nCurrent Wait Time: ${currentWaitTime} minutes\nForecast Data: ${forecastData.slice(0, 5).join(", ")}\n\nProvide:\n1. Target busyness level (realistic goal)\n2. Difficulty level (easy/medium/hard)\n3. 4-6 specific optimization recommendations\n4. Priority level (high/medium/low)\n5. Estimated time to achieve results\n6. Success probability (0-1 scale)`,
           },
         ],
-        max_tokens: 400,
-        temperature: 0.7,
       });
+      const content = out.ok ? out.content : "";
 
-      const content = response.choices[0]?.message?.content || "";
-
-      // Parse AI response and create optimization
+      // Parse AI response and create optimization (static scaffold)
       return {
         id: `opt_${Date.now()}`,
         timeSlot,
@@ -612,8 +553,7 @@ Provide:
       selectedDayOfWeek,
       currentBusyness,
       currentWaitTime,
-      forecast,
-      apiKey
+      forecast
     );
 
     setBusyTimeLibrary((prev) => ({
@@ -693,11 +633,7 @@ Provide:
         showLogo={true}
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={handleGenerateAIBusyTimeOptimization}
-              disabled={!selectedTimeSlot || !selectedDayOfWeek || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={handleGenerateAIBusyTimeOptimization} disabled={!selectedTimeSlot || !selectedDayOfWeek} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize
             </Button>

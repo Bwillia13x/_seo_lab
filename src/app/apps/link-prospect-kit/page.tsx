@@ -75,7 +75,7 @@ import {
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 
 import { saveBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
@@ -458,42 +458,16 @@ async function generateAIPartnerOptimization(
   }
 
   try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a partnership development expert for a barbershop. Analyze potential partners and provide specific outreach and relationship-building recommendations.`,
-        },
-        {
-          role: "user",
-          content: `Analyze this potential partner for Belmont Barbershop:
-
-Partner: "${prospectName}"
-Type: ${prospectType}
-Current Score: ${currentScore}/10
-Localness: ${localness}/5
-Relevance: ${relevance}/5
-
-Provide:
-1. Target partnership score (realistic goal)
-2. Difficulty level (easy/medium/hard)
-3. 4-6 specific outreach and relationship-building recommendations
-4. Priority level (high/medium/low)
-5. Estimated time to achieve results
-6. Success probability (0-1 scale)`,
-        },
-      ],
-      max_tokens: 400,
+    const out = await aiChatSafe({
+      model: "gpt-5-mini-2025-08-07",
+      maxTokens: 400,
       temperature: 0.7,
+      messages: [
+        { role: "system", content: "You are a partnership development expert for a barbershop. Analyze potential partners and provide specific outreach and relationship-building recommendations." },
+        { role: "user", content: `Analyze this potential partner for Belmont Barbershop:\n\nPartner: "${prospectName}"\nType: ${prospectType}\nCurrent Score: ${currentScore}/10\nLocalness: ${localness}/5\nRelevance: ${relevance}/5\n\nProvide:\n1. Target partnership score (realistic goal)\n2. Difficulty level (easy/medium/hard)\n3. 4-6 specific outreach and relationship-building recommendations\n4. Priority level (high/medium/low)\n5. Estimated time to achieve results\n6. Success probability (0-1 scale)` },
+      ],
     });
-
-    const content = response.choices[0]?.message?.content || "";
+    const content = out.ok ? out.content : "";
 
     // Parse AI response and create optimization
     return {
@@ -684,17 +658,7 @@ function LinkProspectKit() {
   const [search, setSearch] = useState<string>("");
   const [copied, setCopied] = useState<string>("");
 
-  // AI-enhanced state
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // AI is server-managed; no client key workflow
   const [aiOptimization, setAiOptimization] =
     useState<PartnerAIOptimization | null>(null);
   const [partnerAnalytics, setPartnerAnalytics] =
@@ -838,42 +802,16 @@ function LinkProspectKit() {
         }
 
         try {
-          const openai = new OpenAI({
-            apiKey,
-            dangerouslyAllowBrowser: true,
-          });
-
-          const response = await openai.chat.completions.create({
-            model: "gpt5-mini",
-            messages: [
-              {
-                role: "system",
-                content: `You are a partnership development expert for a barbershop. Analyze potential partners and provide specific outreach and relationship-building recommendations.`,
-              },
-              {
-                role: "user",
-                content: `Analyze this potential partner for Belmont Barbershop:
-
-Partner: "${prospectName}"
-Type: ${prospectType}
-Current Score: ${currentScore}/10
-Localness: ${localness}/5
-Relevance: ${relevance}/5
-
-Provide:
-1. Target partnership score (realistic goal)
-2. Difficulty level (easy/medium/hard)
-3. 4-6 specific outreach and relationship-building recommendations
-4. Priority level (high/medium/low)
-5. Estimated time to achieve results
-6. Success probability (0-1 scale)`,
-              },
-            ],
-            max_tokens: 400,
+          const out = await aiChatSafe({
+            model: "gpt-5-mini-2025-08-07",
+            maxTokens: 400,
             temperature: 0.7,
+            messages: [
+              { role: "system", content: "You are a partnership development expert for a barbershop. Analyze potential partners and provide specific outreach and relationship-building recommendations." },
+              { role: "user", content: `Analyze this potential partner for Belmont Barbershop:\n\nPartner: "${prospectName}"\nType: ${prospectType}\nCurrent Score: ${currentScore}/10\nLocalness: ${localness}/5\nRelevance: ${relevance}/5\n\nProvide:\n1. Target partnership score (realistic goal)\n2. Difficulty level (easy/medium/hard)\n3. 4-6 specific outreach and relationship-building recommendations\n4. Priority level (high/medium/low)\n5. Estimated time to achieve results\n6. Success probability (0-1 scale)` },
+            ],
           });
-
-          const content = response.choices[0]?.message?.content || "";
+          const content = out.ok ? out.content : "";
 
           // Parse AI response and create optimization
           return {

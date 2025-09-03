@@ -3,73 +3,55 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Brain, CheckCircle, AlertTriangle, Copy, Eye, EyeOff, Link as LinkIcon, Shield } from "lucide-react";
-import OpenAI from "openai";
+import { Brain, CheckCircle, AlertTriangle, Link as LinkIcon } from "lucide-react";
+import { aiChatSafe, getAIStatus } from "@/lib/ai";
 
 type Props = {
   className?: string;
 };
 
 export function AIDiagnostics({ className }: Props) {
-  const [apiKey, setApiKey] = useState<string>("");
-  const [masked, setMasked] = useState(true);
+  const [status, setStatus] = useState<{ hasKey: boolean; defaultModel: string; limits: { perMinute: number; perDay: number } } | null>(null);
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<null | { ok: boolean; message: string }>(null);
+  const [quota, setQuota] = useState<null | { perMinute: number; remainingMinute: number; resetMinute: number; perDay: number; remainingDay: number; resetDay: number }>(null);
 
-  // Load from env or localStorage on mount
+  // Load server status on mount
   useEffect(() => {
-    try {
-      const envKey = (process as any)?.env?.NEXT_PUBLIC_OPENAI_API_KEY as string | undefined;
-      const stored = typeof window !== "undefined" ? window.localStorage.getItem("belmont_openai_key") : "";
-      const key = stored || envKey || "";
-      if (key) setApiKey(key);
-    } catch {}
+    (async () => {
+      const s = await getAIStatus();
+      setStatus(s);
+    })();
   }, []);
 
-  const maskedKey = useMemo(() => {
-    if (!apiKey) return "";
-    if (!masked) return apiKey;
-    const head = apiKey.slice(0, 6);
-    const tail = apiKey.slice(-4);
-    return `${head}…${tail}`;
-  }, [apiKey, masked]);
-
-  const hasKey = Boolean(apiKey);
-
   async function runTest() {
-    if (!apiKey) {
-      setTestResult({ ok: false, message: "No API key configured." });
-      return;
-    }
     setTesting(true);
     setTestResult(null);
     try {
-      const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
-      // Tiny, low-cost call
-      const r = await openai.chat.completions.create({
-        model: "gpt5-mini",
+      const r = await aiChatSafe({
+        model: status?.defaultModel || "gpt-5-mini-2025-08-07",
         messages: [{ role: "user", content: "ping" }],
-        max_tokens: 2,
+        maxTokens: 2,
       });
-      const ok = Boolean(r.choices?.length);
-      setTestResult({ ok, message: ok ? "AI responded." : "No choices returned." });
+      setTestResult({ ok: r.ok, message: r.ok ? "AI responded." : (r as any).error || "No response" });
+      const rl = (r as any)?.meta?.ratelimit;
+      if (rl && typeof rl === "object") {
+        setQuota({
+          perMinute: Number(rl.perMinute || 0),
+          remainingMinute: Number(rl.remainingMinute || 0),
+          resetMinute: Number(rl.resetMinute || 0),
+          perDay: Number(rl.perDay || 0),
+          remainingDay: Number(rl.remainingDay || 0),
+          resetDay: Number(rl.resetDay || 0),
+        });
+      }
     } catch (e: any) {
       setTestResult({ ok: false, message: String(e?.message || e) });
     } finally {
       setTesting(false);
-    }
-  }
-
-  function saveKey() {
-    try {
-      if (apiKey) localStorage.setItem("belmont_openai_key", apiKey);
-      setTestResult({ ok: true, message: "Saved to browser storage." });
-    } catch (e: any) {
-      setTestResult({ ok: false, message: "Could not save key." });
     }
   }
 
@@ -80,44 +62,33 @@ export function AIDiagnostics({ className }: Props) {
           <Brain className="h-5 w-5" />
           AI Diagnostics
         </CardTitle>
-        <CardDescription>Quick status for OpenAI connectivity and setup</CardDescription>
+        <CardDescription>Server-managed OpenAI connectivity and limits</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4 text-sm">
         <div className="grid md:grid-cols-2 gap-3">
           <div className="space-y-1">
             <Label>Configured model</Label>
             <div className="flex items-center gap-2">
-              <Badge>gpt5-mini</Badge>
-              <span className="text-muted-foreground">static in code</span>
+              <Badge>{status?.defaultModel || "gpt-5-mini-2025-08-07"}</Badge>
+              <span className="text-muted-foreground">server default</span>
             </div>
           </div>
           <div className="space-y-1">
-            <Label>API Key</Label>
+            <Label>Key Mode</Label>
             <div className="flex items-center gap-2">
-              {hasKey ? (
+              {status?.hasKey ? (
                 <CheckCircle className="h-4 w-4 text-green-600" />
               ) : (
                 <AlertTriangle className="h-4 w-4 text-amber-600" />
               )}
-              <span className="font-mono text-xs break-all">{maskedKey || "not set"}</span>
-              <Button size="sm" variant="outline" onClick={() => setMasked((m) => !m)} aria-label={masked ? "Show key" : "Hide key"}>
-                {masked ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-              </Button>
+              <span className="text-xs">Server-managed (no client key needed)</span>
             </div>
           </div>
-          <div className="md:col-span-2">
-            <Label>Set/Update API Key</Label>
-            <div className="flex gap-2">
-              <Input type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} placeholder="sk-..." />
-              <Button variant="outline" onClick={saveKey}>
-                <Shield className="h-4 w-4 mr-1" /> Save
-              </Button>
-            </div>
-          </div>
+          {/* No client key input – server-managed */}
         </div>
         <Separator />
         <div className="flex flex-wrap gap-2">
-          <Button onClick={runTest} disabled={!hasKey || testing}>
+          <Button onClick={runTest} disabled={testing}>
             <LinkIcon className="h-4 w-4 mr-2" />
             {testing ? "Testing…" : "Test AI Connection"}
           </Button>
@@ -128,11 +99,13 @@ export function AIDiagnostics({ className }: Props) {
             </span>
           )}
         </div>
-        <div className="text-xs text-muted-foreground">
-          Note: The key is stored locally in your browser under <code>belmont_openai_key</code>.
-        </div>
+        {quota && (
+          <div className="text-xs text-muted-foreground">
+            Quota: {quota.remainingMinute}/{quota.perMinute} this minute (resets in {quota.resetMinute}s), {quota.remainingDay}/{quota.perDay} today (resets in {Math.ceil(quota.resetDay/3600)}h)
+          </div>
+        )}
+        <div className="text-xs text-muted-foreground">Rate limits: {status?.limits?.perMinute ?? 30}/min, {status?.limits?.perDay ?? 1000}/day.</div>
       </CardContent>
     </Card>
   );
 }
-

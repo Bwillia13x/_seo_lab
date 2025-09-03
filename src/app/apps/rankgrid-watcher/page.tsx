@@ -70,7 +70,7 @@ import {
   ArrowDown,
   Minus,
 } from "lucide-react";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { PageHeader } from "@/components/ui/page-header";
@@ -171,17 +171,7 @@ type MonitorLibrary = {
 export default function RankGridWatcher() {
   const [rankData, setRankData] = useState<RankData[]>([]);
 
-  // AI-enhanced state
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // AI is server-managed; no client key needed
   const [aiOptimization, setAiOptimization] =
     useState<MonitorAIOptimization | null>(null);
   const [monitorAnalytics, setMonitorAnalytics] =
@@ -230,65 +220,19 @@ export default function RankGridWatcher() {
 async function generateAIMonitorOptimization(
   keyword: string,
   location: { lat: number; lng: number },
-  currentRank: number,
-  apiKey?: string
+  currentRank: number
 ): Promise<MonitorOptimization> {
-    if (!apiKey) {
-      return {
-        id: `opt_${Date.now()}`,
-        keyword,
-        location,
-        currentRank,
-        targetRank: Math.max(1, currentRank - 3),
-        difficulty: "medium",
-        recommendations: [
-          "Optimize title tag with primary keyword",
-          "Improve meta description with compelling call-to-action",
-          "Add structured data markup",
-          "Improve page load speed",
-        ],
-        priority:
-          currentRank > 10 ? "high" : currentRank > 5 ? "medium" : "low",
-        estimatedTime: "2-4 weeks",
-        successProbability: 0.7,
-      };
-    }
-
     try {
-      const openai = new OpenAI({
-        apiKey,
-        dangerouslyAllowBrowser: true,
-      });
-
-      const response = await openai.chat.completions.create({
-        model: "gpt5-mini",
-        messages: [
-          {
-            role: "system",
-            content: `You are a search engine optimization expert for a barbershop. Analyze keyword ranking performance and provide specific optimization recommendations.`,
-          },
-          {
-            role: "user",
-            content: `Analyze this keyword ranking for Belmont Barbershop SEO optimization:
-
-Keyword: "${keyword}"
-Current Rank: ${currentRank}
-Location: ${location.lat}, ${location.lng}
-
-Provide:
-1. Target rank recommendation (realistic goal)
-2. Difficulty level (easy/medium/hard)
-3. 4-6 specific optimization recommendations
-4. Priority level (high/medium/low)
-5. Estimated time to achieve results
-6. Success probability (0-1 scale)`,
-          },
-        ],
-        max_tokens: 400,
+      const out = await aiChatSafe({
+        model: "gpt-5-mini-2025-08-07",
+        maxTokens: 400,
         temperature: 0.7,
+        messages: [
+          { role: "system", content: "You are a search engine optimization expert for a barbershop. Analyze keyword ranking performance and provide specific optimization recommendations." },
+          { role: "user", content: `Analyze this keyword ranking for Belmont Barbershop SEO optimization:\n\nKeyword: "${keyword}"\nCurrent Rank: ${currentRank}\nLocation: ${location.lat}, ${location.lng}\n\nProvide:\n1. Target rank recommendation (realistic goal)\n2. Difficulty level (easy/medium/hard)\n3. 4-6 specific optimization recommendations\n4. Priority level (high/medium/low)\n5. Estimated time to achieve results\n6. Success probability (0-1 scale)` },
+        ],
       });
-
-      const content = response.choices[0]?.message?.content || "";
+      const content = out.ok ? out.content : "";
       const currentCTR =
         currentRank <= 3
           ? 0.3
@@ -475,8 +419,7 @@ Provide:
     const optimization = await generateAIMonitorOptimization(
       keywordData.keyword,
       { lat: keywordData.lat, lng: keywordData.lng },
-      keywordData.rank,
-      apiKey
+      keywordData.rank
     );
 
     setMonitorLibrary((prev) => ({
@@ -537,11 +480,7 @@ Provide:
         subtitle="AI-powered local search ranking analysis with optimization recommendations, geographic intelligence, and automated monitoring across Calgary locations."
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={handleGenerateAIMonitorOptimization}
-              disabled={!selectedKeyword || !selectedLocation || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={handleGenerateAIMonitorOptimization} disabled={!selectedKeyword || !selectedLocation} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize
             </Button>
@@ -778,12 +717,7 @@ Provide:
               value={rankData.length}
               icon={<MapPin className="h-4 w-4" />}
             />
-            <KPICard
-              label="AI Status"
-              value={apiKey ? "Connected" : "Setup"}
-              hint="AI optimization"
-              icon={<Brain className="h-4 w-4" />}
-            />
+            <KPICard label="AI Status" value="Server-managed" hint="AI optimization" icon={<Brain className="h-4 w-4" />} />
             <KPICard
               label="Avg Rank"
               value={

@@ -62,7 +62,6 @@ export default function Onboarding() {
         if (k && k.startsWith("belmont_")) keys.push(k);
       }
       keys.forEach((k) => {
-        if (k === "belmont_openai_key") return; // preserve AI key
         try { localStorage.removeItem(k); } catch {}
       });
       setPlaceId("");

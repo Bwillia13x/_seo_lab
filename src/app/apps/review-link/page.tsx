@@ -80,7 +80,7 @@ import {
   ThumbsUp,
   MessageCircle,
 } from "lucide-react";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import { saveBlob } from "@/lib/blob";
 import { toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
@@ -239,59 +239,20 @@ type ReviewLibrary = {
 async function generateAIReviewOptimization(
   campaignGoal: string,
   targetAudience: string,
-  currentPerformance: string,
-  apiKey?: string
+  currentPerformance: string
 ): Promise<AIOptimization> {
-  if (!apiKey) {
-    return {
-      suggestions: [
-        "Connect OpenAI API key for intelligent review optimization",
-      ],
-      predictedPerformance: 75,
-      bestPractices: [
-        "Personalize review requests",
-        "Send within 24 hours",
-        "Include clear call-to-action",
-      ],
-      targetAudience: targetAudience,
-      recommendedChannels: ["Email", "SMS", "WhatsApp"],
-      optimalTiming: ["24 hours after service", "During business hours"],
-    };
-  }
-
   try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a review marketing expert for Belmont Barbershop. Provide specific, actionable recommendations for optimizing review request campaigns.`,
-        },
-        {
-          role: "user",
-          content: `Analyze this review request campaign for Belmont Barbershop:
-          Goal: ${campaignGoal}
-          Target Audience: ${targetAudience}
-          Current Performance: ${currentPerformance}
-
-          Provide:
-          1. Specific optimization suggestions
-          2. Predicted performance score (0-100)
-          3. Best practices for review requests
-          4. Recommended communication channels
-          5. Optimal timing strategies`,
-        },
-      ],
-      max_tokens: 350,
+    const out = await aiChatSafe({
+      model: "gpt-5-mini-2025-08-07",
+      maxTokens: 350,
       temperature: 0.7,
+      messages: [
+        { role: "system", content: `You are a review marketing expert for Belmont Barbershop. Provide specific, actionable recommendations for optimizing review request campaigns.` },
+        { role: "user", content: `Analyze this review request campaign for Belmont Barbershop:\nGoal: ${campaignGoal}\nTarget Audience: ${targetAudience}\nCurrent Performance: ${currentPerformance}\n\nProvide:\n1. Specific optimization suggestions\n2. Predicted performance score (0-100)\n3. Best practices for review requests\n4. Recommended communication channels\n5. Optimal timing strategies` },
+      ],
     });
 
-    const content = response.choices[0]?.message?.content || "";
+    const content = out.ok ? out.content : "";
     const lines = content.split("\n");
 
     return {
@@ -530,16 +491,8 @@ export default function ReviewKit() {
   const [logRows, setLogRows] = useState<ConsentLog[]>([]);
 
   // Enhanced state for new features
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // Server-managed AI; no client key needed
+  useEffect(() => {}, []);
   const [aiOptimization, setAiOptimization] = useState<AIOptimization | null>(
     null
   );
@@ -589,8 +542,7 @@ export default function ReviewKit() {
     const optimization = await generateAIReviewOptimization(
       campaignGoal,
       targetAudience,
-      currentPerformance,
-      apiKey
+      currentPerformance
     );
     setAiOptimization(optimization);
   };
@@ -921,11 +873,7 @@ export default function ReviewKit() {
         subtitle="Create Google/Apple review links, copy CASL-compliant email/SMS, and print QR cards. (Optional: connect AI for optimization)"
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={getAIOptimization}
-              disabled={!apiKey}
-              variant="outline"
-            >
+            <Button onClick={getAIOptimization} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize (optional)
             </Button>
@@ -975,12 +923,7 @@ export default function ReviewKit() {
           hint="Active campaigns"
           icon={<Send className="h-4 w-4" />}
         />
-        <KPICard
-          label="AI Status"
-          value={apiKey ? "Connected" : "Setup"}
-          hint="Optimization"
-          icon={<Brain className="h-4 w-4" />}
-        />
+        <KPICard label="AI Status" value="Server-managed" hint="Optimization" icon={<Brain className="h-4 w-4" />} />
         <KPICard
           label="Conversion Rate"
           value={
@@ -1176,18 +1119,7 @@ export default function ReviewKit() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>OpenAI API Key</Label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Required for AI optimization features
-                  </p>
-                </div>
+                {/* No API key input needed – server-managed */}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>

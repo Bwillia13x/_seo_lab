@@ -52,7 +52,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
-import OpenAI from "openai";
+// Using server-managed AI via aiChatSafe
+import { aiChatSafe } from "@/lib/ai";
+import { aiChatSafe } from "@/lib/ai";
 import { logEvent } from "@/lib/analytics";
 
 // ---------------- Enhanced Types ----------------
@@ -275,47 +277,7 @@ function buildUtmUrl(
   return { url: u.toString() };
 }
 
-// AI Content Generation
-async function generateAIContent(
-  prompt: string,
-  apiKey: string,
-  maxTokens = 300
-): Promise<string> {
-  if (!apiKey) {
-    throw new Error("OpenAI API key is required for AI generation");
-  }
-
-  const openai = new OpenAI({
-    apiKey: apiKey,
-    dangerouslyAllowBrowser: true, // Note: In production, this should be server-side
-  });
-
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a professional content writer specializing in local business marketing for Google Business Profile posts. Create engaging, SEO-optimized content that drives action.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      max_tokens: maxTokens,
-      temperature: 0.7,
-    });
-
-    return response.choices[0]?.message?.content?.trim() || "";
-  } catch (error) {
-    console.error("AI Generation Error:", error);
-    throw new Error(
-      "Failed to generate AI content. Please check your API key and try again."
-    );
-  }
-}
+// Removed legacy client-key AI generator; using aiChatSafe below
 
 // SEO Analysis Functions
 function calculateSEOScore(text: string, keywords: string[]): SEOScore {
@@ -600,16 +562,6 @@ export default function GBPPostComposer() {
   const [variants, setVariants] = useState<PostVariant[]>([]);
   const [seoScore, setSeoScore] = useState<SEOScore | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [apiKey, setApiKey] = useState("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
   const [performanceData, setPerformanceData] = useState<PostPerformance[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<AITemplate | null>(
     null
@@ -647,11 +599,6 @@ export default function GBPPostComposer() {
 
   // AI Content Generation
   async function generateAIContent() {
-    if (!apiKey) {
-      try { (await import("@/lib/toast")).showToast("Please enter your OpenAI API key first", "warn"); } catch {}
-      return;
-    }
-
     setIsGenerating(true);
     try {
       const prompt = selectedTemplate
@@ -661,41 +608,16 @@ export default function GBPPostComposer() {
             .replace("{area}", state.area)
             .replace("{audience}", state.targetAudience)
         : `Create a compelling Google Business Profile post for ${state.service} at ${state.bizName} in ${state.area}. Target audience: ${state.targetAudience}. Post type: ${state.type}. Tone: ${state.tone}. Include call to action: ${state.callToAction}.`;
-
-      // Call the external generateAIContent function
-      const generatedContent = await (async function generateAIContentExternal(
-        prompt: string,
-        apiKey: string,
-        maxTokens = 300
-      ): Promise<string> {
-        if (!apiKey) {
-          throw new Error("API key is required");
-        }
-
-        const openai = new OpenAI({
-          apiKey,
-          dangerouslyAllowBrowser: true,
-        });
-
-        const response = await openai.chat.completions.create({
-          model: "gpt5-mini",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a content marketing expert for a barbershop. Create compelling, SEO-optimized Google Business Profile posts that drive engagement and bookings.",
-            },
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          max_tokens: maxTokens,
-          temperature: 0.7,
-        });
-
-        return response.choices[0]?.message?.content || "";
-      })(prompt, apiKey);
+      const out = await aiChatSafe({
+        model: "gpt-5-mini-2025-08-07",
+        maxTokens: 300,
+        temperature: 0.7,
+        messages: [
+          { role: "system", content: "You are a content marketing expert for a barbershop. Create compelling, SEO-optimized Google Business Profile posts that drive engagement and bookings." },
+          { role: "user", content: prompt },
+        ],
+      });
+      const generatedContent = out.ok ? out.content : "";
 
       // Parse the generated content (assuming it contains title and body)
       const lines = generatedContent.split("\n");
@@ -714,10 +636,7 @@ export default function GBPPostComposer() {
         });
       } catch {}
     } catch (error) {
-      alert(
-        "Failed to generate AI content: " +
-          (error instanceof Error ? error.message : String(error))
-      );
+      alert("Failed to generate AI content.");
     } finally {
       setIsGenerating(false);
     }
@@ -1073,9 +992,7 @@ export default function GBPPostComposer() {
                     <CardContent>
                       <div className="space-y-3 text-sm">
                         <div>
-                          <strong>OpenAI API Key:</strong> You'll need to get a
-                          free API key from OpenAI's website to use the AI
-                          features
+                          <strong>AI:</strong> Server-managed. No API key needed.
                         </div>
                         <div>
                           <strong>AI Templates:</strong> Choose from pre-made
@@ -1705,27 +1622,7 @@ export default function GBPPostComposer() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="apiKey">OpenAI API Key</Label>
-                  <Input
-                    id="apiKey"
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="sk-..."
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Get your API key from{" "}
-                    <a
-                      href="https://platform.openai.com/api-keys"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
-                    >
-                      OpenAI Platform
-                    </a>
-                  </p>
-                </div>
+                {/* No API key input needed – server-managed */}
                 <div>
                   <Label>AI Templates</Label>
                   <select
@@ -2438,9 +2335,7 @@ export default function GBPPostComposer() {
                     <CardContent>
                       <div className="space-y-3 text-sm">
                         <div>
-                          <strong>OpenAI API Key:</strong> You'll need to get a
-                          free API key from OpenAI's website to use the AI
-                          features
+                          <strong>AI:</strong> Server-managed. No API key needed.
                         </div>
                         <div>
                           <strong>AI Templates:</strong> Choose from pre-made

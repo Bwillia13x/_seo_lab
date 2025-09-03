@@ -57,7 +57,7 @@ import {
   BarChart,
   LineChart,
 } from "lucide-react";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import { saveBlob } from "@/lib/blob";
 import { showToast } from "@/lib/toast";
 import { PageHeader } from "@/components/ui/page-header";
@@ -148,94 +148,46 @@ type BatchReferralOptions = {
 async function generateAIOptimization(
   referralType: string,
   targetAudience: string,
-  campaignGoal: string,
-  apiKey?: string
+  campaignGoal: string
 ): Promise<AIOptimization> {
-  if (!apiKey) {
-    return {
-      suggestions: [
-        "Connect OpenAI API key for intelligent referral optimization",
-      ],
-      predictedPerformance: 75,
-      bestPractices: [
-        "Use clear call-to-action",
-        "Target satisfied customers",
-        "Offer compelling incentives",
-      ],
-      targetAudience: targetAudience,
-      recommendedChannels: ["Instagram", "Business Cards", "Email"],
-    };
-  }
-
   try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
+    const out = await aiChatSafe({
+      model: "gpt-5-mini-2025-08-07",
+      maxTokens: 300,
+      temperature: 0.7,
       messages: [
         {
           role: "system",
-          content: `You are a referral marketing expert for Belmont Barbershop. Provide specific, actionable recommendations for optimizing referral programs.`,
+          content:
+            "You are a referral marketing expert for Belmont Barbershop. Provide specific, actionable recommendations for optimizing referral programs.",
         },
         {
           role: "user",
-          content: `Analyze this referral campaign for Belmont Barbershop:
-          Type: ${referralType}
-          Target Audience: ${targetAudience}
-          Campaign Goal: ${campaignGoal}
-
-          Provide:
-          1. Specific optimization suggestions
-          2. Predicted performance score (0-100)
-          3. Best practices for this referral type
-          4. Recommended marketing channels
-          5. Target audience insights`,
+          content: `Analyze this referral campaign for Belmont Barbershop:\nType: ${referralType}\nTarget Audience: ${targetAudience}\nCampaign Goal: ${campaignGoal}\n\nProvide:\n1. Specific optimization suggestions\n2. Predicted performance score (0-100)\n3. Best practices for this referral type\n4. Recommended marketing channels\n5. Target audience insights`,
         },
       ],
-      max_tokens: 300,
-      temperature: 0.7,
     });
-
-    const content = response.choices[0]?.message?.content || "";
+    const content = out.ok ? out.content : "";
     const lines = content.split("\n");
-
     return {
-      suggestions: lines
-        .filter((l) => l.includes("•") || l.includes("-"))
-        .slice(0, 4),
-      predictedPerformance: Math.floor(Math.random() * 30) + 70, // 70-100 range
+      suggestions: lines.filter((l) => l.includes("•") || l.includes("-")).slice(0, 4),
+      predictedPerformance: Math.floor(Math.random() * 30) + 70,
       bestPractices: [
         "Use compelling incentives",
         "Make sharing easy",
         "Track performance regularly",
         "Celebrate successes",
       ],
-      targetAudience: targetAudience,
-      recommendedChannels: [
-        "Instagram",
-        "Business Cards",
-        "Email",
-        "Word-of-mouth",
-      ],
+      targetAudience,
+      recommendedChannels: ["Instagram", "Business Cards", "Email", "Word-of-mouth"],
     };
   } catch (error) {
     console.error("AI referral optimization failed:", error);
     return {
-      suggestions: [
-        "Use clear incentives",
-        "Target loyal customers",
-        "Make sharing simple",
-      ],
+      suggestions: ["Use clear incentives", "Target loyal customers", "Make sharing simple"],
       predictedPerformance: 75,
-      bestPractices: [
-        "Track performance",
-        "Offer rewards",
-        "Celebrate top performers",
-      ],
-      targetAudience: targetAudience,
+      bestPractices: ["Track performance", "Offer rewards", "Celebrate top performers"],
+      targetAudience,
       recommendedChannels: ["Instagram", "Business Cards", "Email"],
     };
   }
@@ -388,16 +340,8 @@ export default function ReferralQR() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Enhanced state variables
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // No client API key needed; server-managed
+  useEffect(() => {}, []);
   const [aiOptimization, setAiOptimization] = useState<AIOptimization | null>(
     null
   );
@@ -531,8 +475,7 @@ export default function ReferralQR() {
     const optimization = await generateAIOptimization(
       newType,
       targetAudience,
-      campaignGoal,
-      apiKey
+      campaignGoal
     );
     setAiOptimization(optimization);
   };
@@ -607,11 +550,7 @@ export default function ReferralQR() {
         subtitle="AI-powered referral management with performance analytics, campaign optimization, and automated incentive programs."
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={getAIOptimization}
-              disabled={!apiKey}
-              variant="outline"
-            >
+            <Button onClick={getAIOptimization} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize
             </Button>
@@ -650,12 +589,7 @@ export default function ReferralQR() {
           hint="Active"
           icon={<QrCode className="h-4 w-4" />}
         />
-        <KPICard
-          label="AI Status"
-          value={apiKey ? "Connected" : "Setup"}
-          hint="Optimization"
-          icon={<Brain className="h-4 w-4" />}
-        />
+        <KPICard label="AI Status" value="Server-managed" hint="Optimization" icon={<Brain className="h-4 w-4" />} />
         <KPICard
           label="Total Clicks"
           value={totalStats.clicks}
@@ -986,18 +920,7 @@ export default function ReferralQR() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>OpenAI API Key</Label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your OpenAI API key"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Required for AI optimization features
-                  </p>
-                </div>
+                {/* No API key needed – server-managed */}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>

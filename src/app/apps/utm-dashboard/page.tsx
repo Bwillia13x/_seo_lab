@@ -61,7 +61,7 @@ import {
   Monitor,
   Globe,
 } from "lucide-react";
-import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import { logEvent } from "@/lib/analytics";
 
 import { saveBlob } from "@/lib/blob";
@@ -185,42 +185,18 @@ async function generateAICampaignSuggestion(
   expectedPerformance: string;
   bestPractices: string[];
 }> {
-  if (!apiKey) {
-    return {
-      suggestion:
-        "Connect OpenAI API key to get intelligent campaign suggestions",
-      expectedPerformance: "N/A",
-      bestPractices: ["Add API key for AI optimization"],
-    };
-  }
-
   try {
-    const openai = new OpenAI({
-      apiKey,
-      dangerouslyAllowBrowser: true,
-    });
-
-    const response = await openai.chat.completions.create({
-      model: "gpt5-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a marketing expert for The Belmont Barbershop in ${area}. Provide data-driven campaign suggestions that maximize customer acquisition and booking conversions.`,
-        },
-        {
-          role: "user",
-          content: `Create an optimized campaign strategy for ${service} targeting customers in ${area} via ${platform}. Include:
-          1. Campaign name suggestion
-          2. Expected performance metrics
-          3. Best practices for ${platform} marketing
-          4. UTM parameter optimization tips`,
-        },
-      ],
-      max_tokens: 300,
+    const out = await aiChatSafe({
+      model: "gpt-5-mini-2025-08-07",
+      maxTokens: 300,
       temperature: 0.7,
+      messages: [
+        { role: "system", content: `You are a marketing expert for The Belmont Barbershop in ${area}. Provide data-driven campaign suggestions that maximize customer acquisition and booking conversions.` },
+        { role: "user", content: `Create an optimized campaign strategy for ${service} targeting customers in ${area} via ${platform}. Include:\n1. Campaign name suggestion\n2. Expected performance metrics\n3. Best practices for ${platform} marketing\n4. UTM parameter optimization tips` },
+      ],
     });
 
-    const content = response.choices[0]?.message?.content || "";
+    const content = out.ok ? out.content : "";
     const lines = content.split("\n");
 
     return {
@@ -395,16 +371,8 @@ function UTMDashboard() {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
   // Enhanced state for new features
-  const [apiKey, setApiKey] = useState<string>("");
-  useEffect(() => {
-    try {
-      const k =
-        (typeof process !== "undefined" && (process as any).env?.NEXT_PUBLIC_OPENAI_API_KEY) ||
-        (typeof window !== "undefined" && window.localStorage.getItem("belmont_openai_key")) ||
-        "";
-      if (k) setApiKey(k);
-    } catch {}
-  }, []);
+  // Server-managed AI; no client key needed
+  useEffect(() => {}, []);
   const [aiSuggestions, setAiSuggestions] = useState<{
     suggestion: string;
     expectedPerformance: string;
@@ -794,11 +762,7 @@ function UTMDashboard() {
               )}
               {copied ? "Copied!" : "Copy Link"}
             </Button>
-            <Button
-              onClick={getAISuggestions}
-              disabled={!apiKey}
-              variant="outline"
-            >
+            <Button onClick={getAISuggestions} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Suggest
             </Button>
@@ -831,11 +795,7 @@ function UTMDashboard() {
           value={builtUrl ? "Ready" : "—"}
           icon={<Link className="h-4 w-4" />}
         />
-        <KPICard
-          label="AI Status"
-          value={apiKey ? "Connected" : "Setup"}
-          icon={<Brain className="h-4 w-4" />}
-        />
+        <KPICard label="AI Status" value="Server-managed" icon={<Brain className="h-4 w-4" />} />
         <KPICard
           label="Batch Items"
           value={rows.length}
@@ -1204,24 +1164,9 @@ function UTMDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <Label>OpenAI API Key</Label>
-                  <Input
-                    type="password"
-                    placeholder="Enter your OpenAI API key for AI suggestions"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Required for AI optimization features
-                  </p>
-                </div>
+                {/* No API key input needed – server-managed */}
 
-                <Button
-                  onClick={getAISuggestions}
-                  disabled={!apiKey}
-                  className="w-full"
-                >
+                <Button onClick={getAISuggestions} className="w-full">
                   <Sparkles className="h-4 w-4 mr-2" />
                   Generate AI Suggestions
                 </Button>
