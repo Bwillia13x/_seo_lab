@@ -1,0 +1,28 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('Review Composer', () => {
+  test('loads sample, opens a review, and (optionally) triggers AI', async ({ page }) => {
+    await page.goto('/apps/review-composer');
+
+    // Load sample reviews
+    await page.getByRole('button', { name: /Load Sample/i }).click();
+
+    // Expect queue to show at least one review (look for a star rating badge)
+    await expect(page.getByText(/⭐/).first()).toBeVisible();
+
+    // Click first Reply button
+    await page.getByRole('button', { name: /^Reply$/ }).first().click();
+
+    // Ensure Reply Composer appears
+    await expect(page.getByText(/Reply Composer/)).toBeVisible();
+
+    // If AI button is enabled, click it
+    const aiButton = page.getByRole('button', { name: /AI Generate/i });
+    if (await aiButton.isEnabled()) {
+      await aiButton.click();
+      // Ensure composer section still visible, indicating no fatal error
+      await expect(page.getByText(/CASL\/PIPEDA Note/i)).toBeVisible();
+    }
+  });
+});
+

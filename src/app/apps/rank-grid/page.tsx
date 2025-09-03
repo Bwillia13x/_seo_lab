@@ -107,6 +107,7 @@ import {
   Minus,
 } from "lucide-react";
 import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 import { saveBlob } from "@/lib/blob";
 import { toCSV, fromCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";

@@ -76,6 +76,7 @@ import {
   Search,
 } from "lucide-react";
 import OpenAI from "openai";
+import { aiChatSafe } from "@/lib/ai";
 
 import dynamic from "next/dynamic";
 const CTRScatter = dynamic(() => import("@/components/charts/ScatterCTR"), {
@@ -552,43 +553,23 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
     }
 
     try {
-      const openai = new OpenAI({
+      const out = await aiChatSafe({
         apiKey,
-        dangerouslyAllowBrowser: true,
-      });
-
-      const response = await openai.chat.completions.create({
         model: "gpt5-mini",
+        maxTokens: 400,
         messages: [
           {
             role: "system",
-            content: `You are a search engine optimization expert for a barbershop. Analyze keyword performance and provide specific optimization recommendations.`,
+            content:
+              "You are a search engine optimization expert for a barbershop. Analyze keyword performance and provide specific optimization recommendations.",
           },
           {
             role: "user",
-            content: `Analyze this keyword for Belmont Barbershop SEO optimization:
-
-Keyword: "${keyword}"
-Current Position: ${currentPosition}
-Monthly Impressions: ${impressions}
-Monthly Clicks: ${clicks}
-Current CTR: ${((clicks / impressions) * 100).toFixed(2)}%
-Competitors: ${competitors.join(", ")}
-
-Provide:
-1. Target position recommendation (realistic goal)
-2. Potential CTR improvement percentage
-3. Difficulty level (easy/medium/hard)
-4. 4-6 specific optimization recommendations
-5. Priority level (high/medium/low)
-6. Expected timeline for results`,
+            content: `Analyze this keyword for Belmont Barbershop SEO optimization:\n\nKeyword: \"${keyword}\"\nCurrent Position: ${currentPosition}\nMonthly Impressions: ${impressions}\nMonthly Clicks: ${clicks}\nCurrent CTR: ${((clicks / impressions) * 100).toFixed(2)}%\nCompetitors: ${competitors.join(", ")}\n\nProvide:\n1. Target position recommendation (realistic goal)\n2. Potential CTR improvement percentage\n3. Difficulty level (easy/medium/hard)\n4. 4-6 specific optimization recommendations\n5. Priority level (high/medium/low)\n6. Expected timeline for results`,
           },
         ],
-        max_tokens: 400,
-        temperature: 0.7,
       });
-
-      const content = response.choices[0]?.message?.content || "";
+      const content = out.ok ? out.content : "";
       const currentCTR = clicks / impressions;
 
       // Parse AI response and create optimization
