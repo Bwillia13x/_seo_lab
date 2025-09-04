@@ -972,7 +972,7 @@ export default function RFMMicroCRM() {
         />
         <KPICard
           label="AI Status"
-          value={apiKey ? "Connected" : "Setup"}
+          value="Server-managed"
           hint="AI insights"
           icon={<Brain className="h-4 w-4" />}
         />

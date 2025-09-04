@@ -728,8 +728,7 @@ const loadDemo = useCallback(() => {
       competitors,
       searchType,
       device,
-      location,
-      apiKey
+      location
     );
 
     setRankingLibrary((prev) => ({

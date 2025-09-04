@@ -1265,11 +1265,7 @@ export default function Page() {
           value={`${(posts.reduce((sum, p) => sum + (p.performance?.engagementRate || 0), 0) * 100) / Math.max(posts.length, 1) || 0}%`}
           hint="Avg rate"
         />
-        <KPICard
-          label="Status"
-          value={apiKey ? "AI Ready" : "Setup Needed"}
-          hint="OpenAI API"
-        />
+        <KPICard label="Status" value="Server-managed" hint="OpenAI API" />
       </div>
 
       <Tabs defaultValue="howto" value={activeTab} onValueChange={setActiveTab}>

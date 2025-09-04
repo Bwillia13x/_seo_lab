@@ -456,8 +456,7 @@ function UTMDashboard() {
     const suggestions = await generateAICampaignSuggestion(
       PRESETS[preset].source,
       service,
-      area,
-      apiKey
+      area
     );
     setAiSuggestions(suggestions);
   };

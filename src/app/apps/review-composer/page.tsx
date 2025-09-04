@@ -697,8 +697,7 @@ export default function ReviewComposer() {
       selectedReview.text,
       selectedReview.rating,
       selectedReview.author,
-      selectedReview.platform,
-      apiKey
+      selectedReview.platform
     );
 
     setAiGeneratedResponse(result.response);
@@ -872,12 +871,7 @@ export default function ReviewComposer() {
           hint="Reviews responded to"
           icon={<CheckCircle className="h-4 w-4" />}
         />
-        <KPICard
-          label="AI Status"
-          value={apiKey ? "Connected" : "Setup"}
-          hint="AI optimization"
-          icon={<Brain className="h-4 w-4" />}
-        />
+        <KPICard label="AI Status" value="Server-managed" hint="AI optimization" icon={<Brain className="h-4 w-4" />} />
         <KPICard
           label="Avg Rating"
           value={
