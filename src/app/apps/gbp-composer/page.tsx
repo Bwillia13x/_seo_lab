@@ -773,12 +773,14 @@ export default function GBPPostComposer() {
         <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="guide">How To Use</TabsTrigger>
           <TabsTrigger value="compose">Compose</TabsTrigger>
-          <TabsTrigger value="ai">AI Generate</TabsTrigger>
           <TabsTrigger value="preview">Preview</TabsTrigger>
-          <TabsTrigger value="seo">SEO Analysis</TabsTrigger>
-          <TabsTrigger value="ab-test">A/B Test</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="tests">Tests</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai">AI Generate</TabsTrigger>
+            <TabsTrigger value="seo">SEO Analysis</TabsTrigger>
+            <TabsTrigger value="ab-test">A/B Test</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="tests">Tests</TabsTrigger>
+          </span>
         </TabsList>
 
         <TabsContent value="guide" className="space-y-6">
@@ -1607,7 +1609,7 @@ export default function GBPPostComposer() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="ai" className="space-y-6">
+        <TabsContent value="ai" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1679,7 +1681,7 @@ export default function GBPPostComposer() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="seo" className="space-y-6">
+        <TabsContent value="seo" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1804,7 +1806,7 @@ export default function GBPPostComposer() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="ab-test" className="space-y-6">
+        <TabsContent value="ab-test" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1910,7 +1912,7 @@ export default function GBPPostComposer() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="analytics" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -2045,7 +2047,7 @@ export default function GBPPostComposer() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="pack" className="space-y-6">
+        <TabsContent value="pack" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle>4-Post Content Pack</CardTitle>
@@ -2087,7 +2089,7 @@ export default function GBPPostComposer() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="tests" className="space-y-6">
+        <TabsContent value="tests" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle>Self-Tests</CardTitle>

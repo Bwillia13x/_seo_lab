@@ -953,26 +953,7 @@ function ProfitIntelligenceStudio() {
         showLogo={true}
         actions={
           <div className="flex gap-2">
-            <Button onClick={runAIProfitOptimization} disabled={!selectedService || !selectedTimeSlot} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
-            </Button>
-            <Button
-              onClick={calculateProfitAnalyticsData}
-              disabled={appts.length === 0}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              onClick={exportEnhancedProfitReport}
-              disabled={!profitAnalytics}
-              variant="outline"
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            {/* Simple actions */}
             <Button variant="secondary" onClick={loadDemo}>
               <Sparkles className="h-4 w-4 mr-2" />
               Load Demo
@@ -992,6 +973,29 @@ function ProfitIntelligenceStudio() {
                 </span>
               </Button>
             </label>
+            {/* Advanced-only actions */}
+            <span className="advanced-only contents">
+              <Button onClick={runAIProfitOptimization} disabled={!selectedService || !selectedTimeSlot} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Optimize
+              </Button>
+              <Button
+                onClick={calculateProfitAnalyticsData}
+                disabled={appts.length === 0}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                onClick={exportEnhancedProfitReport}
+                disabled={!profitAnalytics}
+                variant="outline"
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+            </span>
           </div>
         }
       />
@@ -1005,16 +1009,18 @@ function ProfitIntelligenceStudio() {
         <TabsList className="grid w-full grid-cols-4 lg:grid-cols-12 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="data">Upload Data</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="analysis">Analysis</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="services">Services</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="analysis">Analysis</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="services">Services</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To Tab */}
@@ -1362,7 +1368,7 @@ function ProfitIntelligenceStudio() {
         </TabsContent>
 
         {/* Analysis Tab */}
-        <TabsContent value="analysis" className="space-y-6">
+        <TabsContent value="analysis" className="space-y-6 advanced-only">
           {totals.totalAppts === 0 && (
             <Card>
               <CardContent className="p-6 text-center">
@@ -1480,7 +1486,7 @@ function ProfitIntelligenceStudio() {
         </TabsContent>
 
         {/* Settings Tab */}
-        <TabsContent value="settings" className="space-y-6">
+        <TabsContent value="settings" className="space-y-6 advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">

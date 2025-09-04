@@ -758,18 +758,50 @@ export default function UTMBuilder() {
         subtitle="Generate intelligent, optimized QR codes with AI-powered design suggestions and performance analytics."
         actions={
           <div className="flex gap-2">
-            <Button onClick={getAISuggestions} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
-            </Button>
             <Button
-              onClick={testQR}
-              disabled={qrGrid.length === 0}
-              variant="outline"
+              onClick={() => {
+                // Minimal demo: set sensible defaults and build
+                setBaseUrl("https://thebelmontbarber.ca/book");
+                setPreset("gbp_post");
+                setService("mens-cut");
+                setArea("bridgeland");
+                const demoCampaign = `belmont-mens-cut-bridgeland-${todayYYYYMM()}`;
+                setCampaign(demoCampaign);
+                const p = PRESETS["gbp_post"];
+                const { url } = buildUtmUrl(
+                  "https://thebelmontbarber.ca/book",
+                  {
+                    utm_source: p.source,
+                    utm_medium: p.medium,
+                    utm_campaign: slugify(demoCampaign),
+                    utm_term: "",
+                    utm_content: "window-qr",
+                  },
+                  true
+                );
+                setBuiltUrl(url);
+                setQrGrid(generateSimpleQR(url, 16));
+                try { showToast("Loaded demo QR", "success"); } catch {}
+              }}
+              variant="secondary"
             >
-              <TestTube className="h-4 w-4 mr-2" />
-              Test QR
+              <Sparkles className="h-4 w-4 mr-2" />
+              Load Demo
             </Button>
+            <span className="advanced-only contents">
+              <Button onClick={getAISuggestions} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Optimize
+              </Button>
+              <Button
+                onClick={testQR}
+                disabled={qrGrid.length === 0}
+                variant="outline"
+              >
+                <TestTube className="h-4 w-4 mr-2" />
+                Test QR
+              </Button>
+            </span>
             <Button variant="outline" onClick={resetForm}>
               <RefreshCw className="h-4 w-4 mr-2" />
               Reset
@@ -833,12 +865,14 @@ export default function UTMBuilder() {
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="single">Single Link</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="design">Design Studio</TabsTrigger>
-          <TabsTrigger value="library">Library</TabsTrigger>
-          <TabsTrigger value="batch">Batch QR</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="tests">Tests</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="design">Design Studio</TabsTrigger>
+            <TabsTrigger value="library">Library</TabsTrigger>
+            <TabsTrigger value="batch">Batch QR</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="tests">Tests</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To */}
@@ -1000,7 +1034,7 @@ export default function UTMBuilder() {
         </TabsContent>
 
         {/* AI Optimize Tab */}
-        <TabsContent value="ai-optimize" className="space-y-6">
+        <TabsContent value="ai-optimize" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1157,7 +1191,7 @@ export default function UTMBuilder() {
         </TabsContent>
 
         {/* Design Studio Tab */}
-        <TabsContent value="design" className="space-y-6">
+        <TabsContent value="design" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1353,7 +1387,7 @@ export default function UTMBuilder() {
         </TabsContent>
 
         {/* Library Tab */}
-        <TabsContent value="library" className="space-y-6">
+        <TabsContent value="library" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1450,7 +1484,7 @@ export default function UTMBuilder() {
         </TabsContent>
 
         {/* Batch QR Tab */}
-        <TabsContent value="batch" className="space-y-6">
+        <TabsContent value="batch" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1542,7 +1576,7 @@ export default function UTMBuilder() {
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="analytics" className="space-y-6 advanced-only">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">QR Analytics</h2>
@@ -1732,7 +1766,7 @@ export default function UTMBuilder() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div>
-                    <Label>Base URL</Label>
+                    <Label>Base URL (booking link)</Label>
                     <Input
                       value={baseUrl}
                       onChange={(e) => setBaseUrl(e.target.value)}
@@ -1788,7 +1822,7 @@ export default function UTMBuilder() {
                       </select>
                     </div>
                     <div>
-                      <Label>Campaign</Label>
+                      <Label>Campaign Name</Label>
                       <Input
                         value={campaign}
                         onChange={(e) => setCampaign(e.target.value)}
@@ -1822,7 +1856,7 @@ export default function UTMBuilder() {
                         onChange={(e) => setOverwrite(e.target.checked)}
                         className="rounded"
                       />
-                      <Label className="text-sm">Overwrite existing UTMs</Label>
+                      <Label className="text-sm">Replace existing tracking codes</Label>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
@@ -1831,7 +1865,7 @@ export default function UTMBuilder() {
                         onChange={(e) => setForceLower(e.target.checked)}
                         className="rounded"
                       />
-                      <Label className="text-sm">Lowercase</Label>
+                      <Label className="text-sm">Use lowercase</Label>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
@@ -1840,7 +1874,7 @@ export default function UTMBuilder() {
                         onChange={(e) => setHyphenate(e.target.checked)}
                         className="rounded"
                       />
-                      <Label className="text-sm">Hyphenate</Label>
+                      <Label className="text-sm">Use hyphens</Label>
                     </div>
                   </div>
 
@@ -1950,7 +1984,7 @@ export default function UTMBuilder() {
         </TabsContent>
 
         {/* Tests */}
-        <TabsContent value="tests">
+        <TabsContent value="tests" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">

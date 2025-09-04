@@ -426,6 +426,72 @@ function UTMDashboard() {
     } catch {}
   }, []);
 
+  // Demo loader: populate a few example campaigns and a ready QR
+  async function loadDemo() {
+    try {
+      const demo: Row[] = [
+        {
+          id: `demo-1-${Date.now()}`,
+          base: BELMONT_CONSTANTS.BOOK_URL,
+          preset: "instagram_bio",
+          service: "mens-cut",
+          area: "bridgeland",
+          campaign: `belmont-mens-cut-bridgeland-${todayYYYYMM()}`,
+          term: "",
+          content: "profile-link",
+        },
+        {
+          id: `demo-2-${Date.now()}`,
+          base: BELMONT_CONSTANTS.BOOK_URL,
+          preset: "gbp_post",
+          service: "beard-trim",
+          area: "calgary",
+          campaign: `belmont-beard-trim-calgary-${todayYYYYMM()}`,
+          term: "",
+          content: "special-offer",
+        },
+        {
+          id: `demo-3-${Date.now()}`,
+          base: BELMONT_CONSTANTS.BOOK_URL,
+          preset: "groomsmen_party",
+          service: "groomsmen-party",
+          area: "calgary",
+          campaign: `belmont-groomsmen-calgary-${todayYYYYMM()}`,
+          term: "wedding",
+          content: "package",
+        },
+      ];
+
+      // Compute URLs for each demo row
+      const withUrls = demo.map((r) => {
+        const p = PRESETS[r.preset];
+        const { url } = buildUtmUrl(
+          r.base,
+          {
+            utm_source: p.source,
+            utm_medium: p.medium,
+            utm_campaign: slugify(r.campaign),
+            utm_term: slugify(r.term || ""),
+            utm_content: slugify(r.content || ""),
+          },
+          true
+        );
+        return { ...r, url };
+      });
+
+      setRows(withUrls);
+      // Also present the first link as a generated example
+      if (withUrls[0]?.url) {
+        setBuiltUrl(withUrls[0].url);
+        const durl = await qrDataUrl(withUrls[0].url, size, margin, ecLevel);
+        setQrUrl(durl);
+      }
+      showToast("Loaded demo campaigns", "success");
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   // Enhanced Analytics function
   const generateMockAnalytics = (campaigns: Row[]): CampaignPerformance[] => {
     return campaigns.map((row, index) => ({
@@ -761,14 +827,20 @@ function UTMDashboard() {
               )}
               {copied ? "Copied!" : "Copy Link"}
             </Button>
-            <Button onClick={getAISuggestions} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Suggest
+            <Button onClick={loadDemo} variant="secondary">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Load Demo
             </Button>
-            <Button onClick={analyzeCampaignQuality} variant="outline">
-              <Target className="h-4 w-4 mr-2" />
-              Analyze
-            </Button>
+            <span className="advanced-only contents">
+              <Button onClick={getAISuggestions} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Suggest
+              </Button>
+              <Button onClick={analyzeCampaignQuality} variant="outline">
+                <Target className="h-4 w-4 mr-2" />
+                Analyze
+              </Button>
+            </span>
           </div>
         }
       />
@@ -821,14 +893,16 @@ function UTMDashboard() {
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-10 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="builder">Link Builder</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="batch">Batch Builder</TabsTrigger>
-          <TabsTrigger value="ab-test">A/B Test</TabsTrigger>
-          <TabsTrigger value="library">Library</TabsTrigger>
-          <TabsTrigger value="scheduler">Scheduler</TabsTrigger>
-          <TabsTrigger value="qr">QR Codes</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="tests">Tests</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="batch">Batch Builder</TabsTrigger>
+            <TabsTrigger value="ab-test">A/B Test</TabsTrigger>
+            <TabsTrigger value="library">Library</TabsTrigger>
+            <TabsTrigger value="scheduler">Scheduler</TabsTrigger>
+            <TabsTrigger value="qr">QR Codes</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="tests">Tests</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To */}
@@ -993,7 +1067,7 @@ function UTMDashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Base URL</Label>
+                  <Label>Base URL (booking link)</Label>
                   <Input
                     value={baseUrl}
                     onChange={(e) => setBaseUrl(e.target.value)}
@@ -1089,23 +1163,21 @@ function UTMDashboard() {
                         checked={overwrite}
                         onCheckedChange={(v) => setOverwrite(Boolean(v))}
                       />
-                      <Label className="text-sm">
-                        Overwrite existing params
-                      </Label>
+                      <Label className="text-sm">Replace existing tracking codes</Label>
                     </div>
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={forceLower}
                         onCheckedChange={(v) => setForceLower(Boolean(v))}
                       />
-                      <Label className="text-sm">Force lowercase</Label>
+                      <Label className="text-sm">Use lowercase</Label>
                     </div>
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={hyphenate}
                         onCheckedChange={(v) => setHyphenate(Boolean(v))}
                       />
-                      <Label className="text-sm">Hyphenate spaces</Label>
+                      <Label className="text-sm">Use hyphens</Label>
                     </div>
                   </div>
                 </div>
@@ -1296,7 +1368,7 @@ function UTMDashboard() {
         </TabsContent>
 
         {/* A/B Test Tab */}
-        <TabsContent value="ab-test" className="space-y-6">
+        <TabsContent value="ab-test" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1496,7 +1568,7 @@ function UTMDashboard() {
         </TabsContent>
 
         {/* Campaign Library Tab */}
-        <TabsContent value="library" className="space-y-6">
+        <TabsContent value="library" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1603,7 +1675,7 @@ function UTMDashboard() {
         </TabsContent>
 
         {/* Scheduler Tab */}
-        <TabsContent value="scheduler" className="space-y-6">
+        <TabsContent value="scheduler" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1728,7 +1800,7 @@ function UTMDashboard() {
         </TabsContent>
 
         {/* Batch Builder */}
-        <TabsContent value="batch">
+        <TabsContent value="batch" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Batch UTM Generation</CardTitle>
@@ -1831,7 +1903,7 @@ function UTMDashboard() {
         </TabsContent>
 
         {/* QR Codes */}
-        <TabsContent value="qr">
+        <TabsContent value="qr" className="advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader className="pb-2">
@@ -1919,7 +1991,7 @@ function UTMDashboard() {
         </TabsContent>
 
         {/* Enhanced Analytics */}
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="analytics" className="space-y-6 advanced-only">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Campaign Analytics</h2>

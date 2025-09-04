@@ -805,34 +805,7 @@ export default function ReviewComposer() {
         subtitle="AI-powered review management with intelligent responses, performance analytics, and automated optimization."
         actions={
           <div className="flex gap-2">
-            <Button onClick={generateAIResponse} disabled={!selectedReview} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Generate
-            </Button>
-            <Button
-              onClick={calculateAnalytics}
-              disabled={reviews.length === 0}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              onClick={generateBatchResponses}
-              disabled={reviews.length === 0}
-              variant="outline"
-            >
-              <Layers className="h-4 w-4 mr-2" />
-              Batch Generate
-            </Button>
-            <Button
-              onClick={exportEnhancedReport}
-              disabled={!reviewAnalytics}
-              variant="outline"
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            {/* Always-available simple action */}
             <Button variant="outline" onClick={loadSampleData}>
               <Upload className="h-4 w-4 mr-2" />
               Load Sample
@@ -845,11 +818,39 @@ export default function ReviewComposer() {
               onChange={onImportFile}
             />
             <label htmlFor="reviews-upload">
-              <Button variant="outline">
-                <Upload className="h-4 w-4 mr-2" />
-                Import CSV
-              </Button>
+              <Button variant="outline">Import CSV</Button>
             </label>
+            {/* Advanced-only actions */}
+            <span className="advanced-only contents">
+              <Button onClick={generateAIResponse} disabled={!selectedReview} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Generate
+              </Button>
+              <Button
+                onClick={calculateAnalytics}
+                disabled={reviews.length === 0}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                onClick={generateBatchResponses}
+                disabled={reviews.length === 0}
+                variant="outline"
+              >
+                <Layers className="h-4 w-4 mr-2" />
+                Batch Generate
+              </Button>
+              <Button
+                onClick={exportEnhancedReport}
+                disabled={!reviewAnalytics}
+                variant="outline"
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+            </span>
           </div>
         }
       />
@@ -898,12 +899,14 @@ export default function ReviewComposer() {
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="reviews">Review Queue</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
           <TabsTrigger value="composer">Reply Composer</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="compliance">Compliance</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="compliance">Compliance</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To Tab */}

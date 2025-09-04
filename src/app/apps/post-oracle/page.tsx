@@ -761,22 +761,24 @@ export default function PostOracle() {
               <Wand2 className="h-4 w-4 mr-2" />
               Generate Posts
             </Button>
-            <Button onClick={generateAIContent} disabled={isGenerating} variant="outline">
-              {isGenerating ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4 mr-2" />
-              )}
-              AI Generate
-            </Button>
-            <Button
-              variant="outline"
-              onClick={exportPosts}
-              disabled={!posts.length}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </Button>
+            <span className="advanced-only contents">
+              <Button onClick={generateAIContent} disabled={isGenerating} variant="outline">
+                {isGenerating ? (
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                AI Generate
+              </Button>
+              <Button
+                variant="outline"
+                onClick={exportPosts}
+                disabled={!posts.length}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export CSV
+              </Button>
+            </span>
           </div>
         }
       />
@@ -830,13 +832,15 @@ export default function PostOracle() {
       <Tabs defaultValue="howto">
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
-          <TabsTrigger value="ai-generate">AI Generate</TabsTrigger>
           <TabsTrigger value="generator">Generator</TabsTrigger>
-          <TabsTrigger value="quality">Quality</TabsTrigger>
-          <TabsTrigger value="ab-test">A/B Test</TabsTrigger>
-          <TabsTrigger value="library">Library</TabsTrigger>
-          <TabsTrigger value="scheduler">Scheduler</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-generate">AI Generate</TabsTrigger>
+            <TabsTrigger value="quality">Quality</TabsTrigger>
+            <TabsTrigger value="ab-test">A/B Test</TabsTrigger>
+            <TabsTrigger value="library">Library</TabsTrigger>
+            <TabsTrigger value="scheduler">Scheduler</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To Tab */}
@@ -1098,7 +1102,7 @@ export default function PostOracle() {
         </TabsContent>
 
         {/* AI Generate Tab */}
-        <TabsContent value="ai-generate" className="space-y-6">
+        <TabsContent value="ai-generate" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1231,7 +1235,7 @@ export default function PostOracle() {
         </TabsContent>
 
         {/* Quality Analysis Tab */}
-        <TabsContent value="quality" className="space-y-6">
+        <TabsContent value="quality" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1360,7 +1364,7 @@ export default function PostOracle() {
         </TabsContent>
 
         {/* A/B Test Tab */}
-        <TabsContent value="ab-test" className="space-y-6">
+        <TabsContent value="ab-test" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1439,7 +1443,7 @@ export default function PostOracle() {
         </TabsContent>
 
         {/* Content Library Tab */}
-        <TabsContent value="library" className="space-y-6">
+        <TabsContent value="library" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1547,7 +1551,7 @@ export default function PostOracle() {
         </TabsContent>
 
         {/* Scheduler Tab */}
-        <TabsContent value="scheduler" className="space-y-6">
+        <TabsContent value="scheduler" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1670,7 +1674,7 @@ export default function PostOracle() {
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="analytics" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <Card>
               <CardContent className="pt-4">

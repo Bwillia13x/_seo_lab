@@ -717,26 +717,7 @@ async function generateAIPartnershipOptimization(
         subtitle="AI-powered partnership prospecting with intelligent scoring, outreach optimization, and relationship management for Belmont Barbershop partnerships."
         actions={
           <div className="flex gap-2">
-            <Button onClick={generateAIPartnershipOptimization} disabled={!selectedProspectId} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
-            </Button>
-            <Button
-              onClick={calculatePartnershipAnalyticsData}
-              disabled={prospects.length === 0}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              onClick={exportEnhancedPartnershipReport}
-              disabled={!partnershipAnalytics}
-              variant="outline"
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            {/* Simple actions */}
             <Button variant="outline" onClick={loadSampleData}>
               <MapPin className="h-4 w-4 mr-2" />
               Load Sample Prospects
@@ -745,6 +726,29 @@ async function generateAIPartnershipOptimization(
               <CheckCircle className="h-4 w-4 mr-2" />
               Export Status
             </Button>
+            {/* Advanced-only actions */}
+            <span className="advanced-only contents">
+              <Button onClick={generateAIPartnershipOptimization} disabled={!selectedProspectId} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Optimize
+              </Button>
+              <Button
+                onClick={calculatePartnershipAnalyticsData}
+                disabled={prospects.length === 0}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                onClick={exportEnhancedPartnershipReport}
+                disabled={!partnershipAnalytics}
+                variant="outline"
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+            </span>
           </div>
         }
       />
@@ -780,15 +784,17 @@ async function generateAIPartnershipOptimization(
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="prospects">Prospects</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="map">Neighborhood Map</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="bulk">Bulk Add</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="bulk">Bulk Add</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To Tab */}

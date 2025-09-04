@@ -461,10 +461,12 @@ function CitationNAPTracker() {
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="inputs">Your Business Info</TabsTrigger>
           <TabsTrigger value="sites">Your Listings</TabsTrigger>
-          <TabsTrigger value="templates">Ready-Made Content</TabsTrigger>
           <TabsTrigger value="consistency">Check for Mistakes</TabsTrigger>
-          <TabsTrigger value="exports">Save/Load Progress</TabsTrigger>
-          <TabsTrigger value="tests">Tests</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="templates">Ready-Made Content</TabsTrigger>
+            <TabsTrigger value="exports">Save/Load Progress</TabsTrigger>
+            <TabsTrigger value="tests">Tests</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To */}
@@ -1136,7 +1138,7 @@ function CitationNAPTracker() {
         </TabsContent>
 
         {/* Templates */}
-        <TabsContent value="templates">
+        <TabsContent value="templates" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">
@@ -1300,7 +1302,7 @@ function CitationNAPTracker() {
         </TabsContent>
 
         {/* Export/Import */}
-        <TabsContent value="exports">
+        <TabsContent value="exports" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Save Your Progress</CardTitle>
@@ -1330,7 +1332,7 @@ function CitationNAPTracker() {
         </TabsContent>
 
         {/* Tests */}
-        <TabsContent value="tests">
+        <TabsContent value="tests" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">

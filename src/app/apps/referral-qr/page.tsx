@@ -550,34 +550,36 @@ export default function ReferralQR() {
         subtitle="AI-powered referral management with performance analytics, campaign optimization, and automated incentive programs."
         actions={
           <div className="flex gap-2">
-            <Button onClick={getAIOptimization} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
-            </Button>
-            <Button
-              onClick={calculateAnalytics}
-              disabled={!codes.length}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              variant="outline"
-              onClick={downloadAllQRCodes}
-              disabled={!codes.length}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Download All QR
-            </Button>
-            <Button
-              variant="outline"
-              onClick={exportAdvancedReport}
-              disabled={!referralAnalytics}
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            <span className="advanced-only contents">
+              <Button onClick={getAIOptimization} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Optimize
+              </Button>
+              <Button
+                onClick={calculateAnalytics}
+                disabled={!codes.length}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                variant="outline"
+                onClick={downloadAllQRCodes}
+                disabled={!codes.length}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download All QR
+              </Button>
+              <Button
+                variant="outline"
+                onClick={exportAdvancedReport}
+                disabled={!referralAnalytics}
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+            </span>
           </div>
         }
       />
@@ -628,11 +630,13 @@ export default function ReferralQR() {
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="generator">Single Code</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="design">QR Design</TabsTrigger>
-          <TabsTrigger value="batch">Batch Gen</TabsTrigger>
-          <TabsTrigger value="library">Library</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="design">QR Design</TabsTrigger>
+            <TabsTrigger value="batch">Batch Gen</TabsTrigger>
+            <TabsTrigger value="library">Library</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </span>
           <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
         </TabsList>
 
@@ -907,7 +911,7 @@ export default function ReferralQR() {
         </TabsContent>
 
         {/* AI Optimize Tab */}
-        <TabsContent value="ai-optimize" className="space-y-6">
+        <TabsContent value="ai-optimize" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1095,7 +1099,7 @@ export default function ReferralQR() {
         </TabsContent>
 
         {/* QR Design Tab */}
-        <TabsContent value="design" className="space-y-6">
+        <TabsContent value="design" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1294,7 +1298,7 @@ export default function ReferralQR() {
         </TabsContent>
 
         {/* Batch Generation Tab */}
-        <TabsContent value="batch" className="space-y-6">
+        <TabsContent value="batch" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1455,7 +1459,7 @@ export default function ReferralQR() {
         </TabsContent>
 
         {/* Library Tab */}
-        <TabsContent value="library" className="space-y-6">
+        <TabsContent value="library" className="space-y-6 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -1574,7 +1578,7 @@ export default function ReferralQR() {
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="analytics" className="space-y-6 advanced-only">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Referral Analytics</h2>

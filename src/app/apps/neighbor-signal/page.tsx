@@ -53,7 +53,9 @@ export default function NeighborSignal() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="analyzer">Analyzer</TabsTrigger>
-          <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="suggestions">Suggestions</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To Tab */}

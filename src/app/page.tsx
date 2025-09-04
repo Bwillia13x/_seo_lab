@@ -298,9 +298,12 @@ export default function Home() {
           <Button
             size="lg"
             className="belmont-accent text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            asChild
           >
-            <ArrowRight className="h-5 w-5 mr-2" />
-            Get Started
+            <Link href="/apps/onboarding">
+              <ArrowRight className="h-5 w-5 mr-2" />
+              Get Started
+            </Link>
           </Button>
           <Button variant="outline" size="lg" asChild>
             <Link href="#tools">

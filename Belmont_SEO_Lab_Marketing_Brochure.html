@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belmont SEO Lab - Transform Your Barbershop's Online Presence</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a365d;
+            --secondary: #2d3748;
+            --accent: #3182ce;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --danger: #e53e3e;
+            --light: #f7fafc;
+            --dark: #1a202c;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Section */
+        .hero {
+            background: var(--gradient);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="10" cy="50" r="0.5" fill="rgba(255,255,255,0.1)"/><circle cx="90" cy="30" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .stat-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .stat-description {
+            color: var(--secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Section Headers */
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tool Cards */
+        .tools-grid {
+            display: grid;
+            gap: 30px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .tool-header {
+            background: var(--gradient);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+
+        .tool-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .tool-header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .tool-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .tool-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tool-content {
+            padding: 30px;
+        }
+
+        .tool-section {
+            margin-bottom: 25px;
+        }
+
+        .tool-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tool-section-title::before {
+            content: '💡';
+            margin-right: 10px;
+        }
+
+        .business-value-title::before {
+            content: '📈';
+        }
+
+        .features-title::before {
+            content: '⚡';
+        }
+
+        .tool-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .tool-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .tool-features li:last-child {
+            border-bottom: none;
+        }
+
+        .tool-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .tool-features li strong {
+            color: var(--primary);
+            margin-right: 5px;
+        }
+
+        /* Pricing Section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .pricing-header {
+            background: var(--primary);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .pricing-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .pricing-subtitle {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .pricing-content {
+            padding: 30px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 30px;
+        }
+
+        .pricing-features li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .pricing-button {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .pricing-button:hover {
+            background: #2c5282;
+        }
+
+        /* Timeline */
+        .timeline {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            margin-bottom: 50px;
+        }
+
+        .timeline-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 40px;
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .timeline-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .timeline-number {
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 0 auto 15px;
+        }
+
+        .timeline-phase {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .timeline-description {
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: var(--gradient);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            border-radius: var(--border-radius);
+            margin-bottom: 50px;
+        }
+
+        .cta h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .cta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .cta-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .cta-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .cta-text {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: white;
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2c5282;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero fade-in-up">
+            <div class="hero-content">
+                <h1>Belmont SEO Lab</h1>
+                <p>Transform Your Barbershop's Online Presence with AI-Powered Local SEO Tools</p>
+                <div style="font-size: 1.2rem; margin-top: 20px;">
+                    <strong>Get more customers, better reviews, and higher rankings with our comprehensive toolkit</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-grid fade-in-up">
+            <div class="stat-card">
+                <span class="stat-icon">📈</span>
+                <div class="stat-number">40-60%</div>
+                <div class="stat-title">Increase in New Customers</div>
+                <div class="stat-description">Proven track record with local service businesses</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">⭐</span>
+                <div class="stat-number">4.9/5</div>
+                <div class="stat-title">Average Review Rating</div>
+                <div class="stat-description">AI-powered review management system</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">💰</span>
+                <div class="stat-number">$2,500-$8,000</div>
+                <div class="stat-title">Monthly Revenue Growth</div>
+                <div class="stat-description">Typical results for our clients</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">⏰</span>
+                <div class="stat-number">10 Hours</div>
+                <div class="stat-title">Saved Weekly</div>
+                <div class="stat-description">Automate repetitive marketing tasks</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">📍</span>
+                <div class="stat-number">100%</div>
+                <div class="stat-title">Local Search Dominance</div>
+                <div class="stat-description">Appear at the top of Google Maps and local searches</div>
+            </div>
+        </section>
+
+        <!-- Why Choose Section -->
+        <section class="section fade-in-up">
+            <div class="section-header">
+                <h2 class="section-title">Perfect for Your Barbershop</h2>
+                <p class="section-subtitle">Designed specifically for local service businesses like yours</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title">🎨 Brand-Consistent Content</div>
+                            <p>All tools use your barbershop's voice and branding, ensuring every piece of content feels authentically yours.</p>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title">📞 Local Calgary Focus</div>
+                            <p>Specialized for Bridgeland/Riverside area with local keywords, competitors, and community insights.</p>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title">💰 Revenue-Driven</div>
+                            <p>Every feature connects to booking appointments and increasing your bottom line.</p>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title">🛠️ Easy to Use</div>
+                            <p>No technical expertise required - designed for busy barbershop owners.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Marketing Tools Section -->
+        <section class="section fade-in-up">
+            <div class="section-header">
+                <h2 class="section-title">Marketing & Attribution Tools</h2>
+                <p class="section-subtitle">Track every marketing dollar and know exactly what's driving bookings</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">📊</span>
+                            <h3 class="tool-title">UTM Campaign Tracker</h3>
+                            <p class="tool-subtitle">Know exactly which marketing efforts bring in customers</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>Measure Marketing ROI</strong> - Know which campaigns actually work</li>
+                                <li><strong>Optimize Ad Spend</strong> - Invest more in channels that convert to bookings</li>
+                                <li><strong>Track Customer Journey</strong> - See how customers find and book with you</li>
+                                <li><strong>Data-Driven Marketing</strong> - Make decisions based on real results</li>
+                                <li><strong>Multi-Channel Attribution</strong> - Understand the full customer path</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">Belmont-Specific Features</div>
+                            <ul class="tool-features">
+                                <li>Pre-configured booking URL: https://thebelmontbarber.ca/book</li>
+                                <li>Groomsmen party tracking for wedding packages</li>
+                                <li>Veterans/First Responders discount monitoring</li>
+                                <li>Seniors & kids family-focused campaigns</li>
+                                <li>QR code generation for easy customer access</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">📱</span>
+                            <h3 class="tool-title">QR Code Generator</h3>
+                            <p class="tool-subtitle">Make booking effortless for customers</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>Instant Bookings</strong> - Customers can book without typing URLs</li>
+                                <li><strong>Mobile-First Experience</strong> - Perfect for smartphone users</li>
+                                <li><strong>Print Marketing Power</strong> - QR codes on business cards, menus, etc.</li>
+                                <li><strong>Track Scan Performance</strong> - Know which QR codes are most effective</li>
+                                <li><strong>Increased Conversion Rate</strong> - Reduce friction in booking process</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">Technical Features</div>
+                            <ul class="tool-features">
+                                <li>ASCII QR display for console debugging</li>
+                                <li>Custom UTM tracking parameters</li>
+                                <li>Professional QR code downloads</li>
+                                <li>Batch QR code generation</li>
+                                <li>Integration with all Belmont services</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">🤝</span>
+                            <h3 class="tool-title">Referral Program Builder</h3>
+                            <p class="tool-subtitle">Turn satisfied customers into your best marketers</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>New Customer Acquisition</strong> - Leverage satisfied customers to bring in new business</li>
+                                <li><strong>Cost-Effective Marketing</strong> - Referrals cost less than paid advertising</li>
+                                <li><strong>Social Proof</strong> - Customer endorsements are more trustworthy</li>
+                                <li><strong>Customer Loyalty</strong> - Referral program keeps customers engaged</li>
+                                <li><strong>Viral Growth</strong> - Each referral can bring multiple new customers</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">Belmont-Specific Features</div>
+                            <ul class="tool-features">
+                                <li>Staff referral incentives</li>
+                                <li>Partner business rewards</li>
+                                <li>Event promotion tracking</li>
+                                <li>Performance leaderboards</li>
+                                <li>Automated reward tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Content Marketing Suite -->
+        <section class="section fade-in-up">
+            <div class="section-header">
+                <h2 class="section-title">Content Marketing Suite</h2>
+                <p class="section-subtitle">Professional content creation tools for consistent brand presence</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">📱</span>
+                            <h3 class="tool-title">Google Business Profile Content Creator</h3>
+                            <p class="tool-subtitle">Fresh content that appears directly in local search results</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>Higher Local Rankings</strong> - Google favors active business profiles</li>
+                                <li><strong>Local Visibility</strong> - Appear in "near me" searches</li>
+                                <li><strong>Regular Updates</strong> - Show customers you're active and current</li>
+                                <li><strong>Targeted Local Traffic</strong> - Reach customers in your service area</li>
+                                <li><strong>Free Marketing</strong> - No cost for increased visibility</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">Content Types</div>
+                            <ul class="tool-features">
+                                <li>Groomsmen party promotions</li>
+                                <li>Veterans Day specials</li>
+                                <li>Local event participation</li>
+                                <li>Seasonal service campaigns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">🎨</span>
+                            <h3 class="tool-title">Social Media Content Studio</h3>
+                            <p class="tool-subtitle">Professional social media content that builds your brand</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>Brand Awareness</strong> - Keep your shop top-of-mind</li>
+                                <li><strong>Professional Image</strong> - Show high-quality work and service</li>
+                                <li><strong>Customer Engagement</strong> - Build relationships with local community</li>
+                                <li><strong>Traffic to Website</strong> - Drive more visits to your booking page</li>
+                                <li><strong>Social Proof</strong> - Showcase customer transformations and testimonials</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">Belmont Features</div>
+                            <ul class="tool-features">
+                                <li>Instagram caption generation</li>
+                                <li>Image composition tools</li>
+                                <li>Belmont branding application</li>
+                                <li>Cross-platform optimization</li>
+                                <li>Automated hashtag suggestions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Review Management Section -->
+        <section class="section fade-in-up">
+            <div class="section-header">
+                <h2 class="section-title">Review Reputation Management</h2>
+                <p class="section-subtitle">Maintain a 4.9-star rating and turn reviews into marketing assets</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">📝</span>
+                            <h3 class="tool-title">Review Request System</h3>
+                            <p class="tool-subtitle">Professional, compliant review requests that boost your ratings</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>Maintain High Ratings</strong> - Reviews directly impact search rankings</li>
+                                <li><strong>Social Proof</strong> - New customers trust highly-rated businesses</li>
+                                <li><strong>More Visibility</strong> - Google favors businesses with good reviews</li>
+                                <li><strong>Increased Conversions</strong> - Customers prefer highly-rated services</li>
+                                <li><strong>Competitive Advantage</strong> - Stand out from lower-rated competitors</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">Compliance Features</div>
+                            <ul class="tool-features">
+                                <li>CASL-compliant email templates</li>
+                                <li>SMS review request automation</li>
+                                <li>QR code review cards for in-shop use</li>
+                                <li>Consent logging and tracking</li>
+                                <li>Professional Belmont branding</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">💬</span>
+                            <h3 class="tool-title">Review Response Studio</h3>
+                            <p class="tool-subtitle">Turn every review into a customer relationship opportunity</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>Customer Relationship Building</strong> - Turn one-time customers into regulars</li>
+                                <li><strong>Reputation Protection</strong> - Address concerns before they damage your rating</li>
+                                <li><strong>Trust Signals for SEO</strong> - Google rewards businesses with good reviews</li>
+                                <li><strong>Increased Repeat Business</strong> - Satisfied customers return and refer others</li>
+                                <li><strong>Brand Authority</strong> - Position Belmont as the premier barbershop in Bridgeland</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">AI-Powered Features</div>
+                            <ul class="tool-features">
+                                <li>AI-powered response generation</li>
+                                <li>Sentiment analysis for each review</li>
+                                <li>Pre-configured professional templates</li>
+                                <li>Local Calgary context awareness</li>
+                                <li>Compliance-focused language</li>
+                                <li>Response tracking and analytics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Performance Section -->
+        <section class="section fade-in-up">
+            <div class="section-header">
+                <h2 class="section-title">Search Performance & Rankings</h2>
+                <p class="section-subtitle">Dominate local search results with data-driven optimization</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">📊</span>
+                            <h3 class="tool-title">Search Performance Analyzer</h3>
+                            <p class="tool-subtitle">Understand exactly what customers are searching for</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>Identify High-Intent Keywords</strong> - Find customers actively looking for your services</li>
+                                <li><strong>Optimize for Revenue-Generating Terms</strong> - Focus on keywords that lead to appointments</li>
+                                <li><strong>Track Seasonal Trends</strong> - Know when demand peaks for groomsmen packages</li>
+                                <li><strong>Improve Ad Spend ROI</strong> - Target the keywords that actually convert</li>
+                                <li><strong>Competitive Intelligence</strong> - See how you stack up against other barbershops</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">Belmont Keywords Analyzed</div>
+                            <ul class="tool-features">
+                                <li>"barber shop bridgeland"</li>
+                                <li>"mens haircut calgary"</li>
+                                <li>"beard trim calgary"</li>
+                                <li>"bridgeland barber"</li>
+                                <li>"groomsmen packages calgary"</li>
+                                <li>Local service variations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="tool-header">
+                        <div class="tool-header-content">
+                            <span class="tool-icon">📍</span>
+                            <h3 class="tool-title">Local Ranking Grid</h3>
+                            <p class="tool-subtitle">Track your position against competitors across all keywords</p>
+                        </div>
+                    </div>
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <div class="tool-section-title business-value-title">Business Value</div>
+                            <ul class="tool-features">
+                                <li><strong>Competitive Intelligence</strong> - See how you rank vs. competitors</li>
+                                <li><strong>Track Ranking Changes</strong> - Monitor if your SEO efforts are working</li>
+                                <li><strong>Identify Opportunities</strong> - Find keywords where you can quickly rank #1</li>
+                                <li><strong>Data-Driven Decisions</strong> - Make SEO investments based on real data</li>
+                                <li><strong>Revenue Correlation</strong> - Connect ranking improvements to booking increases</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <div class="tool-section-title features-title">Belmont Focus Areas</div>
+                            <ul class="tool-features">
+                                <li>Bridgeland neighborhood</li>
+                                <li>Riverside community</li>
+                                <li>Downtown Calgary</li>
+                                <li>Local competitor tracking</li>
+                                <li>Geographic performance analysis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section class="section fade-in-up">
+            <div class="section-header">
+                <h2 class="section-title">Pricing & ROI</h2>
+                <p class="section-subtitle">Invest in your business growth with our proven results</p>
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Monthly Plan</h3>
+                        <div class="pricing-price">$497<span class="pricing-subtitle">/month</span></div>
+                        <div class="pricing-subtitle">Billed annually</div>
+                    </div>
+                    <div class="pricing-content">
+                        <ul class="pricing-features">
+                            <li>All 22 SEO tools included</li>
+                            <li>Belmont-specific configuration</li>
+                            <li>Priority support</li>
+                            <li>Monthly performance reports</li>
+                            <li>Training and onboarding</li>
+                        </ul>
+                        <button class="pricing-button">Get Started Today</button>
+                    </div>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Annual Plan</h3>
+                        <div class="pricing-price">$4,997<span class="pricing-subtitle">/year</span></div>
+                        <div class="pricing-subtitle">Save 17%</div>
+                    </div>
+                    <div class="pricing-content">
+                        <ul class="pricing-features">
+                            <li>All 22 SEO tools included</li>
+                            <li>Belmont-specific configuration</li>
+                            <li>Priority support</li>
+                            <li>Quarterly strategy sessions</li>
+                            <li>Custom reporting dashboard</li>
+                        </ul>
+                        <button class="pricing-button">Best Value</button>
+                    </div>
+                </div>
+
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Enterprise</h3>
+                        <div class="pricing-price">Custom<span class="pricing-subtitle">Pricing</span></div>
+                        <div class="pricing-subtitle">Multiple locations</div>
+                    </div>
+                    <div class="pricing-content">
+                        <ul class="pricing-features">
+                            <li>All 22 SEO tools included</li>
+                            <li>Multi-location support</li>
+                            <li>Dedicated account manager</li>
+                            <li>Custom integrations</li>
+                            <li>White-label options</li>
+                        </ul>
+                        <button class="pricing-button">Contact Sales</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline">
+                <h3 class="timeline-title">Your ROI Timeline</h3>
+                <div class="timeline-grid">
+                    <div class="timeline-item">
+                        <div class="timeline-number">1</div>
+                        <div class="timeline-phase">Month 1</div>
+                        <div class="timeline-description">Setup and initial optimizations</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">2</div>
+                        <div class="timeline-phase">Month 2</div>
+                        <div class="timeline-description">First ranking improvements and increased traffic</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">3</div>
+                        <div class="timeline-phase">Month 3</div>
+                        <div class="timeline-description">Measurable increase in bookings and revenue</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">6</div>
+                        <div class="timeline-phase">Month 6</div>
+                        <div class="timeline-description">40-60% increase in new customers</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-number">12</div>
+                        <div class="timeline-phase">Year 1</div>
+                        <div class="timeline-description">100-150% return on investment</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Getting Started Section -->
+        <section class="section fade-in-up">
+            <div class="section-header">
+                <h2 class="section-title">Getting Started - Quick Wins</h2>
+                <p class="section-subtitle">Start seeing results in your first week</p>
+            </div>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <div class="tool-content">
+                        <div class="tool-section">
+                            <h4 style="font-size: 1.3rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;">Week 1: Foundation</h4>
+                            <ul class="tool-features">
+                                <li><strong>Set up Google Business Profile</strong> - Claim and optimize your listing</li>
+                                <li><strong>Run SEO Brief</strong> - Get your website optimization roadmap</li>
+                                <li><strong>Import Reviews</strong> - Start managing your online reputation</li>
+                                <li><strong>Create UTM Links</strong> - Begin tracking your marketing efforts</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <h4 style="font-size: 1.3rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;">Week 2: Content & Marketing</h4>
+                            <ul class="tool-features">
+                                <li><strong>Generate Social Content</strong> - Create professional social media posts</li>
+                                <li><strong>Set up Google Posts</strong> - Start posting to Business Profile</li>
+                                <li><strong>Create QR Codes</strong> - Make booking easier for customers</li>
+                                <li><strong>Track Rankings</strong> - Establish baseline for keyword performance</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <h4 style="font-size: 1.3rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;">Week 3: Optimization</h4>
+                            <ul class="tool-features">
+                                <li><strong>Optimize Meta Tags</strong> - Improve search result click-through rates</li>
+                                <li><strong>Build Citations</strong> - Complete your online business listings</li>
+                                <li><strong>Set up Review Responses</strong> - Automate reputation management</li>
+                                <li><strong>Analyze Customer Data</strong> - Understand your most valuable customers</li>
+                            </ul>
+                        </div>
+                        <div class="tool-section">
+                            <h4 style="font-size: 1.3rem; font-weight: 600; color: var(--primary); margin-bottom: 20px;">Month 2+: Advanced Growth</h4>
+                            <ul class="tool-features">
+                                <li><strong>Content Marketing</strong> - Establish authority with regular content</li>
+                                <li><strong>Partnership Building</strong> - Expand reach through strategic alliances</li>
+                                <li><strong>Advanced Analytics</strong> - Deep dive into performance metrics</li>
+                                <li><strong>ROI Optimization</strong> - Maximize return on marketing investments</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta fade-in-up">
+            <h2>Ready to Transform Your Barbershop?</h2>
+            <p>Contact us today for a free consultation and see how Belmont SEO Lab can transform your business</p>
+
+            <div class="cta-grid">
+                <div class="cta-item">
+                    <span class="cta-icon">📧</span>
+                    <div class="cta-title">Email</div>
+                    <div class="cta-text">info@thebelmontbarber.ca</div>
+                </div>
+                <div class="cta-item">
+                    <span class="cta-icon">📞</span>
+                    <div class="cta-title">Phone</div>
+                    <div class="cta-text">403-457-0420</div>
+                </div>
+                <div class="cta-item">
+                    <span class="cta-icon">🗺️</span>
+                    <div class="cta-title">Location</div>
+                    <div class="cta-text">915 General Ave NE, Calgary, AB</div>
+                </div>
+            </div>
+
+            <a href="mailto:info@thebelmontbarber.ca" class="cta-button">Get Your Free Consultation</a>
+
+            <div style="margin-top: 30px; font-size: 1.1rem; opacity: 0.9;">
+                <strong>Join successful barbershops who've increased their revenue by 40-60% using our proven system.</strong>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div style="margin-bottom: 20px;">
+                <strong>90-Day Money-Back Guarantee</strong> - If you don't see measurable improvements, get your money back
+            </div>
+            <div style="margin-bottom: 20px;">
+                <strong>Success Metrics:</strong> Based on actual business results, not just vanity metrics
+            </div>
+            <div>
+                *Results may vary based on current business conditions, competition, and implementation effort. Individual results are not guaranteed.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Add smooth scrolling and animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation to sections as they come into view
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.opacity = '0';
+                section.style.transform = 'translateY(30px)';
+                section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(section);
+            });
+
+            // Add hover effects to pricing cards
+            document.querySelectorAll('.pricing-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

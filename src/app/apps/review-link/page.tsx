@@ -872,7 +872,7 @@ export default function ReviewKit() {
         title="Review Request Links"
         subtitle="Create Google/Apple review links, copy CASL-compliant email/SMS, and print QR cards. (Optional: connect AI for optimization)"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-2 advanced-only">
             <Button onClick={getAIOptimization} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize (optional)
@@ -900,6 +900,26 @@ export default function ReviewKit() {
           </div>
         }
       />
+
+      {/* Helper: What this tool does (plain English) */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Info className="h-4 w-4" />
+            What this tool does
+          </CardTitle>
+          <CardDescription>
+            Make it easy for customers to leave a review and help Belmont keep a 5‑star reputation.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          - Creates one‑click links to your Google and Apple review pages
+          <br />
+          - Generates ready‑to‑send Email and SMS messages (CASL‑friendly)
+          <br />
+          - Prints QR codes you can place at the counter
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="pb-2">
@@ -962,12 +982,14 @@ export default function ReviewKit() {
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="compose">Compose</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="qrs">QR & Cards</TabsTrigger>
-          <TabsTrigger value="compliance">Compliance</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="qrs">QR & Cards</TabsTrigger>
+            <TabsTrigger value="compliance">Compliance</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* Compose */}
@@ -1105,7 +1127,7 @@ export default function ReviewKit() {
         </TabsContent>
 
         {/* AI Optimize Tab */}
-        <TabsContent value="ai-optimize" className="space-y-6">
+        <TabsContent value="ai-optimize" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1312,7 +1334,7 @@ export default function ReviewKit() {
         </TabsContent>
 
         {/* Templates Tab */}
-        <TabsContent value="templates" className="space-y-6">
+        <TabsContent value="templates" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1473,7 +1495,7 @@ export default function ReviewKit() {
         </TabsContent>
 
         {/* Campaigns Tab */}
-        <TabsContent value="campaigns" className="space-y-6">
+        <TabsContent value="campaigns" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1630,7 +1652,7 @@ export default function ReviewKit() {
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="analytics" className="space-y-6 advanced-only">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">Review Analytics</h2>
@@ -1861,7 +1883,7 @@ export default function ReviewKit() {
         </TabsContent>
 
         {/* Compliance */}
-        <TabsContent value="compliance">
+        <TabsContent value="compliance" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -1912,7 +1934,7 @@ export default function ReviewKit() {
         </TabsContent>
 
         {/* QR & Cards */}
-        <TabsContent value="qrs">
+        <TabsContent value="qrs" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">

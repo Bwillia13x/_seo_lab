@@ -193,10 +193,12 @@ export default function MetaPlanner() {
               <Upload className="h-4 w-4 mr-2" />
               Load Sample Experiments
             </Button>
-            <Button variant="outline" onClick={exportBacklog}>
-              <Download className="h-4 w-4 mr-2" />
-              Export Backlog
-            </Button>
+            <span className="advanced-only contents">
+              <Button variant="outline" onClick={exportBacklog}>
+                <Download className="h-4 w-4 mr-2" />
+                Export Backlog
+              </Button>
+            </span>
           </div>
         }
       />

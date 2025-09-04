@@ -930,14 +930,16 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                 Import Your GSC CSV
               </Button>
             </label>
-            <Button
-              variant="outline"
-              onClick={exportRecsCSV}
-              disabled={recs.length === 0}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export Recommendations
-            </Button>
+            <span className="advanced-only contents">
+              <Button
+                variant="outline"
+                onClick={exportRecsCSV}
+                disabled={recs.length === 0}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export Recommendations
+              </Button>
+            </span>
           </div>
         }
       />
@@ -1007,14 +1009,16 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-10 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
-          <TabsTrigger value="experiments">Experiments</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="competitors">Competitors</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
-          <TabsTrigger value="charts">Charts</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
+            <TabsTrigger value="experiments">Experiments</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="competitors">Competitors</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="charts">Charts</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To */}
@@ -1223,7 +1227,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Settings */}
-        <TabsContent value="settings">
+        <TabsContent value="settings" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -1352,7 +1356,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Opportunities */}
-        <TabsContent value="opportunities">
+        <TabsContent value="opportunities" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">
@@ -1418,7 +1422,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Page Experiments */}
-        <TabsContent value="experiments">
+        <TabsContent value="experiments" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">
@@ -1507,7 +1511,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Charts */}
-        <TabsContent value="charts">
+        <TabsContent value="charts" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">CTR vs Position</CardTitle>

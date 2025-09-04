@@ -960,6 +960,24 @@ export default function Page() {
     "Facebook",
     "GBP",
   ]);
+
+  function loadBelmontSample() {
+    try {
+      setBiz(DEFAULT_BIZ);
+      // Ensure standard platforms
+      setSelectedPlatforms(["Instagram", "Facebook", "GBP"]);
+      // Generate a small set of posts immediately
+      const newPosts: Post[] = [];
+      const order = ["offer", "style", "neigh", "hours"];
+      ["Instagram", "GBP"].forEach((platform) => {
+        order.forEach((theme) => newPosts.push(makePost(theme, platform as Post["channel"], DEFAULT_BIZ)));
+      });
+      setPosts((prev) => [...prev, ...newPosts]);
+      setActiveTab("posts");
+    } catch (e) {
+      console.error(e);
+    }
+  }
   const [abTestVersionA, setAbTestVersionA] = useState<string>("");
   const [abTestVersionB, setAbTestVersionB] = useState<string>("");
   const [customInstructions, setCustomInstructions] = useState<string>("");
@@ -1211,6 +1229,10 @@ export default function Page() {
         subtitle="Generate AI-powered multi-platform content with analytics, scheduling, and performance tracking."
         actions={
           <div className="flex gap-2">
+            <Button variant="secondary" onClick={loadBelmontSample}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Load Belmont Sample
+            </Button>
             <Button
               variant="outline"
               onClick={() => {
@@ -1227,10 +1249,12 @@ export default function Page() {
               <Share2 className="h-4 w-4 mr-2" />
               Generate Multi-Platform
             </Button>
-            <Button onClick={generateCalendar} variant="outline">
-              <Calendar className="h-4 w-4 mr-2" />
-              Content Calendar
-            </Button>
+            <span className="advanced-only contents">
+              <Button onClick={generateCalendar} variant="outline">
+                <Calendar className="h-4 w-4 mr-2" />
+                Content Calendar
+              </Button>
+            </span>
             <a
               href={BELMONT_CONSTANTS.BOOK_URL}
               target="_blank"
@@ -1273,7 +1297,7 @@ export default function Page() {
           <TabsTrigger value="howto" className="text-xs">
             How To
           </TabsTrigger>
-          <TabsTrigger value="ai-generate" className="text-xs">
+          <TabsTrigger value="ai-generate" className="text-xs advanced-only">
             AI Generate
           </TabsTrigger>
           <TabsTrigger value="context" className="text-xs">
@@ -1282,19 +1306,19 @@ export default function Page() {
           <TabsTrigger value="posts" className="text-xs">
             Posts
           </TabsTrigger>
-          <TabsTrigger value="quality" className="text-xs">
+          <TabsTrigger value="quality" className="text-xs advanced-only">
             Quality
           </TabsTrigger>
-          <TabsTrigger value="ab-test" className="text-xs">
+          <TabsTrigger value="ab-test" className="text-xs advanced-only">
             A/B Test
           </TabsTrigger>
-          <TabsTrigger value="library" className="text-xs">
+          <TabsTrigger value="library" className="text-xs advanced-only">
             Library
           </TabsTrigger>
-          <TabsTrigger value="scheduler" className="text-xs">
+          <TabsTrigger value="scheduler" className="text-xs advanced-only">
             Scheduler
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs">
+          <TabsTrigger value="analytics" className="text-xs advanced-only">
             Analytics
           </TabsTrigger>
           <TabsTrigger value="hashtags" className="text-xs">
@@ -1303,7 +1327,7 @@ export default function Page() {
           <TabsTrigger value="designer" className="text-xs">
             Designer
           </TabsTrigger>
-          <TabsTrigger value="exports" className="text-xs">
+          <TabsTrigger value="exports" className="text-xs advanced-only">
             Exports
           </TabsTrigger>
         </TabsList>
@@ -1986,7 +2010,7 @@ export default function Page() {
         </TabsContent>
 
         {/* Quality Analysis Tab */}
-        <TabsContent value="quality">
+        <TabsContent value="quality" className="advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -2101,7 +2125,7 @@ export default function Page() {
         </TabsContent>
 
         {/* A/B Testing Tab */}
-        <TabsContent value="ab-test">
+        <TabsContent value="ab-test" className="advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -2175,7 +2199,7 @@ export default function Page() {
         </TabsContent>
 
         {/* Content Library Tab */}
-        <TabsContent value="library">
+        <TabsContent value="library" className="advanced-only">
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -2295,7 +2319,7 @@ export default function Page() {
         </TabsContent>
 
         {/* Scheduler Tab */}
-        <TabsContent value="scheduler">
+        <TabsContent value="scheduler" className="advanced-only">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -2492,7 +2516,7 @@ export default function Page() {
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics">
+        <TabsContent value="analytics" className="advanced-only">
           <div className="space-y-6">
             <Card>
               <CardHeader>
@@ -2868,7 +2892,7 @@ export default function Page() {
         </TabsContent>
 
         {/* Exports */}
-        <TabsContent value="exports">
+        <TabsContent value="exports" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Exports</CardTitle>

@@ -92,6 +92,16 @@ export default function Onboarding() {
         }
       />
 
+      {/* Helper: What this page does */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">What this does</CardTitle>
+          <CardDescription>
+            Sets your review link and contact details so every tool uses the right info. Takes about 2 minutes.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>1) Google Review Link</CardTitle>

@@ -480,26 +480,7 @@ async function generateAIMonitorOptimization(
         subtitle="AI-powered local search ranking analysis with optimization recommendations, geographic intelligence, and automated monitoring across Calgary locations."
         actions={
           <div className="flex gap-2">
-            <Button onClick={handleGenerateAIMonitorOptimization} disabled={!selectedKeyword || !selectedLocation} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
-            </Button>
-            <Button
-              onClick={calculateMonitorAnalyticsData}
-              disabled={rankData.length === 0}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              onClick={exportEnhancedMonitorReport}
-              disabled={!monitorAnalytics}
-              variant="outline"
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            {/* Simple actions */}
             <Button variant="outline" onClick={loadSampleData}>
               <Upload className="h-4 w-4 mr-2" />
               Load Sample Grid
@@ -508,6 +489,29 @@ async function generateAIMonitorOptimization(
               <Download className="h-4 w-4 mr-2" />
               Export Grid
             </Button>
+            {/* Advanced-only actions */}
+            <span className="advanced-only contents">
+              <Button onClick={handleGenerateAIMonitorOptimization} disabled={!selectedKeyword || !selectedLocation} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Optimize
+              </Button>
+              <Button
+                onClick={calculateMonitorAnalyticsData}
+                disabled={rankData.length === 0}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                onClick={exportEnhancedMonitorReport}
+                disabled={!monitorAnalytics}
+                variant="outline"
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+            </span>
           </div>
         }
       />
@@ -521,16 +525,18 @@ async function generateAIMonitorOptimization(
         <TabsList className="grid w-full grid-cols-4 lg:grid-cols-12 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="locations">Locations</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="locations">Locations</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To Tab */}

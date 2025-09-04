@@ -633,26 +633,7 @@ async function generateAIBusyTimeOptimization(
         showLogo={true}
         actions={
           <div className="flex gap-2">
-            <Button onClick={handleGenerateAIBusyTimeOptimization} disabled={!selectedTimeSlot || !selectedDayOfWeek} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
-            </Button>
-            <Button
-              onClick={calculateBusyTimeAnalyticsData}
-              disabled={visits.length === 0}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              onClick={exportEnhancedBusyTimeReport}
-              disabled={!busyTimeAnalytics}
-              variant="outline"
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            {/* Simple actions */}
             <Button variant="outline" onClick={loadSampleData}>
               <Upload className="h-4 w-4 mr-2" />
               Load Sample Data
@@ -670,14 +651,37 @@ async function generateAIBusyTimeOptimization(
                 Import Visits CSV
               </Button>
             </label>
-            <Button
-              variant="outline"
-              onClick={exportBestTimes}
-              disabled={!bestTimes.length}
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export Best Times
-            </Button>
+            {/* Advanced-only actions */}
+            <span className="advanced-only contents">
+              <Button onClick={handleGenerateAIBusyTimeOptimization} disabled={!selectedTimeSlot || !selectedDayOfWeek} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Optimize
+              </Button>
+              <Button
+                onClick={calculateBusyTimeAnalyticsData}
+                disabled={visits.length === 0}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                onClick={exportEnhancedBusyTimeReport}
+                disabled={!busyTimeAnalytics}
+                variant="outline"
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+              <Button
+                variant="outline"
+                onClick={exportBestTimes}
+                disabled={!bestTimes.length}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Export Best Times
+              </Button>
+            </span>
           </div>
         }
       />
@@ -686,16 +690,18 @@ async function generateAIBusyTimeOptimization(
         <TabsList className="grid w-full grid-cols-4 lg:grid-cols-12 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="forecast">Forecast</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="timeslots">Time Slots</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="timeslots">Time Slots</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To Tab */}
@@ -996,7 +1002,7 @@ async function generateAIBusyTimeOptimization(
           </Card>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-4">
+        <TabsContent value="settings" className="space-y-4 advanced-only">
           <Card>
             <CardHeader>
               <CardTitle>Holt-Winters Parameters</CardTitle>

@@ -919,27 +919,8 @@ export default function RFMMicroCRM() {
         title="AI Customer Intelligence Studio"
         subtitle="AI-powered customer segmentation, predictive analytics, and personalized marketing campaigns."
         actions={
-          <>
-            <Button onClick={generateAIInsights} disabled={!selectedCustomer} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Insights
-            </Button>
-            <Button
-              onClick={calculateCustomerAnalyticsData}
-              disabled={scored.length === 0}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              onClick={exportEnhancedCustomerReport}
-              disabled={!customerAnalytics}
-              variant="outline"
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+          <div className="flex gap-2">
+            {/* Simple actions */}
             <Button variant="secondary" onClick={loadDemo}>
               <Sparkles className="h-4 w-4 mr-2" />
               Load Demo
@@ -959,7 +940,30 @@ export default function RFMMicroCRM() {
                 </span>
               </Button>
             </label>
-          </>
+            {/* Advanced-only actions */}
+            <span className="advanced-only contents">
+              <Button onClick={generateAIInsights} disabled={!selectedCustomer} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Insights
+              </Button>
+              <Button
+                onClick={calculateCustomerAnalyticsData}
+                disabled={scored.length === 0}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                onClick={exportEnhancedCustomerReport}
+                disabled={!customerAnalytics}
+                variant="outline"
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+            </span>
+          </div>
         }
       />
 
@@ -1366,12 +1370,14 @@ export default function RFMMicroCRM() {
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="segmentation">Segmentation</TabsTrigger>
-          <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="messages">Messages</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="messages">Messages</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To Tab */}
@@ -1668,7 +1674,7 @@ export default function RFMMicroCRM() {
         </TabsContent>
 
         {/* AI Insights Tab */}
-        <TabsContent value="ai-insights" className="space-y-6">
+        <TabsContent value="ai-insights" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -1833,7 +1839,7 @@ export default function RFMMicroCRM() {
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="analytics" className="space-y-6 advanced-only">
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold">
@@ -2111,7 +2117,7 @@ export default function RFMMicroCRM() {
         </TabsContent>
 
         {/* Campaigns Tab */}
-        <TabsContent value="campaigns" className="space-y-6">
+        <TabsContent value="campaigns" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -2276,7 +2282,7 @@ export default function RFMMicroCRM() {
         </TabsContent>
 
         {/* Templates Tab */}
-        <TabsContent value="templates" className="space-y-6">
+        <TabsContent value="templates" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -2448,7 +2454,7 @@ export default function RFMMicroCRM() {
         </TabsContent>
 
         {/* Messages Tab */}
-        <TabsContent value="messages" className="space-y-6">
+        <TabsContent value="messages" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -2565,7 +2571,7 @@ export default function RFMMicroCRM() {
         </TabsContent>
 
         {/* Settings Tab */}
-        <TabsContent value="settings" className="space-y-6">
+        <TabsContent value="settings" className="space-y-6 advanced-only">
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>

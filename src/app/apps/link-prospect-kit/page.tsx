@@ -958,26 +958,7 @@ function LinkProspectKit() {
         subtitle="AI-powered partner prospecting with intelligent scoring, outreach optimization, and relationship management for Belmont Barbershop partnerships."
         actions={
           <div className="flex gap-2">
-            <Button onClick={generateAIPartnerOptimization} disabled={!selectedProspect} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
-            </Button>
-            <Button
-              onClick={calculatePartnerAnalyticsData}
-              disabled={rows.length === 0}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              onClick={exportEnhancedPartnerReport}
-              disabled={!partnerAnalytics}
-              variant="outline"
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            {/* Simple actions */}
             <Button
               variant="outline"
               onClick={() => setRows(DEMO.map(recompute))}
@@ -1030,6 +1011,29 @@ function LinkProspectKit() {
               <Filter className="h-4 w-4 mr-2" />
               Reset
             </Button>
+            {/* Advanced-only actions */}
+            <span className="advanced-only contents">
+              <Button onClick={generateAIPartnerOptimization} disabled={!selectedProspect} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Optimize
+              </Button>
+              <Button
+                onClick={calculatePartnerAnalyticsData}
+                disabled={rows.length === 0}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                onClick={exportEnhancedPartnerReport}
+                disabled={!partnerAnalytics}
+                variant="outline"
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+            </span>
           </div>
         }
       />
@@ -1058,15 +1062,17 @@ function LinkProspectKit() {
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="prospects">Prospects</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="outreach">Outreach</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="bulk">Bulk Add</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="outreach">Outreach</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="bulk">Bulk Add</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To - First Tab */}
@@ -1540,7 +1546,7 @@ function LinkProspectKit() {
         </TabsContent>
 
         {/* Outreach */}
-        <TabsContent value="outreach">
+        <TabsContent value="outreach" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">
@@ -1597,7 +1603,7 @@ function LinkProspectKit() {
         </TabsContent>
 
         {/* Bulk Add */}
-        <TabsContent value="bulk">
+        <TabsContent value="bulk" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Bulk Import Prospects</CardTitle>

@@ -2164,26 +2164,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         showLogo={true}
         actions={
           <div className="flex gap-2">
-            <Button onClick={generateAIOptimization} disabled={!selectedKeyword} variant="outline">
-              <Brain className="h-4 w-4 mr-2" />
-              AI Optimize
-            </Button>
-            <Button
-              onClick={calculateRankingAnalyticsData}
-              disabled={snapshots.length === 0}
-              variant="outline"
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Analytics
-            </Button>
-            <Button
-              onClick={exportEnhancedRankingReport}
-              disabled={!rankingAnalytics}
-              variant="outline"
-            >
-              <FileImage className="h-4 w-4 mr-2" />
-              Export Report
-            </Button>
+            {/* Simple actions */}
             <Button variant="outline" onClick={loadDemo}>
               <Sparkles className="h-4 w-4 mr-2" />
               Load Demo
@@ -2192,12 +2173,35 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
               <RefreshCw className="h-4 w-4 mr-2" />
               Clear Grid
             </Button>
-            {alerts.length > 0 && (
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Bell className="h-3 w-3" />
-                {alerts.length} Alert{alerts.length !== 1 ? "s" : ""}
-              </Badge>
-            )}
+            {/* Advanced-only actions */}
+            <span className="advanced-only contents">
+              <Button onClick={generateAIOptimization} disabled={!selectedKeyword} variant="outline">
+                <Brain className="h-4 w-4 mr-2" />
+                AI Optimize
+              </Button>
+              <Button
+                onClick={calculateRankingAnalyticsData}
+                disabled={snapshots.length === 0}
+                variant="outline"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </Button>
+              <Button
+                onClick={exportEnhancedRankingReport}
+                disabled={!rankingAnalytics}
+                variant="outline"
+              >
+                <FileImage className="h-4 w-4 mr-2" />
+                Export Report
+              </Button>
+              {alerts.length > 0 && (
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Bell className="h-3 w-3" />
+                  {alerts.length} Alert{alerts.length !== 1 ? "s" : ""}
+                </Badge>
+              )}
+            </span>
           </div>
         }
       />
@@ -2229,20 +2233,22 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         <TabsList className="grid w-full grid-cols-4 lg:grid-cols-16 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="grid">Grid Input</TabsTrigger>
-          <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="snapshots">Snapshots</TabsTrigger>
-          <TabsTrigger value="trends">Trends</TabsTrigger>
-          <TabsTrigger value="competitors">Competitors</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts</TabsTrigger>
-          <TabsTrigger value="goals">Goals</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="heatmaps">Heat Maps</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="mobile">Mobile</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="integrations">Integrations</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <span className="advanced-only contents">
+            <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="snapshots">Snapshots</TabsTrigger>
+            <TabsTrigger value="trends">Trends</TabsTrigger>
+            <TabsTrigger value="competitors">Competitors</TabsTrigger>
+            <TabsTrigger value="alerts">Alerts</TabsTrigger>
+            <TabsTrigger value="goals">Goals</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="heatmaps">Heat Maps</TabsTrigger>
+            <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="mobile">Mobile</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="integrations">Integrations</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </span>
         </TabsList>
 
         {/* How To */}
@@ -2760,7 +2766,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Snapshots */}
-        <TabsContent value="snapshots">
+        <TabsContent value="snapshots" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Saved Snapshots</CardTitle>
@@ -2825,7 +2831,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Trends */}
-        <TabsContent value="trends">
+        <TabsContent value="trends" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -2847,7 +2853,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Competitors */}
-        <TabsContent value="competitors">
+        <TabsContent value="competitors" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -2985,7 +2991,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Alerts */}
-        <TabsContent value="alerts">
+        <TabsContent value="alerts" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -3055,7 +3061,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Goals */}
-        <TabsContent value="goals">
+        <TabsContent value="goals" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -3202,7 +3208,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Advanced Analytics */}
-        <TabsContent value="analytics">
+        <TabsContent value="analytics" className="advanced-only">
           <div className="space-y-6">
             {/* Seasonality Analysis */}
             <Card>
@@ -3459,7 +3465,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Geographic Heat Maps */}
-        <TabsContent value="heatmaps">
+        <TabsContent value="heatmaps" className="advanced-only">
           <div className="space-y-6">
             {/* Calgary Neighborhood Heat Map */}
             <Card>
@@ -3659,7 +3665,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Mobile-Optimized Interface */}
-        <TabsContent value="mobile">
+        <TabsContent value="mobile" className="advanced-only">
           <div className="space-y-6">
             {/* Mobile Quick Actions */}
             <Card>
@@ -3853,7 +3859,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Custom Reports & Insights */}
-        <TabsContent value="reports">
+        <TabsContent value="reports" className="advanced-only">
           <div className="space-y-6">
             {/* Executive Summary */}
             <Card>
@@ -4192,7 +4198,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Tool Integrations */}
-        <TabsContent value="integrations">
+        <TabsContent value="integrations" className="advanced-only">
           <div className="space-y-6">
             {/* Integration Overview */}
             <Card>
@@ -4516,7 +4522,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Bulk Operations */}
-        <TabsContent value="bulk">
+        <TabsContent value="bulk" className="advanced-only">
           <div className="space-y-6">
             <Card>
               <CardHeader className="pb-2">
@@ -4700,7 +4706,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Tests */}
-        <TabsContent value="tests">
+        <TabsContent value="tests" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -4737,7 +4743,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         </TabsContent>
 
         {/* Help */}
-        <TabsContent value="help">
+        <TabsContent value="help" className="advanced-only">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
