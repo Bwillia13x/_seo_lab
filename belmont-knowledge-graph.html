@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belmont SEO Lab - Codebase Knowledge Graph</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .control-group label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        select, button {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        .graph-container {
+            position: relative;
+            height: 800px;
+            background: #fafbfc;
+        }
+        
+        .node {
+            cursor: pointer;
+            stroke-width: 2px;
+        }
+        
+        .node:hover {
+            stroke-width: 3px;
+        }
+        
+        .node-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-anchor: middle;
+            pointer-events: none;
+            fill: #2c3e50;
+        }
+        
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+            stroke-width: 2px;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .legend {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .stats {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .category-section {
+            margin-bottom: 30px;
+        }
+        
+        .category-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .tool-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.2s;
+        }
+        
+        .tool-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .tool-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .tool-description {
+            color: #6c757d;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .tech-stack {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .tech-item {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin: 4px;
+        }
+        
+        .catalog-view, .architecture-view {
+            display: none;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 Belmont SEO Lab</h1>
+            <p>Interactive Codebase Knowledge Graph</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>View:</label>
+                <select id="viewSelect">
+                    <option value="graph">Interactive Graph</option>
+                    <option value="catalog">Tool Catalog</option>
+                    <option value="architecture">Architecture</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Filter:</label>
+                <select id="filterSelect">
+                    <option value="all">All Components</option>
+                    <option value="apps">SEO Tools Only</option>
+                    <option value="components">UI Components</option>
+                    <option value="utilities">Utilities</option>
+                </select>
+            </div>
+            <button onclick="resetGraph()">Reset View</button>
+            <button onclick="exportGraph()">Export Data</button>
+        </div>
+        
+        <div id="graphView" class="graph-container">
+            <div class="legend">
+                <h4>Node Types</h4>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e74c3c;"></div>
+                    <span>SEO Tools (22)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3498db;"></div>
+                    <span>UI Components</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2ecc71;"></div>
+                    <span>Utilities</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f39c12;"></div>
+                    <span>Core App</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #9b59b6;"></div>
+                    <span>External APIs</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="catalogView" class="catalog-view">
+            <div class="tech-stack">
+                <h3>Technology Stack</h3>
+                <div>
+                    <span class="tech-item">Next.js 14</span>
+                    <span class="tech-item">React 18</span>
+                    <span class="tech-item">TypeScript</span>
+                    <span class="tech-item">Tailwind CSS</span>
+                    <span class="tech-item">Radix UI</span>
+                    <span class="tech-item">Lucide Icons</span>
+                    <span class="tech-item">Recharts</span>
+                    <span class="tech-item">Zustand</span>
+                    <span class="tech-item">Vitest</span>
+                    <span class="tech-item">Playwright</span>
+                </div>
+            </div>
+            
+            <div class="category-section">
+                <h2 class="category-title">🎯 Marketing & Tracking Tools</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">Campaign Link Builder</div>
+                        <div class="tool-description">Create UTM tracking links for Belmont's marketing campaigns to track customer sources</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">QR Code Maker</div>
+                        <div class="tool-description">Generate QR codes for easy mobile scanning and campaign tracking</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Referral Program QR</div>
+                        <div class="tool-description">Create QR codes for staff and partner referral reward programs</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category-section">
+                <h2 class="category-title">📝 Content Creation Tools</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">Google Business Posts</div>
+                        <div class="tool-description">Create professional posts for Google Business Profile</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Social Media Studio</div>
+                        <div class="tool-description">Create content for Facebook, Instagram, and other social platforms</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Content Calendar</div>
+                        <div class="tool-description">Plan and schedule weekly social media posts</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category-section">
+                <h2 class="category-title">⭐ Customer Reviews</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">Review Request Links</div>
+                        <div class="tool-description">Create links to ask customers for reviews on Google and Apple Maps</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Review Response Writer</div>
+                        <div class="tool-description">Write professional responses to customer reviews</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category-section">
+                <h2 class="category-title">📊 Search Performance</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">Search Results Analyzer</div>
+                        <div class="tool-description">Analyze how customers find Belmont online and improve search rankings</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Local Search Rankings</div>
+                        <div class="tool-description">Monitor where Belmont appears when people search for barbers in Calgary</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Ranking Tracker</div>
+                        <div class="tool-description">Get automatic updates on Belmont's search position changes</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category-section">
+                <h2 class="category-title">🤝 Local Partnerships</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">Partner Finder</div>
+                        <div class="tool-description">Discover Calgary businesses that could partner with Belmont</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Neighborhood Content Analyzer</div>
+                        <div class="tool-description">See what content works best for Bridgeland customers</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Partnership Map</div>
+                        <div class="tool-description">Visual map showing Belmont's local business connections</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category-section">
+                <h2 class="category-title">📈 Business Insights (Advanced)</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">Customer Traffic Predictor</div>
+                        <div class="tool-description">Predict when Belmont will be busiest for staffing planning</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Appointment Optimizer</div>
+                        <div class="tool-description">See which services make the most money and schedule them better</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Customer Behavior Tracker</div>
+                        <div class="tool-description">Learn which customers are best and how to keep them happy</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category-section">
+                <h2 class="category-title">🛡️ Appointment Protection (Advanced)</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">No-Show Predictor</div>
+                        <div class="tool-description">Identify customers who might not show up and send reminders</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Service Recommender</div>
+                        <div class="tool-description">Suggest extra services customers might like during their visit</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category-section">
+                <h2 class="category-title">🌐 Website Optimization</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-name">Page Title Tester</div>
+                        <div class="tool-description">Test different page titles and descriptions to see what works best</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Website Improvement Guide</div>
+                        <div class="tool-description">Get step-by-step instructions to improve Belmont's website</div>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-name">Business Info Checker</div>
+                        <div class="tool-description">Make sure Belmont's address and phone number are correct everywhere online</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="architectureView" class="architecture-view">
+            <h2>Architecture Overview</h2>
+            <div class="tech-stack">
+                <h3>Project Structure</h3>
+                <pre style="background: #f8f9fa; padding: 15px; border-radius: 6px; overflow-x: auto;">
+belmont-seo-lab/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── page.tsx           # Homepage with tool catalog
+│   │   ├── layout.tsx         # Root layout with metadata
+│   │   ├── globals.css        # Global styles
+│   │   └── apps/              # 22 SEO tools
+│   │       ├── utm-dashboard/ # Campaign Link Builder
+│   │       ├── utm-qr/        # QR Code Maker
+│   │       ├── gbp-composer/  # Google Business Posts
+│   │       ├── review-link/   # Review Request Links
+│   │       ├── rank-grid/     # Local Search Rankings
+│   │       └── ...            # 17 more tools
+│   ├── components/            # Reusable UI components
+│   │   ├── ui/               # Base UI components
+│   │   ├── charts/           # Data visualization
+│   │   └── shell/            # Layout components
+│   └── lib/                  # Utility functions
+│       ├── constants.ts      # Belmont-specific data
+│       ├── ai.ts            # AI integration
+│       ├── analytics.ts     # Event tracking
+│       └── ...              # Other utilities
+├── public/                   # Static assets
+├── tests/                    # Test files
+└── docs/                     # Documentation
+                </pre>
+            </div>
+            
+            <div class="tech-stack">
+                <h3>Key Dependencies</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <div>
+                        <h4>Core Framework</h4>
+                        <ul>
+                            <li>Next.js 14 - React framework</li>
+                            <li>React 18 - UI library</li>
+                            <li>TypeScript - Type safety</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>UI & Styling</h4>
+                        <ul>
+                            <li>Tailwind CSS - Utility-first CSS</li>
+                            <li>Radix UI - Accessible components</li>
+                            <li>Lucide React - Icons</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Data & Charts</h4>
+                        <ul>
+                            <li>Recharts - Data visualization</li>
+                            <li>Zustand - State management</li>
+                            <li>QRCode - QR generation</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Testing</h4>
+                        <ul>
+                            <li>Vitest - Unit testing</li>
+                            <li>Playwright - E2E testing</li>
+                            <li>Testing Library - Component testing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">22</div>
+                <div class="stat-label">SEO Tools</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">18</div>
+                <div class="stat-label">UI Components</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Utility Functions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Tool Categories</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data structure for the knowledge graph
+        const graphData = {
+            nodes: [
+                // Core App
+                { id: "app", name: "Belmont SEO Lab", type: "core", category: "Application", description: "Main Next.js application for The Belmont Barbershop SEO toolkit" },
+                
+                // SEO Tools (22 total)
+                { id: "utm-dashboard", name: "Campaign Link Builder", type: "app", category: "Marketing", description: "Create UTM tracking links for marketing campaigns" },
+                { id: "utm-qr", name: "QR Code Maker", type: "app", category: "Marketing", description: "Generate QR codes for easy mobile scanning" },
+                { id: "referral-qr", name: "Referral Program QR", type: "app", category: "Marketing", description: "Create QR codes for referral programs" },
+                { id: "gbp-composer", name: "Google Business Posts", type: "app", category: "Content", description: "Create posts for Google Business Profile" },
+                { id: "post-studio", name: "Social Media Studio", type: "app", category: "Content", description: "Create content for social platforms" },
+                { id: "post-oracle", name: "Content Calendar", type: "app", category: "Content", description: "Plan and schedule social media posts" },
+                { id: "review-link", name: "Review Request Links", type: "app", category: "Reviews", description: "Create links for customer reviews" },
+                { id: "review-composer", name: "Review Response Writer", type: "app", category: "Reviews", description: "Write professional review responses" },
+                { id: "gsc-ctr-miner", name: "Search Results Analyzer", type: "app", category: "Search", description: "Analyze search performance and rankings" },
+                { id: "rank-grid", name: "Local Search Rankings", type: "app", category: "Search", description: "Monitor local search positions" },
+                { id: "rankgrid-watcher", name: "Ranking Tracker", type: "app", category: "Search", description: "Track ranking changes automatically" },
+                { id: "link-prospect-kit", name: "Partner Finder", type: "app", category: "Partnerships", description: "Find local business partners" },
+                { id: "neighbor-signal", name: "Neighborhood Content Analyzer", type: "app", category: "Partnerships", description: "Analyze local content performance" },
+                { id: "link-map", name: "Partnership Map", type: "app", category: "Partnerships", description: "Visual map of business connections" },
+                { id: "queuetime", name: "Customer Traffic Predictor", type: "app", category: "Insights", description: "Predict busy times for staffing" },
+                { id: "slot-yield", name: "Appointment Optimizer", type: "app", category: "Insights", description: "Optimize service scheduling" },
+                { id: "rfm-crm", name: "Customer Behavior Tracker", type: "app", category: "Insights", description: "Track customer behavior patterns" },
+                { id: "noshow-shield", name: "No-Show Predictor", type: "app", category: "Protection", description: "Predict and prevent no-shows" },
+                { id: "addon-recommender", name: "Service Recommender", type: "app", category: "Protection", description: "Suggest additional services" },
+                { id: "meta-planner", name: "Page Title Tester", type: "app", category: "Website", description: "Test page titles and descriptions" },
+                { id: "seo-brief", name: "Website Improvement Guide", type: "app", category: "Website", description: "Get website optimization steps" },
+                { id: "citation-tracker", name: "Business Info Checker", type: "app", category: "Website", description: "Verify business information consistency" },
+                
+                // UI Components
+                { id: "app-shell", name: "App Shell", type: "component", category: "Layout", description: "Main application layout wrapper" },
+                { id: "sidebar", name: "Sidebar", type: "component", category: "Layout", description: "Navigation sidebar component" },
+                { id: "card", name: "Card", type: "component", category: "UI", description: "Reusable card component" },
+                { id: "button", name: "Button", type: "component", category: "UI", description: "Button component with variants" },
+                { id: "input", name: "Input", type: "component", category: "UI", description: "Form input component" },
+                { id: "table", name: "Table", type: "component", category: "UI", description: "Data table component" },
+                { id: "charts", name: "Charts", type: "component", category: "Data", description: "Data visualization components" },
+                { id: "ai-diagnostics", name: "AI Diagnostics", type: "component", category: "AI", description: "AI-powered diagnostic component" },
+                
+                // Utilities
+                { id: "constants", name: "Constants", type: "utility", category: "Data", description: "Belmont-specific business data" },
+                { id: "ai", name: "AI Integration", type: "utility", category: "AI", description: "AI chat and analysis functions" },
+                { id: "analytics", name: "Analytics", type: "utility", category: "Tracking", description: "Event tracking and analytics" },
+                { id: "storage", name: "Storage", type: "utility", category: "Data", description: "Local storage utilities" },
+                { id: "csv", name: "CSV Utils", type: "utility", category: "Data", description: "CSV import/export functions" },
+                { id: "blob", name: "Blob Utils", type: "utility", category: "Data", description: "File download utilities" },
+                { id: "math", name: "Math Utils", type: "utility", category: "Calculation", description: "Mathematical calculations" },
+                { id: "dates", name: "Date Utils", type: "utility", category: "Time", description: "Date manipulation functions" },
+                { id: "geo", name: "Geo Utils", type: "utility", category: "Location", description: "Geographic calculations" },
+                { id: "net", name: "Network Utils", type: "utility", category: "Network", description: "Network request utilities" },
+                
+                // External APIs
+                { id: "openai", name: "OpenAI API", type: "external", category: "AI", description: "AI chat and analysis services" },
+                { id: "google-maps", name: "Google Maps", type: "external", category: "Location", description: "Maps and location services" },
+                { id: "google-business", name: "Google Business", type: "external", category: "Business", description: "Google Business Profile API" }
+            ],
+            links: [
+                // App connections
+                { source: "app", target: "app-shell" },
+                { source: "app-shell", target: "sidebar" },
+                
+                // SEO Tools to App
+                { source: "app", target: "utm-dashboard" },
+                { source: "app", target: "utm-qr" },
+                { source: "app", target: "referral-qr" },
+                { source: "app", target: "gbp-composer" },
+                { source: "app", target: "post-studio" },
+                { source: "app", target: "post-oracle" },
+                { source: "app", target: "review-link" },
+                { source: "app", target: "review-composer" },
+                { source: "app", target: "gsc-ctr-miner" },
+                { source: "app", target: "rank-grid" },
+                { source: "app", target: "rankgrid-watcher" },
+                { source: "app", target: "link-prospect-kit" },
+                { source: "app", target: "neighbor-signal" },
+                { source: "app", target: "link-map" },
+                { source: "app", target: "queuetime" },
+                { source: "app", target: "slot-yield" },
+                { source: "app", target: "rfm-crm" },
+                { source: "app", target: "noshow-shield" },
+                { source: "app", target: "addon-recommender" },
+                { source: "app", target: "meta-planner" },
+                { source: "app", target: "seo-brief" },
+                { source: "app", target: "citation-tracker" },
+                
+                // Component dependencies
+                { source: "app-shell", target: "card" },
+                { source: "app-shell", target: "button" },
+                { source: "app-shell", target: "input" },
+                { source: "app-shell", target: "table" },
+                { source: "app-shell", target: "charts" },
+                { source: "app-shell", target: "ai-diagnostics" },
+                
+                // Utility dependencies
+                { source: "app", target: "constants" },
+                { source: "app", target: "analytics" },
+                { source: "app", target: "storage" },
+                { source: "app", target: "csv" },
+                { source: "app", target: "blob" },
+                { source: "app", target: "math" },
+                { source: "app", target: "dates" },
+                { source: "app", target: "geo" },
+                { source: "app", target: "net" },
+                
+                // AI connections
+                { source: "ai-diagnostics", target: "ai" },
+                { source: "ai", target: "openai" },
+                
+                // External API connections
+                { source: "review-link", target: "google-maps" },
+                { source: "gbp-composer", target: "google-business" },
+                { source: "gsc-ctr-miner", target: "google-business" },
+                { source: "rank-grid", target: "google-business" }
+            ]
+        };
+
+        let svg, simulation, tooltip;
+        let currentView = 'graph';
+
+        // Color mapping for node types
+        const nodeColors = {
+            'core': '#f39c12',
+            'app': '#e74c3c',
+            'component': '#3498db',
+            'utility': '#2ecc71',
+            'external': '#9b59b6'
+        };
+
+        function initializeGraph() {
+            const container = d3.select('#graphView');
+            container.selectAll('*').remove();
+
+            const width = container.node().offsetWidth;
+            const height = container.node().offsetHeight;
+
+            svg = container
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Create tooltip
+            tooltip = d3.select('body')
+                .append('div')
+                .attr('class', 'tooltip')
+                .style('opacity', 0);
+
+            // Create simulation
+            simulation = d3.forceSimulation(graphData.nodes)
+                .force('link', d3.forceLink(graphData.links).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(30));
+
+            // Create links
+            const link = svg.append('g')
+                .selectAll('line')
+                .data(graphData.links)
+                .enter().append('line')
+                .attr('class', 'link');
+
+            // Create nodes
+            const node = svg.append('g')
+                .selectAll('circle')
+                .data(graphData.nodes)
+                .enter().append('circle')
+                .attr('class', 'node')
+                .attr('r', d => d.type === 'core' ? 20 : d.type === 'app' ? 15 : 12)
+                .attr('fill', d => nodeColors[d.type])
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2)
+                .call(d3.drag()
+                    .on('start', dragstarted)
+                    .on('drag', dragged)
+                    .on('end', dragended))
+                .on('mouseover', showTooltip)
+                .on('mouseout', hideTooltip)
+                .on('click', nodeClick);
+
+            // Add labels
+            const labels = svg.append('g')
+                .selectAll('text')
+                .data(graphData.nodes)
+                .enter().append('text')
+                .attr('class', 'node-label')
+                .text(d => d.name.length > 15 ? d.name.substring(0, 15) + '...' : d.name)
+                .attr('dy', 4);
+
+            // Update positions on tick
+            simulation.on('tick', () => {
+                link
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                node
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                labels
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y);
+            });
+        }
+
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        function showTooltip(event, d) {
+            tooltip.transition()
+                .duration(200)
+                .style('opacity', .9);
+            tooltip.html(`
+                <strong>${d.name}</strong><br/>
+                <em>${d.category}</em><br/>
+                ${d.description}
+            `)
+                .style('left', (event.pageX + 10) + 'px')
+                .style('top', (event.pageY - 28) + 'px');
+        }
+
+        function hideTooltip() {
+            tooltip.transition()
+                .duration(500)
+                .style('opacity', 0);
+        }
+
+        function nodeClick(event, d) {
+            console.log('Clicked node:', d);
+            // Add any click functionality here
+        }
+
+        function resetGraph() {
+            if (simulation) {
+                simulation.alpha(1).restart();
+            }
+        }
+
+        function exportGraph() {
+            const dataStr = JSON.stringify(graphData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'belmont-seo-lab-graph.json';
+            link.click();
+        }
+
+        // View switching
+        document.getElementById('viewSelect').addEventListener('change', function(e) {
+            const view = e.target.value;
+            currentView = view;
+            
+            document.getElementById('graphView').style.display = view === 'graph' ? 'block' : 'none';
+            document.getElementById('catalogView').style.display = view === 'catalog' ? 'block' : 'none';
+            document.getElementById('architectureView').style.display = view === 'architecture' ? 'block' : 'none';
+            
+            if (view === 'graph' && !svg) {
+                initializeGraph();
+            }
+        });
+
+        // Filter functionality
+        document.getElementById('filterSelect').addEventListener('change', function(e) {
+            const filter = e.target.value;
+            if (currentView === 'graph' && svg) {
+                // Filter nodes and links based on selection
+                const filteredNodes = graphData.nodes.filter(node => {
+                    if (filter === 'all') return true;
+                    if (filter === 'apps') return node.type === 'app';
+                    if (filter === 'components') return node.type === 'component';
+                    if (filter === 'utilities') return node.type === 'utility';
+                    return true;
+                });
+                
+                const filteredLinks = graphData.links.filter(link => {
+                    return filteredNodes.some(node => node.id === link.source.id || node.id === link.target.id);
+                });
+                
+                // Update simulation with filtered data
+                simulation.nodes(filteredNodes);
+                simulation.force('link').links(filteredLinks);
+                simulation.alpha(1).restart();
+            }
+        });
+
+        // Initialize on load
+        window.addEventListener('load', function() {
+            initializeGraph();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (currentView === 'graph' && svg) {
+                const container = d3.select('#graphView');
+                const width = container.node().offsetWidth;
+                const height = container.node().offsetHeight;
+                
+                svg.attr('width', width).attr('height', height);
+                simulation.force('center', d3.forceCenter(width / 2, height / 2));
+                simulation.alpha(1).restart();
+            }
+        });
+    </script>
+</body>
+</html>
