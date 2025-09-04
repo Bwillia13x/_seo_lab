@@ -4,6 +4,9 @@ test.describe('Review Composer', () => {
   test('loads sample, opens a review, and (optionally) triggers AI', async ({ page }) => {
     await page.goto('/apps/review-composer');
 
+    // Switch to Review Queue tab first
+    await page.getByRole('tab', { name: 'Review Queue' }).click();
+
     // Load sample reviews
     await page.getByRole('button', { name: /Load Sample/i }).click();
 
@@ -13,8 +16,11 @@ test.describe('Review Composer', () => {
     // Click first Reply button
     await page.getByRole('button', { name: /^Reply$/ }).first().click();
 
-    // Ensure Reply Composer appears
-    await expect(page.getByText(/Reply Composer/)).toBeVisible();
+    // Switch to Reply Composer tab
+    await page.getByRole('tab', { name: 'Reply Composer' }).click();
+
+    // Ensure Reply Composer tab is active
+    await expect(page.getByRole('tab', { name: 'Reply Composer' })).toHaveAttribute('data-state', 'active');
 
     // If AI button is enabled, click it
     const aiButton = page.getByRole('button', { name: /AI Generate/i });

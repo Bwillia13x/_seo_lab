@@ -4,6 +4,7 @@ test.describe('CSV Exports', () => {
   test('Dashboard events export after logging an event', async ({ page }) => {
     // Trigger an event via UTM QR
     await page.goto('/apps/utm-qr');
+    await page.getByRole('tab', { name: 'Single Link' }).click();
     await page.getByRole('button', { name: /Generate/i }).click();
 
     // Go to Dashboard and export
@@ -28,6 +29,7 @@ test.describe('CSV Exports', () => {
 
   test('Ranking Grid export CSV', async ({ page }) => {
     await page.goto('/apps/rank-grid');
+    await page.getByRole('tab', { name: 'Grid Input' }).click();
     await page.getByRole('button', { name: /Load Demo/i }).click();
     await page.getByRole('button', { name: /Save Snapshot/i }).click();
     const [download] = await Promise.all([
