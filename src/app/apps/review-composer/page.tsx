@@ -806,11 +806,7 @@ export default function ReviewComposer() {
         subtitle="AI-powered review management with intelligent responses, performance analytics, and automated optimization."
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={generateAIResponse}
-              disabled={!selectedReview || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={generateAIResponse} disabled={!selectedReview} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Generate
             </Button>

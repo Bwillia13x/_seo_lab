@@ -761,11 +761,7 @@ export default function PostOracle() {
               <Wand2 className="h-4 w-4 mr-2" />
               Generate Posts
             </Button>
-            <Button
-              onClick={generateAIContent}
-              disabled={isGenerating || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={generateAIContent} disabled={isGenerating} variant="outline">
               {isGenerating ? (
                 <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
               ) : (
@@ -1181,13 +1177,7 @@ export default function PostOracle() {
                   />
                 </div>
 
-                <Button
-                  onClick={generateAIContent}
-                  disabled={
-                    isGenerating || !apiKey || selectedPlatforms.length === 0
-                  }
-                  className="w-full"
-                >
+                <Button onClick={generateAIContent} disabled={isGenerating || selectedPlatforms.length === 0} className="w-full">
                   {isGenerating ? (
                     <>
                       <RefreshCw className="h-4 w-4 mr-2 animate-spin" />

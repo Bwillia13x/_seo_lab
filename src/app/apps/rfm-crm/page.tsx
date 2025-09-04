@@ -920,11 +920,7 @@ export default function RFMMicroCRM() {
         subtitle="AI-powered customer segmentation, predictive analytics, and personalized marketing campaigns."
         actions={
           <>
-            <Button
-              onClick={generateAIInsights}
-              disabled={!selectedCustomer || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={generateAIInsights} disabled={!selectedCustomer} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Insights
             </Button>

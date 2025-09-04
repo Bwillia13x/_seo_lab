@@ -384,28 +384,8 @@ async function generateAIRankingOptimization(
   competitors: CompetitorData[],
   searchType: string,
   device: string,
-  location: string,
-  apiKey?: string
+  location: string
 ): Promise<RankingOptimization> {
-  if (!apiKey) {
-    return {
-      id: `opt_${Date.now()}`,
-      keyword,
-      currentRank,
-      targetRank: Math.max(1, currentRank - 3),
-      difficulty: "medium",
-      recommendations: [
-        "Optimize title tag with primary keyword",
-        "Improve meta description with compelling call-to-action",
-        "Add structured data markup",
-        "Improve page load speed",
-      ],
-      priority: currentRank > 10 ? "high" : currentRank > 5 ? "medium" : "low",
-      estimatedTime: "2-4 weeks",
-      successProbability: 0.7,
-    };
-  }
-
   try {
     const competitorSummary = competitors
       .slice(0, 5)
@@ -413,7 +393,6 @@ async function generateAIRankingOptimization(
       .join(", ");
 
     const out = await aiChatSafe({
-      apiKey,
       model: "gpt-5-mini-2025-08-07",
       maxTokens: 400,
       messages: [
@@ -2186,11 +2165,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
         showLogo={true}
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={generateAIOptimization}
-              disabled={!selectedKeyword || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={generateAIOptimization} disabled={!selectedKeyword} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize
             </Button>

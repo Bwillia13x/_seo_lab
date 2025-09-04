@@ -777,29 +777,9 @@ function LinkProspectKit() {
         prospectType: string,
         currentScore: number,
         localness: number,
-        relevance: number,
-        apiKey?: string
+        relevance: number
       ): Promise<PartnerOptimization> {
-        if (!apiKey) {
-          return {
-            id: `opt_${Date.now()}`,
-            prospectId: "",
-            name: prospectName,
-            currentScore,
-            targetScore: Math.min(10, currentScore + 2),
-            difficulty: "medium",
-            recommendations: [
-              "Personalize outreach message",
-              "Research prospect's business needs",
-              "Offer value-first approach",
-              "Follow up consistently",
-            ],
-            priority:
-              currentScore > 7 ? "high" : currentScore > 5 ? "medium" : "low",
-            estimatedTime: "2-4 weeks",
-            successProbability: 0.7,
-          };
-        }
+        
 
         try {
           const out = await aiChatSafe({
@@ -859,8 +839,7 @@ function LinkProspectKit() {
         prospect.type,
         prospect.ice,
         prospect.localness,
-        prospect.relevance,
-        apiKey
+        prospect.relevance
       );
 
     setPartnerLibrary((prev) => ({
@@ -979,11 +958,7 @@ function LinkProspectKit() {
         subtitle="AI-powered partner prospecting with intelligent scoring, outreach optimization, and relationship management for Belmont Barbershop partnerships."
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={generateAIPartnerOptimization}
-              disabled={!selectedProspect || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={generateAIPartnerOptimization} disabled={!selectedProspect} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize
             </Button>

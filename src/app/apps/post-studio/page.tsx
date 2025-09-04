@@ -1721,11 +1721,7 @@ export default function Page() {
                     />
                   </div>
 
-                  <Button
-                    onClick={handleGenerateAIContent}
-                    disabled={isGenerating || !apiKey.trim()}
-                    className="w-full"
-                  >
+                  <Button onClick={handleGenerateAIContent} disabled={isGenerating} className="w-full">
                     {isGenerating ? (
                       <>
                         <RefreshCw className="h-4 w-4 mr-2 animate-spin" />

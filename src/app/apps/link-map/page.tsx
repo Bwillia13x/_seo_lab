@@ -567,30 +567,8 @@ async function generateAIPartnershipOptimization(
         prospectType: string,
         currentScore: number,
         localness: number,
-        relevance: number,
-        apiKey?: string
+        relevance: number
       ): Promise<PartnershipOptimization> {
-        if (!apiKey) {
-          return {
-            id: `opt_${Date.now()}`,
-            prospectId: "",
-            name: prospectName,
-            currentScore,
-            targetScore: Math.min(10, currentScore + 2),
-            difficulty: "medium",
-            recommendations: [
-              "Personalize outreach message",
-              "Research prospect's business needs",
-              "Offer value-first approach",
-              "Follow up consistently",
-            ],
-            priority:
-              currentScore > 7 ? "high" : currentScore > 5 ? "medium" : "low",
-            estimatedTime: "2-4 weeks",
-            successProbability: 0.7,
-          };
-        }
-
         try {
           const out = await aiChatSafe({
             model: "gpt-5-mini-2025-08-07",
@@ -649,8 +627,7 @@ async function generateAIPartnershipOptimization(
         prospect.type,
         prospect.ice,
         prospect.localness,
-        prospect.relevance,
-        apiKey
+        prospect.relevance
       );
 
     setPartnershipLibrary((prev) => ({
@@ -740,11 +717,7 @@ async function generateAIPartnershipOptimization(
         subtitle="AI-powered partnership prospecting with intelligent scoring, outreach optimization, and relationship management for Belmont Barbershop partnerships."
         actions={
           <div className="flex gap-2">
-            <Button
-              onClick={generateAIPartnershipOptimization}
-              disabled={!selectedProspectId || !apiKey}
-              variant="outline"
-            >
+            <Button onClick={generateAIPartnershipOptimization} disabled={!selectedProspectId} variant="outline">
               <Brain className="h-4 w-4 mr-2" />
               AI Optimize
             </Button>
