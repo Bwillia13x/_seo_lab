@@ -11,7 +11,7 @@ export const BELMONT_CONSTANTS = {
 
   // Review Links
   REVIEW_GOOGLE_URL:
-    "https://search.google.com/local/writereview?placeid=REPLACE_WITH_REAL_PLACE_ID", // TODO: replace with actual Google Place ID
+    "https://search.google.com/local/writereview?placeid=ChIJM6if2dNlcVMRvq05yS0wfPU",
   REVIEW_APPLE_URL:
     "https://maps.apple.com/?q=915+General+Ave+NE,+Calgary,+AB,+T2E+9E1",
 

@@ -3,6 +3,7 @@ import AppShell from "@/components/shell/AppShell";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 const SITE_BASE = process.env.NEXT_PUBLIC_SITE_BASE || "https://thebelmontbarber.ca";
+const ALLOW_INDEXING = process.env.NEXT_PUBLIC_ALLOW_INDEXING === "true";
 
 export const metadata = {
   title: "Belmont SEO Lab - Local SEO Tools for The Belmont Barbershop",
@@ -36,11 +37,11 @@ export const metadata = {
     canonical: "/",
   },
   robots: {
-    index: true,
-    follow: true,
+    index: ALLOW_INDEXING,
+    follow: ALLOW_INDEXING,
     googleBot: {
-      index: true,
-      follow: true,
+      index: ALLOW_INDEXING,
+      follow: ALLOW_INDEXING,
       "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
