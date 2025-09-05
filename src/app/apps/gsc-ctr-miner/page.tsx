@@ -83,13 +83,13 @@ import dynamic from "next/dynamic";
 const CTRScatter = dynamic(() => import("@/components/charts/ScatterCTR"), {
   ssr: false,
   loading: () => (
-    <div className="h-80 rounded border p-3 text-sm text-muted-foreground">Loading chart…</div>
+    <div className="h-80 rounded border p-3 text-sm text-muted-foreground" role="status" aria-live="polite" data-testid="loading-spinner">Loading chart…</div>
   ),
 });
 const ExpectedLine = dynamic(() => import("@/components/charts/LineExpected"), {
   ssr: false,
   loading: () => (
-    <div className="h-56 mt-6 rounded border p-3 text-sm text-muted-foreground">Loading chart…</div>
+    <div className="h-56 mt-6 rounded border p-3 text-sm text-muted-foreground" role="status" aria-live="polite" data-testid="loading-spinner">Loading chart…</div>
   ),
 });
 
@@ -98,6 +98,8 @@ import { parseCSV, toCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
+import { showToast } from "@/lib/toast";
+import { Tour } from "@/components/ui/tour";
 
 // ---------------- Utilities ----------------
 function clamp(n: number, lo: number, hi: number) {
@@ -774,6 +776,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
       new Blob([csv], { type: "text/csv;charset=utf-8;" }),
       `belmont-gsc-recs-${todayISO()}.csv`
     );
+    try { showToast("Exported GSC recommendations", "success"); } catch {}
   }
 
   // ---------------- Enhanced Functions ----------------
@@ -839,6 +842,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    try { showToast("Exported GSC analytics CSV", "success"); } catch {}
     saveBlob(blob, `enhanced-search-analytics-${todayISO()}.csv`);
   };
 
@@ -888,9 +892,17 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
 
   return (
     <div className="p-5 md:p-8 space-y-6">
+      <Tour
+        id="gsc-ctr-miner"
+        steps={[
+          { title: "Load sample data", body: "Start with Belmont sample data to preview analytics and opportunities." },
+          { title: "Analyze results", body: "Open the Analytics and Opportunities tabs to see missed clicks and top pages." },
+          { title: "Export recommendations", body: "Export a CSV with title/meta suggestions and estimated lift." }
+        ]}
+      />
       <PageHeader
         title="AI Search Intelligence Studio"
-        subtitle="AI-powered search performance analysis with optimization recommendations and automated campaign management."
+        subtitle="Analyze GSC results and export prioritized recommendations."
         actions={
           <div className="flex gap-2">
             <Button
@@ -922,10 +934,14 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
               accept=".csv"
               className="hidden"
               id="gsc-upload"
+              aria-hidden="true"
+              tabIndex={-1}
+              aria-label="Import GSC CSV file"
+              style={{ display: 'none' }}
               onChange={onImportFile}
             />
             <label htmlFor="gsc-upload">
-              <Button variant="outline">
+              <Button variant="outline" aria-label="Import Your GSC CSV" data-testid="gsc-import-btn">
                 <Upload className="h-4 w-4 mr-2" />
                 Import Your GSC CSV
               </Button>
@@ -935,6 +951,8 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                 variant="outline"
                 onClick={exportRecsCSV}
                 disabled={recs.length === 0}
+                aria-label="Export Recommendations"
+                title={recs.length === 0 ? 'Load data first' : 'Export recommendations CSV'}
               >
                 <Download className="h-4 w-4 mr-2" />
                 Export Recommendations
@@ -1004,6 +1022,11 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
           icon={<Target className="h-4 w-4" />}
         />
       </div>
+
+      {/* Deterministic signal for tests when recommendations are computed */}
+      {recs.length > 0 && (
+        <span data-testid="recs-ready" className="sr-only">recs ready</span>
+      )}
 
       <Tabs defaultValue="howto" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-10 gap-1">
@@ -1197,7 +1220,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" onClick={calculateSearchAnalyticsData} disabled={rows.length === 0}>
+                <Button variant="outline" onClick={calculateSearchAnalyticsData} disabled={rows.length === 0} data-testid="run-analytics">
                   <Play className="h-4 w-4 mr-2" />
                   Run Analytics
                 </Button>
@@ -1238,22 +1261,28 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
             <CardContent className="space-y-4 text-sm">
               <div className="grid md:grid-cols-3 gap-3 items-end">
                 <div className="md:col-span-2">
-                  <Label>Business name</Label>
+                  <Label htmlFor="gsc-biz-name">Business name</Label>
                   <Input
+                    id="gsc-biz-name"
+                    aria-label="Business name"
                     value={bizName}
                     onChange={(e) => setBizName(e.target.value)}
                   />
                 </div>
                 <div>
-                  <Label>Booking URL</Label>
+                  <Label htmlFor="gsc-booking-url">Booking URL</Label>
                   <Input
+                    id="gsc-booking-url"
+                    aria-label="Booking URL"
                     value={bookingUrl}
                     onChange={(e) => setBookingUrl(e.target.value)}
                   />
                 </div>
                 <div>
-                  <Label>Min impressions</Label>
+                  <Label htmlFor="gsc-min-impr">Min impressions</Label>
                   <Input
+                    id="gsc-min-impr"
+                    aria-label="Minimum impressions"
                     type="number"
                     min={0}
                     value={knobs.minImpr}
@@ -1267,6 +1296,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                 </div>
                 <div className="flex items-center gap-2">
                   <Checkbox
+                    aria-label="Include brand queries"
                     checked={knobs.includeBrand}
                     onCheckedChange={(v) =>
                       setKnobs((k) => ({ ...k, includeBrand: Boolean(v) }))
@@ -1275,8 +1305,9 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                   <Label>Include brand queries</Label>
                 </div>
                 <div>
-                  <Label>Filter family</Label>
+                  <Label htmlFor="gsc-filter-fam">Filter family</Label>
                   <select
+                    id="gsc-filter-fam"
                     className="w-full h-9 border rounded-md px-2"
                     value={filterFam}
                     onChange={(e) => setFilterFam(e.target.value)}
@@ -1291,8 +1322,9 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                   </select>
                 </div>
                 <div>
-                  <Label>Filter area</Label>
+                  <Label htmlFor="gsc-filter-area">Filter area</Label>
                   <select
+                    id="gsc-filter-area"
                     className="w-full h-9 border rounded-md px-2"
                     value={filterArea}
                     onChange={(e) => setFilterArea(e.target.value)}
@@ -1342,6 +1374,8 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                             ),
                           }));
                         }}
+                        aria-label={`Expected CTR percent for position bucket ${label}`}
+                        name={`bench-${label}`}
                       />
                     </div>
                   ))}
@@ -1523,6 +1557,9 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
               <div className="h-56 mt-6">
                 <ExpectedLine data={expectedLine} />
               </div>
+              {recs.length > 0 && (
+                <span data-testid="recs-ready" className="sr-only">recs ready</span>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

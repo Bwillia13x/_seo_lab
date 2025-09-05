@@ -7,6 +7,136 @@ on:
     branches: [main]
 
 jobs:
+  smoke:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SITE_BASE: http://localhost:3000
+      NEXT_PUBLIC_ALLOW_INDEXING: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build app
+        run: npm run build
+
+      - name: Start Next server
+        run: |
+          npm start &
+          for i in $(seq 1 60); do
+            if curl -sSf http://localhost:3000 >/dev/null; then echo "Server up"; break; fi
+            sleep 1
+            if [ "$i" -eq 60 ]; then echo "Server failed to start"; exit 1; fi
+          done
+
+      - name: Run CI Smoke Suite
+        run: npm run ci:smoke
+
+  visual:
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'full-visual') }}
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SITE_BASE: http://localhost:3000
+      NEXT_PUBLIC_ALLOW_INDEXING: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build app
+        run: npm run build
+
+      - name: Start Next server
+        run: |
+          npm start &
+          for i in $(seq 1 60); do
+            if curl -sSf http://localhost:3000 >/dev/null; then echo "Server up"; break; fi
+            sleep 1
+            if [ "$i" -eq 60 ]; then echo "Server failed to start"; exit 1; fi
+          done
+
+      - name: Run Visual Regression Suite
+        run: npm run visual:test
+
+      - name: Upload Visual Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-results
+          path: |
+            visual-test-results.json
+            test-results/**
+          if-no-files-found: ignore
+
+  accessibility:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SITE_BASE: http://localhost:3000
+      NEXT_PUBLIC_ALLOW_INDEXING: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Build app
+        run: npm run build
+
+      - name: Start Next server
+        run: |
+          npm start &
+          for i in $(seq 1 60); do
+            if curl -sSf http://localhost:3000 >/dev/null; then echo "Server up"; break; fi
+            sleep 1
+            if [ "$i" -eq 60 ]; then echo "Server failed to start"; exit 1; fi
+          done
+
+      - name: Run Accessibility Compliance Suite
+        run: |
+          npm run accessibility:ci || true
+          node scripts/compliance-summary.js || true
+
+      - name: Upload Accessibility Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-results
+          path: |
+            accessibility-report.json
+            tests/accessibility/wcag-summary.json
+          if-no-files-found: ignore
+
   test:
     runs-on: ubuntu-latest
 
@@ -40,6 +170,9 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SITE_BASE: http://localhost:3000
+      NEXT_PUBLIC_ALLOW_INDEXING: false
 
     steps:
       - uses: actions/checkout@v4
@@ -55,6 +188,18 @@ jobs:
 
       - name: Install Playwright
         run: npx playwright install --with-deps
+
+      - name: Build app
+        run: npm run build
+
+      - name: Start Next server
+        run: |
+          npm start &
+          for i in $(seq 1 60); do
+            if curl -sSf http://localhost:3000 >/dev/null; then echo "Server up"; break; fi
+            sleep 1
+            if [ "$i" -eq 60 ]; then echo "Server failed to start"; exit 1; fi
+          done
 
       - name: Run Playwright tests
         run: npm run e2e

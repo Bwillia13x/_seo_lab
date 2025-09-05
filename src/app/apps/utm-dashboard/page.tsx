@@ -803,7 +803,7 @@ function UTMDashboard() {
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
         title="AI Campaign Studio"
-        subtitle="Create intelligent, optimized campaign links with AI-powered suggestions and performance tracking."
+        subtitle="Create optimized campaign links with suggestions and tracking."
         showLogo={true}
         actions={
           <div className="flex gap-2">
@@ -1073,6 +1073,7 @@ function UTMDashboard() {
                     onChange={(e) => setBaseUrl(e.target.value)}
                     placeholder="https://thebelmontbarber.ca/book"
                     aria-label="Base URL for UTM tracking"
+                    name="url"
                   />
                 </div>
 
@@ -1132,6 +1133,7 @@ function UTMDashboard() {
                     onChange={(e) => setCampaign(e.target.value)}
                     placeholder="belmont-skin-fade-bridgeland-202412"
                     aria-label="UTM campaign name"
+                    name="campaign"
                   />
                 </div>
 
