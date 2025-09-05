@@ -44,6 +44,7 @@ jobs:
         run: npm run ci:smoke
 
   visual:
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'full-visual') }}
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_SITE_BASE: http://localhost:3000
@@ -78,7 +79,18 @@ jobs:
       - name: Run Visual Regression Suite
         run: npm run visual:test
 
+      - name: Upload Visual Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-results
+          path: |
+            visual-test-results.json
+            test-results/**
+          if-no-files-found: ignore
+
   accessibility:
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_SITE_BASE: http://localhost:3000
@@ -114,6 +126,16 @@ jobs:
         run: |
           npm run accessibility:ci || true
           node scripts/compliance-summary.js || true
+
+      - name: Upload Accessibility Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-results
+          path: |
+            accessibility-report.json
+            tests/accessibility/wcag-summary.json
+          if-no-files-found: ignore
 
   test:
     runs-on: ubuntu-latest
