@@ -8,7 +8,6 @@ on:
 
 jobs:
   smoke:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_SITE_BASE: http://localhost:3000
@@ -138,6 +137,7 @@ jobs:
           if-no-files-found: ignore
 
   test:
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -169,6 +169,7 @@ jobs:
         run: npm run build
 
   e2e:
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     env:
       NEXT_PUBLIC_SITE_BASE: http://localhost:3000
