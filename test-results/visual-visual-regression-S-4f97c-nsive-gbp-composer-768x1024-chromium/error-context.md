@@ -1,0 +1,71 @@
+# Page snapshot
+
+```yaml
+- generic [active]:
+  - alert [ref=e1]
+  - dialog [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - heading "Build Error" [level=1] [ref=e7]
+        - paragraph [ref=e8]: Failed to compile
+        - generic [ref=e9]:
+          - generic "An outdated version detected (latest is 15.5.2), upgrade is highly recommended!" [ref=e11]: Next.js (14.2.32) is outdated
+          - link "(learn more)" [ref=e12] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - link "./src/app/apps/gsc-ctr-miner/page.tsx:102:1" [ref=e15] [cursor=pointer]:
+            - text: ./src/app/apps/gsc-ctr-miner/page.tsx:102:1
+            - img [ref=e16] [cursor=pointer]
+          - generic [ref=e20]:
+            - generic [ref=e21]: Module not found
+            - generic [ref=e22]: ": Can't resolve '"
+            - generic [ref=e23]: "@/components/ui/tour"
+            - generic [ref=e24]: "'"
+            - generic [ref=e26]: 100 |
+            - generic [ref=e28]: import
+            - generic [ref=e29]: "{"
+            - generic [ref=e30]: KPICard
+            - generic [ref=e31]: "}"
+            - generic [ref=e32]: from
+            - generic [ref=e34]: "\"@/components/ui/kpi-card\""
+            - generic [ref=e35]: ;
+            - generic [ref=e37]: 101 |
+            - generic [ref=e39]: import
+            - generic [ref=e40]: "{ showToast }"
+            - generic [ref=e41]: from
+            - generic [ref=e43]: "\"@/lib/toast\""
+            - generic [ref=e44]: ;
+            - generic [ref=e45]: ">"
+            - generic [ref=e46]: 102 |
+            - generic [ref=e48]: import
+            - generic [ref=e49]: "{"
+            - generic [ref=e50]: Tour
+            - generic [ref=e51]: "}"
+            - generic [ref=e52]: from
+            - generic [ref=e54]: "\"@/components/ui/tour\""
+            - generic [ref=e55]: ;
+            - generic [ref=e57]: "|"
+            - generic [ref=e59]: ^
+            - generic [ref=e61]: 103 |
+            - generic [ref=e63]: 104 |
+            - generic [ref=e65]: // ---------------- Utilities ----------------
+            - generic [ref=e67]: 105 |
+            - generic [ref=e69]: function
+            - generic [ref=e70]: clamp(n
+            - generic [ref=e71]: ":"
+            - generic [ref=e72]: number
+            - generic [ref=e73]: ","
+            - generic [ref=e74]: lo
+            - generic [ref=e75]: ":"
+            - generic [ref=e76]: number
+            - generic [ref=e77]: ","
+            - generic [ref=e78]: hi
+            - generic [ref=e79]: ":"
+            - generic [ref=e80]: "number) {"
+            - link "https://nextjs.org/docs/messages/module-not-found" [ref=e82] [cursor=pointer]:
+              - /url: https://nextjs.org/docs/messages/module-not-found
+        - contentinfo [ref=e83]:
+          - paragraph [ref=e84]:
+            - generic [ref=e85]: This error occurred during the build process and can only be dismissed by fixing the error.
+```
