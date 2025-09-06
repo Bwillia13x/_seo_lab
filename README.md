@@ -52,6 +52,10 @@ npm run dev
 
 Visit `http://localhost:3000` to access the Belmont SEO Lab.
 
+Production (client trial):
+- App: https://seo-lab-echoexes-projects.vercel.app
+- See `docs/CLIENT_TRIAL_GUIDE.md` for a link bundle and a 10‑minute demo script.
+
 ### Production Deployment
 
 ```bash
@@ -62,9 +66,20 @@ npm install -g vercel
 vercel --prod
 ```
 
+See docs/DEPLOYMENT.md for a full deployment runbook and rollback steps.
+
 Environment variables:
 - `NEXT_PUBLIC_SITE_BASE`: Set to the deployed base URL (e.g. `https://belmont-seo-lab.vercel.app`). Used for OpenGraph, robots, and sitemap.
 - `NEXT_PUBLIC_ALLOW_INDEXING`: Set to `true` when you want search engines to index the site. Defaults to noindex when unset.
+
+### Security & Secrets Management
+- Do not commit secrets. Local env files (`.env*.local`) are ignored by Git.
+- Rotate `OPENAI_API_KEY` before client delivery:
+  - Generate a new key in your OpenAI account.
+  - Update the key in your hosting provider’s secrets manager for production and staging.
+  - Remove/replace any local test keys in `.env.local` as needed.
+- Prefer provider-managed env vars over committing files. Use the templates in `env/.env.production.example` and `env/.env.staging.example` for reference only.
+- In CI (GitHub Actions), set secrets under repository Settings → Secrets and variables → Actions, and expose them via `env:` in the workflow if required by tests.
 
 ---
 
@@ -183,6 +198,13 @@ The Belmont SEO Lab comes pre-configured with Belmont-specific data and settings
 - Veterans Day specials
 - Local event participation
 - Seasonal service campaigns
+
+---
+
+## 📦 Handoff & Client Guide
+
+- Review the Client Handoff Checklist at docs/CLIENT_HANDOFF_CHECKLIST.md to verify production readiness.
+- Use docs/DEMO_GUIDE.md to walk through the key flows with stakeholders.
 
 #### **5. 🎨 Social Media Content Studio**
 **Why It Matters:** Consistent, professional social media content builds your brand and keeps customers engaged. Show off your work, share tips, and remind customers you're the best barber in town.
