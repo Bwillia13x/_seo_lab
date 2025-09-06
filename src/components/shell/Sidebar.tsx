@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Scissors,
   BarChart3,
@@ -23,7 +24,7 @@ import {
   X,
 } from "lucide-react";
 
-const navigationGroups = [
+export const navigationGroups = [
   {
     title: "Getting Started",
     items: [
@@ -84,6 +85,13 @@ const navigationGroups = [
       { href: "/apps/citation-tracker", label: "Business Listings Check", icon: Scissors },
     ],
   },
+  {
+    title: "Support",
+    items: [
+      { href: "/status", label: "Status", icon: AlertTriangle },
+      { href: "/guide/trial", label: "Trial Guide", icon: FileText },
+    ],
+  },
 ];
 
 function NavItem({
@@ -113,7 +121,9 @@ function NavItem({
 }
 
 export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
 
   // Close mobile menu when clicking outside or on navigation
   useEffect(() => {
@@ -136,6 +146,38 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
     };
   }, [isMobileMenuOpen]);
 
+  // Focus trap when mobile menu is open
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Tab') return;
+      const root = sidebarRef.current;
+      if (!root) return;
+      const focusables = Array.from(
+        root.querySelectorAll<HTMLElement>(
+          'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => !el.hasAttribute('disabled'));
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (active === first || !root.contains(active)) {
+          last.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (active === last) {
+          first.focus();
+          e.preventDefault();
+        }
+      }
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isMobileMenuOpen]);
+
   return (
     <>
       {/* Mobile Menu Toggle */}
@@ -147,7 +189,7 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
         {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
-      <aside className={`sidebar-container border-r bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:translate-x-0 transition-transform duration-300 ease-in-out ${
+      <aside ref={sidebarRef} className={`sidebar-container border-r bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:translate-x-0 transition-transform duration-300 ease-in-out ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       } fixed lg:static inset-y-0 left-0 z-40 w-72 lg:w-auto`}>
         <div className="p-4 border-b lg:border-b-0">
@@ -167,7 +209,7 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
             </div>
           </div>
         </div>
-      <nav className="px-2 space-y-4">
+      <nav className="px-2 space-y-4" aria-label="Primary Navigation" role="navigation">
         {navigationGroups.map((group, groupIndex) => {
           const simpleHide = new Set([
             "/apps/queuetime",
@@ -190,7 +232,9 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
                 </div>
               )}
               <div className="space-y-1">
-              {items.map(({ href, label, icon: Icon }) => (
+              {items.map(({ href, label, icon: Icon }) => {
+                const active = pathname === href;
+                return (
                 <div key={href} className="space-y-0.5">
                   <NavItem
                     href={href}
@@ -198,6 +242,8 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
                     Icon={Icon}
                     onClick={() => setIsMobileMenuOpen(false)}
                   />
+                  {/* Active indicator */}
+                  <div className={`h-[2px] mx-3 ${active ? 'bg-primary/60' : 'bg-transparent'}`} />
                   {simple && group.title === "Marketing & Tracking" && (
                     <div className="pl-10 pr-3 text-[11px] text-muted-foreground">
                       {label === "Campaign Links" &&
@@ -237,7 +283,7 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
                     </div>
                   )}
                 </div>
-              ))}
+              )})}
             </div>
           </div>
           );

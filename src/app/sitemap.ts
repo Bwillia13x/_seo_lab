@@ -43,6 +43,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${base}/status`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.5,
+    },
+    {
+      url: `${base}/guide/trial`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.5,
+    },
   ];
   for (const r of appRoutes) {
     items.push({
