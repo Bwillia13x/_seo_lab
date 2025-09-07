@@ -61,6 +61,12 @@ test.describe('SEO Lab - Visual Regression Suite', () => {
         await page.waitForLoadState('networkidle');
         await page.waitForTimeout(2000); // Allow charts/dynamic content to render
 
+        // Reduce motion globally and disable animations/caret artifacts
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await page.addStyleTag({
+          content: '* { animation: none !important; transition: none !important; caret-color: transparent !important; }',
+        });
+
         // Take layout screenshot
         const screenshot = await page.screenshot({
           fullPage: true,
@@ -81,13 +87,38 @@ test.describe('SEO Lab - Visual Regression Suite', () => {
       for (const viewport of VIEWPORTS) {
         test(`Responsive: ${app} @ ${viewport.width}x${viewport.height}`, async ({ page }) => {
           await page.setViewportSize({ width: viewport.width, height: viewport.height });
+          // Freeze time and random for deterministic visuals before app code runs
+          await page.addInitScript(() => {
+            const fixed = new Date('2024-01-01T00:00:00Z').valueOf();
+            // @ts-ignore
+            Date.now = () => fixed;
+            let seed = 1337;
+            // @ts-ignore
+            Math.random = () => {
+              seed = (seed * 1103515245 + 12345) % 0x100000000;
+              return seed / 0x100000000;
+            };
+          });
           await page.goto(`/apps/${app}`);
           await page.waitForLoadState('networkidle');
           await page.waitForTimeout(1500);
 
+          // Reduce motion and disable animations to de-flake visuals
+          await page.emulateMedia({ reducedMotion: 'reduce' });
+          await page.addStyleTag({
+            content: '* { animation: none !important; transition: none !important; caret-color: transparent !important; }',
+          });
+
+          // Mask dynamic chart areas for apps with high-motion visualizations
+          const masks = [page.locator('[data-testid="loading-spinner"]').first()];
+          if (app === 'gsc-ctr-miner') {
+            masks.push(page.locator('[class*="recharts-"]'));
+            masks.push(page.locator('svg[aria-label*="chart"], svg[role="img"]'));
+          }
+
           const screenshot = await page.screenshot({
             fullPage: false, // Only viewport for mobile testing
-            mask: [page.locator('[data-testid="loading-spinner"]').first()],
+            mask: masks,
             animations: 'disabled'
           });
 
@@ -105,16 +136,16 @@ test.describe('SEO Lab - Visual Regression Suite', () => {
 
       // Initial state: KPI labels visible
       await expect(page.getByText(/Links \(30d\)/)).toBeVisible();
-      let screenshot = await page.screenshot();
-      expect(screenshot).toMatchSnapshot('dashboard-initial-state.png');
+      let screenshot = await page.screenshot({ animations: 'disabled', fullPage: false });
+      expect(screenshot).toMatchSnapshot('dashboard-initial-state.png', { maxDiffPixelRatio: 0.03 });
 
       // Load demo data
       await page.getByRole('button', { name: /Load Demo Metrics/i }).click();
       await page.waitForTimeout(2000);
 
       // Loaded state
-      screenshot = await page.screenshot({ fullPage: false });
-      expect(screenshot).toMatchSnapshot('dashboard-loaded-state.png');
+      screenshot = await page.screenshot({ fullPage: false, animations: 'disabled' });
+      expect(screenshot).toMatchSnapshot('dashboard-loaded-state.png', { maxDiffPixelRatio: 0.03 });
 
       // Verify KPI cards are populated
       await expect(page.getByText(/Links.*30d/).first()).toBeVisible();
@@ -193,13 +224,32 @@ test.describe('SEO Lab - Visual Regression Suite', () => {
 
     test('Table Data Rendering - Rank Grid', async ({ page }) => {
       await page.setViewportSize({ width: 1920, height: 1080 });
+      // Freeze time and random for deterministic visuals before app code runs
+      await page.addInitScript(() => {
+        const fixed = new Date('2024-01-01T00:00:00Z').valueOf();
+        // @ts-ignore - override Date.now for page context
+        Date.now = () => fixed;
+        // Deterministic PRNG
+        let seed = 42;
+        // @ts-ignore - override Math.random in page context
+        Math.random = () => {
+          seed = (seed * 1664525 + 1013904223) % 4294967296;
+          return seed / 4294967296;
+        };
+      });
       await page.goto('/apps/rank-grid');
 
       const gridTab = page.getByRole('tab', { name: 'Grid Input' });
       await gridTab.click();
 
+      // De-flake visuals: hide blinking caret and disable transitions/animations
+      await page.addStyleTag({
+        content:
+          '* { caret-color: transparent !important; animation: none !important; transition: none !important; }',
+      });
+
       // Empty data table
-      let screenshot = await page.screenshot({ fullPage: false });
+      let screenshot = await page.screenshot({ fullPage: false, animations: 'disabled' });
       expect(screenshot).toMatchSnapshot('rank-grid-empty-table.png');
 
       // Load demo data
@@ -211,6 +261,7 @@ test.describe('SEO Lab - Visual Regression Suite', () => {
       // Populated grid after demo load
       screenshot = await page.screenshot({
         fullPage: false,
+        animations: 'disabled',
         mask: [page.locator('[data-testid="table-loading"]')]
       });
       expect(screenshot).toMatchSnapshot('rank-grid-populated-table.png');

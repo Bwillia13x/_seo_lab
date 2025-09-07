@@ -33,3 +33,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# visual and accessibility artifacts
+/test-results/
+/visual-reports/
+visual-test-results.json
+accessibility-report.json
+tests/performance-results.json

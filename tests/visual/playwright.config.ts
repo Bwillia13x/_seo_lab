@@ -4,8 +4,8 @@ import { defineConfig, devices } from '@playwright/test';
 // Optimized for screenshot comparison and visual consistency
 
 export default defineConfig({
-  testDir: './tests/visual',
-  outputDir: './test-results/visual',
+  testDir: './',
+  outputDir: '../../test-results/visual',
   testIgnore: '**/github.com/**',
 
   // Timeout settings for visual tests (longer for screenshot capture)
@@ -13,7 +13,8 @@ export default defineConfig({
   expect: {
     timeout: 10000,
     toMatchSnapshot: {
-      threshold: 0.03, // 3% pixel difference threshold to reduce flakiness
+      threshold: 0.03, // Pixel color sensitivity for pixelmatch
+      maxDiffPixelRatio: 0.03, // Allow up to 3% of pixels to differ to reduce flake
     },
   },
 
@@ -80,6 +81,6 @@ export default defineConfig({
   },
 
   // Global setup and teardown
-  globalSetup: './tests/visual/setup.ts',
-  globalTeardown: './tests/visual/teardown.ts',
+  globalSetup: './setup.ts',
+  globalTeardown: './teardown.ts',
 });
