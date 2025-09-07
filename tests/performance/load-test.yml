@@ -1,0 +1,84 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 10
+      arrivalRate: 5
+      name: Warm up phase
+    - duration: 60
+      arrivalRate: 20
+      name: Traffic spike
+    - duration: 30
+      arrivalRate: 2
+      name: Recovery phase
+  defaults:
+    headers:
+      User-Agent: "Artillery Load Test"
+  http:
+    pool: 10
+    timeout: 30000
+  outputFormat: json
+
+scenarios:
+  - name: "Load Test SEO Tools"
+    weight: 100
+    flow:
+      - get:
+          url: "/"
+      - wait: 1
+      - get:
+          url: "/apps/dashboard"
+      - wait: 2
+      - get:
+          url: "/api/ai/status"
+      - wait: 1
+      - get:
+          url: "/apps/gsc-ctr-miner"
+      - wait: 3
+      - post:
+          url: "/apps/gsc-ctr-miner"
+          formData:
+            data: "Sample GSC CSV data simulation"
+      - wait: 2
+      - get:
+          url: "/apps/utm-qr"
+      - wait: 1
+
+  - name: "Stress AI Endpoints"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/health"
+      - wait: 0.5
+      - get:
+          url: "/api/ai/status"
+      - wait: 1
+      - post:
+          url: "/api/ai/chat"
+          json:
+            model: "gpt-5-mini-2025-08-07"
+            messages: [
+              { role: "user", content: "Test performance monitoring" }
+            ]
+          capture:
+            json: "$.ok"
+            as: "ai_response"
+      - wait: 2
+
+  - name: "Concurrent Tool Usage"
+    weight: 40
+    flow:
+      - get:
+          url: "/apps/review-composer"
+      - wait: 2
+      - post:
+          url: "/apps/review-composer/request-reviews"
+          formData:
+            email_count: 2
+            service_type: "haircut"
+      - wait: 1
+      - get:
+          url: "/apps-addon-recommender"
+      - wait: 3
+      - get:
+          url: "/apps/rank-grid"
+      - wait: 2

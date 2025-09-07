@@ -55,6 +55,7 @@ import { aiChatSafe } from "@/lib/ai";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
+import { saveBlob } from "@/lib/blob";
 
 // ---------- Enhanced Types ----------
 type Post = {
@@ -321,16 +322,6 @@ function monthCode() {
   const y = String(d.getFullYear()).slice(2);
   const m = String(d.getMonth() + 1).padStart(2, "0");
   return `${y}${m}`;
-}
-function saveBlob(blob: Blob, filename: string) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
 }
 function buildUrl(base: string, p: Record<string, string | undefined>) {
   try {
@@ -1226,7 +1217,7 @@ export default function Page() {
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
         title="AI Social Media Studio"
-        subtitle="Generate AI-powered multi-platform content with analytics, scheduling, and performance tracking."
+        subtitle="Create multi‑platform posts, schedule, and track."
         actions={
           <div className="flex gap-2">
             <Button variant="secondary" onClick={loadBelmontSample}>

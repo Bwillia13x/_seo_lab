@@ -739,6 +739,7 @@ export default function PostOracle() {
 
     const blob = new Blob([csvContent], { type: "text/csv" });
     saveBlob(blob, `belmont-posts-${selectedWeek}.csv`);
+    try { showToast("Exported posts CSV", "success"); } catch {}
   };
 
   const postsByDate = posts.reduce(
@@ -754,7 +755,7 @@ export default function PostOracle() {
     <div className="space-y-6">
       <PageHeader
         title="AI Content Studio"
-        subtitle="Generate intelligent, local-focused content across all platforms with AI-powered optimization."
+        subtitle="Generate weekly content plans with AI help."
         actions={
           <div className="flex gap-2">
             <Button onClick={generatePosts}>
@@ -774,6 +775,8 @@ export default function PostOracle() {
                 variant="outline"
                 onClick={exportPosts}
                 disabled={!posts.length}
+                aria-label="Export Posts CSV"
+                title="Download posts CSV"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Export CSV

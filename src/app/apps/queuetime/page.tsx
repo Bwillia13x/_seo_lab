@@ -629,7 +629,7 @@ async function generateAIBusyTimeOptimization(
     <div className="space-y-6">
       <PageHeader
         title="AI Busy Time Intelligence Studio"
-        subtitle="AI-powered busy time prediction with optimization recommendations, customer flow intelligence, and automated scheduling optimization for Belmont Barbershop."
+        subtitle="Predict busy times and optimize scheduling."
         showLogo={true}
         actions={
           <div className="flex gap-2">

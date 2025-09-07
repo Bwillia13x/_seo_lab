@@ -111,6 +111,8 @@ import { aiChatSafe } from "@/lib/ai";
 import { saveBlob } from "@/lib/blob";
 import { toCSV, fromCSV } from "@/lib/csv";
 import { todayISO } from "@/lib/dates";
+import { Tour } from "@/components/ui/tour";
+import { showToast } from "@/lib/toast";
 
 // -------- Utilities --------
 function clamp(n: number, lo: number, hi: number) {
@@ -690,6 +692,8 @@ const loadDemo = useCallback(() => {
 
     // Clear competitors for next snapshot
     setCompetitors([]);
+    // Mark snapshot ready for tests/UX hooks
+    try { (async () => { (await import("@/lib/toast")).showToast("Snapshot saved", "success"); })(); } catch {}
   }
 
   function exportCSV() {
@@ -710,6 +714,7 @@ const loadDemo = useCallback(() => {
       new Blob([csv], { type: "text/csv;charset=utf-8;" }),
       `belmont-rank-grid-${todayISO()}.csv`
     );
+    try { (async () => { (await import("@/lib/toast")).showToast("Exported Rank Grid CSV", "success"); })(); } catch {}
   }
 
   // ---------------- Enhanced Functions ----------------
@@ -2158,9 +2163,17 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
 
   return (
     <div className="p-5 md:p-8 space-y-6">
+      <Tour
+        id="rank-grid"
+        steps={[
+          { title: "Load a demo grid", body: "Use Load Demo to populate a realistic ranking grid." },
+          { title: "Save a snapshot", body: "Click Save Snapshot to track changes over time." },
+          { title: "Export data", body: "Export a CSV to share results or analyze in spreadsheets." }
+        ]}
+      />
       <PageHeader
         title="AI Ranking Intelligence Studio"
-        subtitle="AI-powered search ranking analysis with optimization recommendations, competitor intelligence, and automated campaign management."
+        subtitle="Analyze local rankings with AI and track improvements."
         showLogo={true}
         actions={
           <div className="flex gap-2">
@@ -2232,7 +2245,7 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
       <Tabs defaultValue="howto" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4 lg:grid-cols-16 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
-          <TabsTrigger value="grid">Grid Input</TabsTrigger>
+          <TabsTrigger value="grid" data-testid="rank-grid-tab-grid">Grid Input</TabsTrigger>
           <span className="advanced-only contents">
             <TabsTrigger value="ai-optimize">AI Optimize</TabsTrigger>
             <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
@@ -2603,6 +2616,10 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                     Save Snapshot
                   </Button>
                 </div>
+                {/* Deterministic signal for tests: snapshot exists */}
+                {snapshots.length > 0 && (
+                  <span data-testid="rankgrid-snapshot-ready" className="sr-only">snapshot ready</span>
+                )}
                 <div className="flex gap-2 items-center">
                   <input
                     type="file"
@@ -2617,11 +2634,11 @@ function onImportFile(e: React.ChangeEvent<HTMLInputElement>) {
                       Import CSV
                     </Button>
                   </label>
-                  <Button variant="outline" onClick={exportCSV}>
+                  <Button variant="outline" onClick={exportCSV} aria-label="Export Rank Grid CSV" title="Download Rank Grid as CSV">
                     <Download className="h-4 w-4 mr-2" />
                     Export CSV
                   </Button>
-                  <Button variant="outline" onClick={exportJSON}>
+                  <Button variant="outline" onClick={exportJSON} aria-label="Export Rank Grid JSON" title="Download Rank Grid as JSON">
                     <Download className="h-4 w-4 mr-2" />
                     Export JSON
                   </Button>

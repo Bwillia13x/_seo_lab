@@ -870,7 +870,7 @@ export default function ReviewKit() {
       )}
       <PageHeader
         title="Review Request Links"
-        subtitle="Create Google/Apple review links, copy CASL-compliant email/SMS, and print QR cards. (Optional: connect AI for optimization)"
+        subtitle="Create review links, copy CASL‑compliant messages, and print QR cards."
         actions={
           <div className="flex gap-2 advanced-only">
             <Button onClick={getAIOptimization} variant="outline">

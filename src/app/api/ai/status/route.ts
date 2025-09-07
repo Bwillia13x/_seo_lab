@@ -7,7 +7,31 @@ const LIMITS = {
 };
 
 export async function GET() {
+  console.log('🔍 Checking AI status (edge runtime)');
+
   const hasKey = Boolean(process.env.OPENAI_API_KEY);
-  return NextResponse.json({ hasKey, defaultModel: DEFAULT_MODEL, limits: LIMITS });
+  const rateLimitsValid = Boolean(
+    process.env.AI_RATE_PER_MINUTE &&
+    process.env.AI_RATE_PER_DAY &&
+    !isNaN(Number(process.env.AI_RATE_PER_MINUTE)) &&
+    !isNaN(Number(process.env.AI_RATE_PER_DAY))
+  );
+
+  if (!hasKey) {
+    console.warn('⚠️ OPENAI_API_KEY is missing - AI features will be disabled');
+  } else {
+    console.log('✅ OPENAI_API_KEY is configured');
+  }
+
+  if (!rateLimitsValid) {
+    console.warn('⚠️ AI rate limits not properly configured, using defaults');
+  }
+
+  return NextResponse.json({
+    hasKey,
+    defaultModel: DEFAULT_MODEL,
+    limits: LIMITS,
+    warnings: hasKey ? undefined : ['AI API key missing']
+  });
 }
 

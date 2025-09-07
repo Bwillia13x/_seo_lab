@@ -1,0 +1,901 @@
+{
+  "config": {
+    "configFile": "/Users/benjaminwilliams/_seo_lab/playwright.config.ts",
+    "rootDir": "/Users/benjaminwilliams/_seo_lab/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 5
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/benjaminwilliams/_seo_lab/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/benjaminwilliams/_seo_lab/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 5,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "accessibility/accessibility.spec.ts",
+      "file": "accessibility/accessibility.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Full Accessibility Audit Report",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 1073,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "\n📊 ACCESSIBILITY COMPLIANCE SCORECARD:\n"
+                    },
+                    {
+                      "text": "Overall Score: 89%\n"
+                    },
+                    {
+                      "text": "Violations: 4\n"
+                    },
+                    {
+                      "text": "Passes: 32\n"
+                    },
+                    {
+                      "text": "Critical Issues: 0\n"
+                    },
+                    {
+                      "text": "Serious Issues: 2\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-09-05T22:34:33.671Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "4a7f7e6dc8f91dd24280-c8184e17e889d49b56c0",
+          "file": "accessibility/accessibility.spec.ts",
+          "line": 213,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "WCAG Compliance - Core Applications",
+          "file": "accessibility/accessibility.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Dashboard - Critical Access Points",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1039,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:32.402Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-44b7604e206d8a69f759",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 11,
+              "column": 7
+            },
+            {
+              "title": "Review Composer - Form Accessibility",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 968,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:32.399Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-8a65cc7af15837e9dd18",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 42,
+              "column": 7
+            },
+            {
+              "title": "Keyboard Navigation - Core Functionality",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 648,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:32.400Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-cd68b3baa45e4b9ff1c9",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "Screen Reader Support - ARIA Labels",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1074,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:32.395Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-d0b53877d4614d23a659",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 92,
+              "column": 7
+            },
+            {
+              "title": "Color Contrast - Charts and Visual Elements",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 1035,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:32.397Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-86b9eaf833005f186971",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 113,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "SEO Lab Business Logic Accessibility",
+          "file": "accessibility/accessibility.spec.ts",
+          "line": 152,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Language Toggle and Internationalization",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 279,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:33.304Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-5a2241e230ab83ea25be",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 153,
+              "column": 7
+            },
+            {
+              "title": "Skip Links and Navigation Landmarks",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 447,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:33.591Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-94538929ddc2a37b6f8b",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 166,
+              "column": 7
+            },
+            {
+              "title": "Error Handling and Feedback Accessibility",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 545,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:33.649Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-dc2577d3231fcfb3476a",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 179,
+              "column": 7
+            },
+            {
+              "title": "Modal and Dialog Accessibility",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 455,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:33.651Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4a7f7e6dc8f91dd24280-b5f85ca6420e84326635",
+              "file": "accessibility/accessibility.spec.ts",
+              "line": 196,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "accessibility/compliance-rules.spec.ts",
+      "file": "accessibility/compliance-rules.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "WCAG 2.1 AA - Critical Success Criteria",
+          "file": "accessibility/compliance-rules.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Info and Relationships - Form Labels and Structure",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 614,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:33.691Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-bcf08da9e72bc6e07362",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 20,
+              "column": 7
+            },
+            {
+              "title": "Keyboard Access - Chart Navigation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 688,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:34.086Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-c4cefc0fe34e92955bdc",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 39,
+              "column": 7
+            },
+            {
+              "title": "Color Contrast - KPI Cards",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 824,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:34.173Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-49f699c28fd41c473153",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 56,
+              "column": 7
+            },
+            {
+              "title": "Focus Visibility - Interactive Elements",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 576,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:34.235Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-580a6f579920a202e158",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 76,
+              "column": 7
+            },
+            {
+              "title": "Form Labels and Instructions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1008,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:34.344Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-cfb3f1d933c360e6cf57",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 100,
+              "column": 7
+            },
+            {
+              "title": "Heading Structure Hierarchy",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 359,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:34.792Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-1511ecbfea74825dd242",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 118,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "SEO Lab - Application-Specific A11Y",
+          "file": "accessibility/compliance-rules.spec.ts",
+          "line": 139,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Chart Accessibility - Recharts ARIA Support",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1335,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:34.820Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-8fef081768b29b6d604b",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 140,
+              "column": 7
+            },
+            {
+              "title": "Dynamic Content Updates - Screen Reader Announcements",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 381,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "⚠️ Consider adding aria-live regions for dynamic content updates\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:34.836Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-b050ce75885e85833704",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 148,
+              "column": 7
+            },
+            {
+              "title": "Error Boundaries - Accessible Error Handling",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 236,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:35.033Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-cc40f3e010440a9f0c91",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 167,
+              "column": 7
+            },
+            {
+              "title": "Loading States - Screen Reader Feedback",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 214,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "ℹ️ Consider adding accessible loading indicators\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:35.167Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-3a6efc6581f62fbf75df",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 178,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Progressive Enhancement - A11Y First",
+          "file": "accessibility/compliance-rules.spec.ts",
+          "line": 199,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Graceful Degradation - CSS Disabled",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 231,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:35.231Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-802ef71e789ac59b29e3",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 200,
+              "column": 7
+            },
+            {
+              "title": "Enhanced Experience - ARIA Attributes",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 207,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "📈 Enhanced accessibility elements found: 4\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-09-05T22:34:35.283Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3accb366ecb475594197-9e1034147679e5a15f52",
+              "file": "accessibility/compliance-rules.spec.ts",
+              "line": 216,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-09-05T22:34:31.947Z",
+    "duration": 4249.995000000001,
+    "expected": 22,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

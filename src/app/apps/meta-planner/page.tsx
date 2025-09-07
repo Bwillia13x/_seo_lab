@@ -186,7 +186,7 @@ export default function MetaPlanner() {
     <div className="space-y-6">
       <PageHeader
         title="Page Titles & Descriptions"
-        subtitle="Manage A/B/C title and meta description experiments with CTR tracking."
+        subtitle="Plan and test titles and meta descriptions."
         actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={loadSampleExperiments}>

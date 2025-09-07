@@ -714,7 +714,7 @@ async function generateAIPartnershipOptimization(
     <div className="space-y-6">
       <PageHeader
         title="AI Partnership Intelligence Studio"
-        subtitle="AI-powered partnership prospecting with intelligent scoring, outreach optimization, and relationship management for Belmont Barbershop partnerships."
+        subtitle="Map partner opportunities and plan outreach."
         actions={
           <div className="flex gap-2">
             {/* Simple actions */}

@@ -955,7 +955,7 @@ function LinkProspectKit() {
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
         title="AI Partner Intelligence Studio"
-        subtitle="AI-powered partner prospecting with intelligent scoring, outreach optimization, and relationship management for Belmont Barbershop partnerships."
+        subtitle="Find, score, and track partner prospects."
         actions={
           <div className="flex gap-2">
             {/* Simple actions */}

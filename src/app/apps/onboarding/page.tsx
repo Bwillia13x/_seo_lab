@@ -84,7 +84,7 @@ export default function Onboarding() {
     <div className="space-y-6">
       <PageHeader
         title="Onboarding"
-        subtitle="Three quick steps to set review link, contact info, and booking URL."
+        subtitle="Set review link, contact info, and booking URL."
         actions={
           <Button asChild>
             <Link href="/apps/review-link"><ArrowRight className="h-4 w-4 mr-2"/>Go to Review Requests</Link>

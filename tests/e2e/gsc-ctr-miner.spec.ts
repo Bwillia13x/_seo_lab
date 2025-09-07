@@ -7,15 +7,20 @@ test.describe('Search Performance (CTR Miner)', () => {
     // Load Belmont sample data
     await page.getByRole('button', { name: /Load Belmont Sample Data/i }).click();
 
-    // Switch to Analytics tab and run
-    await page.getByRole('tab', { name: /^Analytics$/ }).click();
-    const runBtn = page.getByRole('button', { name: /Run Analytics/i });
-    if (await runBtn.isEnabled()) {
-      await runBtn.click();
-    }
+    // Short wait for UI hydrate
+    await page.waitForTimeout(500);
+
+    // Switch to Analytics tab (disambiguate from "Run Analytics" button)
+    await page.getByRole('tab', { name: 'Analytics' }).click();
+    await expect(page.getByText(/Search Analytics Summary/i)).toBeVisible({ timeout: 12000 });
+
+    // Wait for Run Analytics button to be enabled
+    const runBtn = page.getByTestId('run-analytics');
+    await expect(runBtn).toBeVisible({ timeout: 12000 });
+    await expect(runBtn).toBeEnabled();
+    await runBtn.click();
 
     // Expect KPIs like Total Queries to appear
     await expect(page.getByText(/Total Queries/i)).toBeVisible();
   });
 });
-

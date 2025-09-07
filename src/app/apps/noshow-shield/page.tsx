@@ -32,7 +32,7 @@ export default function NoShowShield() {
     <div className="space-y-6">
       <PageHeader
         title="Appointment Reminders"
-        subtitle="Predict and prevent no-show appointments using historical data patterns."
+        subtitle="Predict and prevent no‑shows from historical patterns."
         actions={
           <Button variant="outline" onClick={() => setLoaded(true)}>
             <Upload className="h-4 w-4 mr-2" />

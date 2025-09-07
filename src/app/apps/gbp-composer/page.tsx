@@ -753,7 +753,7 @@ export default function GBPPostComposer() {
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
         title="Google Business Profile Post Composer"
-        subtitle="AI-powered content creation with SEO optimization, A/B testing, analytics tracking, and professional templates for Belmont's Google Business Profile."
+        subtitle="Create GBP posts with SEO checks and templates."
         showLogo={true}
       />
 

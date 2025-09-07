@@ -486,7 +486,7 @@ export default function SEOBriefSchemaBuilder() {
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
         title="Website Guide"
-        subtitle="Generate page briefs & JSON‑LD for Belmont — copy‑paste into your CMS today."
+        subtitle="Generate page briefs and JSON‑LD for your CMS."
         showLogo={true}
       />
 

@@ -547,7 +547,7 @@ export default function ReferralQR() {
     <div className="space-y-6">
       <PageHeader
         title="AI Referral Studio"
-        subtitle="AI-powered referral management with performance analytics, campaign optimization, and automated incentive programs."
+        subtitle="Manage referrals, track performance, and optimize incentives."
         actions={
           <div className="flex gap-2">
             <span className="advanced-only contents">

@@ -46,7 +46,7 @@ export default function NeighborSignal() {
     <div className="space-y-6">
       <PageHeader
         title="Local Content Ideas"
-        subtitle="Analyze content for local SEO signals and suggest improvements for Bridgeland/Riverside."
+        subtitle="Check local SEO signals and suggest improvements."
       />
 
       <Tabs defaultValue="howto" className="w-full">

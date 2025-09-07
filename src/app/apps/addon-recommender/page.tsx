@@ -446,7 +446,7 @@ export default function AddOnRecommender() {
     <div className="space-y-6">
       <PageHeader
         title="Service Suggestions"
-        subtitle="Recommend service add-ons based on customer purchase patterns."
+        subtitle="Recommend add‑ons from purchase patterns."
         actions={
           <Button variant="outline" onClick={() => setLoaded(true)}>
             <Upload className="h-4 w-4 mr-2" />

@@ -68,6 +68,7 @@ import { logEvent } from "@/lib/analytics";
 import { saveBlob, createCSVBlob } from "@/lib/blob";
 import { parseCSV, toCSV } from "@/lib/csv";
 import { todayISO, addDays } from "@/lib/dates";
+import { Tour } from "@/components/ui/tour";
 import { fetchWithRetry } from "@/lib/net";
 
 type Review = {
@@ -799,17 +800,30 @@ export default function ReviewComposer() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" aria-current="page">
+      {reviews.length > 0 && (
+        <span data-testid="review-queue-ready" className="sr-only">queue ready</span>
+      )}
+      <Tour
+        id="review-composer"
+        steps={[
+          { title: "Load sample reviews", body: "Use Load Sample to populate the queue for a quick demo." },
+          { title: "Compose a reply", body: "Open a review and use AI Generate to draft a response you can edit." },
+          { title: "Track performance", body: "View response analytics and export a report for your records." }
+        ]}
+      />
       <PageHeader
         title="AI Review Response Studio"
-        subtitle="AI-powered review management with intelligent responses, performance analytics, and automated optimization."
+        subtitle="Load sample reviews, draft AI responses, and export analytics."
         actions={
           <div className="flex gap-2">
+            <span id="ai-generate-help" className="sr-only">Generates a suggested reply using AI.</span>
             {/* Always-available simple action */}
-            <Button variant="outline" onClick={loadSampleData}>
+            <Button variant="outline" onClick={loadSampleData} aria-describedby="reviews-load-help">
               <Upload className="h-4 w-4 mr-2" />
               Load Sample
             </Button>
+            <span id="reviews-load-help" className="sr-only">Loads example reviews for testing the composer.</span>
             <input
               type="file"
               accept=".csv"
@@ -822,7 +836,7 @@ export default function ReviewComposer() {
             </label>
             {/* Advanced-only actions */}
             <span className="advanced-only contents">
-              <Button onClick={generateAIResponse} disabled={!selectedReview} variant="outline">
+              <Button onClick={generateAIResponse} disabled={!selectedReview} variant="outline" aria-describedby="ai-generate-help">
                 <Brain className="h-4 w-4 mr-2" />
                 AI Generate
               </Button>

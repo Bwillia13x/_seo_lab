@@ -2,6 +2,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { AIBadge } from "@/components/ui/ai-badge";
 
 type PageHeaderProps = {
@@ -32,6 +33,7 @@ export function PageHeader({
           />
         )}
         <div>
+          <Breadcrumbs />
           <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
           {subtitle && (
             <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>

@@ -401,7 +401,7 @@ function CitationNAPTracker() {
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
         title="Business Listings Check"
-        subtitle="Create and manage your business listings on Google, Yelp, Facebook, and other websites so more customers can find you."
+        subtitle="Track and fix business listings across major sites."
         actions={
           <Button
             variant="outline"

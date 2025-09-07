@@ -949,7 +949,7 @@ function ProfitIntelligenceStudio() {
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
         title="AI Profit Intelligence Studio"
-        subtitle="AI-powered service profitability analysis with optimization recommendations, revenue forecasting, and automated profit maximization across all services and time slots."
+        subtitle="Analyze service profitability, forecast revenue, and optimize pricing."
         showLogo={true}
         actions={
           <div className="flex gap-2">

@@ -917,7 +917,7 @@ export default function RFMMicroCRM() {
     <div className="p-5 md:p-8 space-y-6">
       <PageHeader
         title="AI Customer Intelligence Studio"
-        subtitle="AI-powered customer segmentation, predictive analytics, and personalized marketing campaigns."
+        subtitle="Segment customers, predict value, and run campaigns."
         actions={
           <div className="flex gap-2">
             {/* Simple actions */}

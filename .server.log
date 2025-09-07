@@ -1,4 +1,6 @@
-   ▲ Next.js 14.0.0
-   - Local:        http://localhost:3123
+  ▲ Next.js 14.2.32
+  - Local:        http://localhost:3000
 
- ✓ Ready in 390ms
+ ✓ Starting...
+ ✓ Ready in 217ms
+🚨 Health check warnings: [ 'Redis configuration incomplete - rate limiting may not work' ]

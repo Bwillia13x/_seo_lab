@@ -2,13 +2,16 @@
 
 import { Sidebar } from "./Sidebar";
 import Link from "next/link";
-import { Search, Sun, MoonStar, Phone, MapPin, Brain, X } from "lucide-react";
+import { Search, Sun, MoonStar, Phone, MapPin, Brain, X, Command, HelpCircle, Type } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
 import Image from "next/image";
 import { AIDiagnostics } from "@/components/ui/ai-diagnostics";
 import { logEvent } from "@/lib/analytics";
 import { ToastProvider } from "@/components/ui/toast";
+import { CommandPalette } from "@/components/ui/command-palette";
+import { HelpOverlay } from "@/components/ui/help-overlay";
 
 export default function AppShell({
   children,
@@ -20,6 +23,9 @@ export default function AppShell({
   const [phoneTel, setPhoneTel] = useState(BELMONT_CONSTANTS.PHONE_TEL);
   const [mapUrl, setMapUrl] = useState(BELMONT_CONSTANTS.MAP_URL);
   const [showAI, setShowAI] = useState(false);
+  const [cmdOpen, setCmdOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     if (typeof document !== "undefined") {
       const isDark = document.documentElement.classList.contains("dark");
@@ -56,6 +62,13 @@ export default function AppShell({
     document.documentElement.classList.toggle("dark");
     setDark((d) => !d);
   }
+  function toggleDensity() {
+    if (typeof document === "undefined") return;
+    const html = document.documentElement;
+    const next = !html.classList.contains("compact");
+    html.classList.toggle("compact", next);
+    try { window.localStorage.setItem("belmont_density", next ? "compact" : "normal"); } catch {}
+  }
   function toggleSimple() {
     if (typeof document === "undefined") return;
     setSimple((s) => {
@@ -80,6 +93,10 @@ export default function AppShell({
       <div className="flex flex-col">
         <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/70 shadow-sm">
           <div className="max-w-[1440px] mx-auto px-4 md:px-6 h-16 flex items-center gap-3">
+            {/* Skip link */}
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-ring px-2 py-1 rounded">
+              Skip to main content
+            </a>
             <Link
               href="/"
               className="flex items-center gap-2 font-semibold tracking-tight text-sm md:text-base hover:opacity-80 transition-opacity"
@@ -123,6 +140,7 @@ export default function AppShell({
                 <div className="relative hidden md:block">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                   <input
+                    id="header-search"
                     placeholder="Search tools…"
                     aria-label="Search tools"
                     className="h-10 w-[220px] pl-9 pr-3 rounded-full border bg-background/60 focus:bg-background transition-colors focus:ring-2 focus:ring-ring focus:ring-offset-2"
@@ -141,6 +159,22 @@ export default function AppShell({
                   {simple ? "Simple" : "Advanced"}
                 </button>
                 <button
+                  aria-label="Command palette"
+                  className="h-10 w-10 inline-flex items-center justify-center rounded-md border hover:bg-accent transition-colors focus-ring"
+                  onClick={() => setCmdOpen(true)}
+                  title="Command palette (Ctrl/Cmd+K)"
+                >
+                  <Command className="h-4 w-4" />
+                </button>
+                <button
+                  aria-label="Toggle density"
+                  className="h-10 w-10 inline-flex items-center justify-center rounded-md border hover:bg-accent transition-colors focus-ring"
+                  onClick={toggleDensity}
+                  title="Toggle density (compact/comfortable)"
+                >
+                  <Type className="h-4 w-4" />
+                </button>
+                <button
                   aria-label="Toggle theme"
                   className="h-10 w-10 inline-flex items-center justify-center rounded-md border hover:bg-accent transition-colors focus-ring"
                   onClick={toggleTheme}
@@ -151,14 +185,24 @@ export default function AppShell({
                     <MoonStar className="h-4 w-4" />
                   )}
                 </button>
+                <button
+                  aria-label="Help"
+                  className="h-10 w-10 inline-flex items-center justify-center rounded-md border hover:bg-accent transition-colors focus-ring"
+                  onClick={() => setHelpOpen(true)}
+                  title="Help (press ?)"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                </button>
               </div>
             </div>
           </div>
         </header>
-        <main className="p-4 md:p-6 max-w-[1440px] mx-auto w-full">
+        <main id="main-content" className="p-4 md:p-6 max-w-[1440px] mx-auto w-full">
           {children}
         </main>
         <ToastProvider />
+        <CommandPalette open={cmdOpen} onOpenChange={setCmdOpen} />
+        <HelpOverlay open={helpOpen} onOpenChange={setHelpOpen} />
         {/* Floating Help Actions */}
         <div className="fixed bottom-6 right-6 z-50">
           <div className="flex flex-col items-end gap-3">

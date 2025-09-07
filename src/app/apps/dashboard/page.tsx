@@ -5,11 +5,13 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
+import { Tour } from "@/components/ui/tour";
 import Link from "next/link";
 import { getEvents, countByType, getOnboardingStatus } from "@/lib/analytics";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
 import { CheckCircle, AlertTriangle, ArrowRight, Link as LinkIcon, MessageSquare, FileText, QrCode, Sparkles, Printer, Download, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
+import { showToast } from "@/lib/toast";
 import { toCSV } from "@/lib/csv";
 import {
   ResponsiveContainer,
@@ -51,6 +53,7 @@ export default function Dashboard() {
     try {
       const rows = getEvents(30).map((e) => ({ ts: e.ts, type: e.type, meta: e.meta ? JSON.stringify(e.meta) : "" }));
       const csv = toCSV(rows);
+      try { showToast("Exported events CSV", "success"); } catch {}
       saveBlob(new Blob([csv], { type: "text/csv;charset=utf-8;" }), `belmont-events-last30.csv`);
     } catch {}
   }
@@ -67,6 +70,7 @@ export default function Dashboard() {
       ];
       const csv = rows.map((r) => r.join(",")).join("\n");
       saveBlob(new Blob([csv], { type: "text/csv;charset=utf-8;" }), `belmont-dashboard-snapshot.csv`);
+      try { showToast("Exported dashboard snapshot", "success"); } catch {}
     } catch {}
   }
 
@@ -82,7 +86,7 @@ export default function Dashboard() {
   }
 
   // Executive overview (last 30 days)
-  const last30 = useMemo(() => (typeof window !== "undefined" ? getEvents(30) : []), [now]);
+  const last30 = useMemo(() => (typeof window !== "undefined" ? getEvents(30) : []), []);
   const kpis = useMemo(() => {
     let links = 0, bookings = 0, reviews = 0, ratingSum = 0;
     let scans = 0;
@@ -173,7 +177,7 @@ export default function Dashboard() {
     const curr = byDay(0, 7);
     const change = prev === 0 ? 100 : Math.round(((curr - prev) / Math.max(prev, 1)) * 100);
     return { prev, curr, change };
-  }, [now]);
+  }, []);
 
   // Alerts (simple rules)
   const alerts = useMemo(() => {
@@ -253,28 +257,36 @@ export default function Dashboard() {
       days.push({ day: key.slice(5), count });
     }
     return days;
-  }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-6">
+      <Tour
+        id="dashboard"
+        steps={[
+          { title: "Load demo metrics", body: "Use the Load Demo button to populate KPIs and charts for a quick preview." },
+          { title: "Review 30‑day KPIs", body: "Links, QR scans, bookings, and reviews update here with your activity." },
+          { title: "Export or print", body: "Export a CSV snapshot or print this dashboard for weekly reviews." }
+        ]}
+      />
       <PageHeader
         title="Belmont Dashboard"
-        subtitle="Executive overview, today’s actions, and quick links for wins."
+        subtitle="Executive overview with actions and quick wins."
         actions={
           <div className="flex gap-2">
-            <Button onClick={loadDemoMetrics} variant="secondary">
+            <Button onClick={loadDemoMetrics} variant="secondary" aria-label="Load Demo Metrics" data-testid="dashboard-load-demo">
               <Sparkles className="h-4 w-4 mr-2" />
               Load Demo Metrics
             </Button>
-            <Button onClick={resetDemoMetrics} variant="outline">
+            <Button onClick={resetDemoMetrics} variant="outline" aria-label="Reset Demo" title="Clear recent demo metrics">
               <Trash2 className="h-4 w-4 mr-2" />
               Reset Demo
             </Button>
-            <Button onClick={exportSnapshotCSV} variant="outline">
+            <Button onClick={exportSnapshotCSV} variant="outline" aria-label="Export Snapshot" title="Download current KPI snapshot">
               <Download className="h-4 w-4 mr-2" />
               Export Snapshot
             </Button>
-            <Button onClick={printDashboard} variant="outline">
+            <Button onClick={printDashboard} variant="outline" aria-label="Print Dashboard" title="Print this dashboard">
               <Printer className="h-4 w-4 mr-2" />
               Print
             </Button>
@@ -284,7 +296,7 @@ export default function Dashboard() {
             <Button asChild>
               <Link href="/apps/utm-dashboard"><LinkIcon className="h-4 w-4 mr-2"/>Create Tracking Link</Link>
             </Button>
-            <Button onClick={exportEvents} variant="outline">Export Events CSV</Button>
+            <Button onClick={exportEvents} variant="outline" aria-label="Export Events CSV" title="Download recent activity CSV">Export Events CSV</Button>
           </div>
         }
       />
@@ -315,7 +327,7 @@ export default function Dashboard() {
             <CardDescription>Links, bookings, and reviews</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-56">
+            <div className="h-56" role="img" aria-label="30-day trends chart" title="30-day trends chart" data-testid="chart">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={trend30} margin={{ top: 5, right: 10, bottom: 0, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
@@ -336,7 +348,7 @@ export default function Dashboard() {
             <CardDescription>Top sources for UTM links</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-56">
+            <div className="h-56" role="img" aria-label="Attribution pie chart" title="Attribution pie chart" data-testid="chart">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie data={sourceAttribution} dataKey="value" nameKey="name" outerRadius={90} innerRadius={40}>

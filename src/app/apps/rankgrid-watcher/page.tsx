@@ -477,7 +477,7 @@ async function generateAIMonitorOptimization(
     <div className="space-y-6">
       <PageHeader
         title="AI Ranking Monitor Studio"
-        subtitle="AI-powered local search ranking analysis with optimization recommendations, geographic intelligence, and automated monitoring across Calgary locations."
+        subtitle="Monitor local rankings, compare areas, and get AI recommendations."
         actions={
           <div className="flex gap-2">
             {/* Simple actions */}

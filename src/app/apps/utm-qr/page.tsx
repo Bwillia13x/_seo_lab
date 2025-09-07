@@ -70,6 +70,7 @@ import { logEvent } from "@/lib/analytics";
 import { toCSV } from "@/lib/csv";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
+import { Tour } from "@/components/ui/tour";
 
 // ---------------- Enhanced Types ----------------
 type QRPerformance = {
@@ -753,9 +754,17 @@ export default function UTMBuilder() {
 
   return (
     <div className="p-5 md:p-8 space-y-6">
+      <Tour
+        id="utm-qr"
+        steps={[
+          { title: "Set your base URL", body: "Enter your booking link or landing page (we’ll add https:// if missing)." },
+          { title: "Generate a trackable link", body: "Choose a preset and click Generate to build a UTM link and preview a QR." },
+          { title: "Copy or save", body: "Copy the link or save the design to your library for reuse." }
+        ]}
+      />
       <PageHeader
         title="AI QR Studio"
-        subtitle="Generate intelligent, optimized QR codes with AI-powered design suggestions and performance analytics."
+        subtitle="Build trackable links, preview QR, and save designs."
         actions={
           <div className="flex gap-2">
             <Button
@@ -861,7 +870,7 @@ export default function UTMBuilder() {
         />
       </div>
 
-      <Tabs defaultValue="howto">
+      <Tabs defaultValue="single">
         <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 gap-1">
           <TabsTrigger value="howto">How To</TabsTrigger>
           <TabsTrigger value="single">Single Link</TabsTrigger>
@@ -1766,8 +1775,9 @@ export default function UTMBuilder() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div>
-                    <Label>Base URL (booking link)</Label>
+                    <Label htmlFor="qr-base-url" data-testid="utmqr-label-url">Base URL (booking link)</Label>
                     <Input
+                      id="qr-base-url"
                       value={baseUrl}
                       onChange={(e) => setBaseUrl(e.target.value)}
                       placeholder="https://thebelmontbarber.ca/book"
@@ -1822,8 +1832,9 @@ export default function UTMBuilder() {
                       </select>
                     </div>
                     <div>
-                      <Label>Campaign Name</Label>
+                      <Label htmlFor="qr-campaign" data-testid="utmqr-label-campaign">Campaign Name</Label>
                       <Input
+                        id="qr-campaign"
                         value={campaign}
                         onChange={(e) => setCampaign(e.target.value)}
                       />
@@ -1879,7 +1890,7 @@ export default function UTMBuilder() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button onClick={build}>
+                    <Button onClick={build} disabled={!baseOk} title={!baseOk ? 'Enter a valid Base URL' : 'Generate link and preview QR'}>
                       <Wand2 className="h-4 w-4 mr-2" />
                       Generate
                     </Button>

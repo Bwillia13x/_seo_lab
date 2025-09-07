@@ -5,7 +5,7 @@ test.describe('Ranking Grid', () => {
     await page.goto('/apps/rank-grid');
 
     // Switch to Grid Input tab
-    await page.getByRole('tab', { name: 'Grid Input' }).click();
+    await page.getByTestId('rank-grid-tab-grid').click();
 
     // Load demo grid
     await page.getByRole('button', { name: /Load Demo/i }).click();
@@ -27,4 +27,3 @@ test.describe('Ranking Grid', () => {
     }
   });
 });
-

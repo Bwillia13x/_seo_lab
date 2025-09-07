@@ -9,6 +9,21 @@ export function saveBlob(blob: Blob, filename: string) {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+
+  // Deterministic testing signal: mark download as ready with filename
+  try {
+    const id = "belmont-download-signal";
+    let el = document.getElementById(id) as HTMLSpanElement | null;
+    if (!el) {
+      el = document.createElement("span");
+      el.id = id;
+      el.setAttribute("data-testid", "download-ready");
+      el.className = "sr-only";
+      document.body.appendChild(el);
+    }
+    el.setAttribute("data-file", filename);
+    el.textContent = "download ready";
+  } catch {}
 }
 
 export function downloadBlob(blob: Blob, filename: string) {
