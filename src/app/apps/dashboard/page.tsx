@@ -9,7 +9,7 @@ import { Tour } from "@/components/ui/tour";
 import Link from "next/link";
 import { getEvents, countByType, getOnboardingStatus } from "@/lib/analytics";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
-import { CheckCircle, AlertTriangle, ArrowRight, Link as LinkIcon, MessageSquare, FileText, QrCode, Sparkles, Printer, Download, TrendingUp, TrendingDown, Trash2, MapPin, Phone, Clock } from "lucide-react";
+import { CheckCircle, AlertTriangle, ArrowRight, Link as LinkIcon, MessageSquare, FileText, QrCode, Sparkles, Printer, Download, TrendingUp, TrendingDown, Trash2, MapPin, Phone, Clock, Star } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
 import { showToast } from "@/lib/toast";
 import { toCSV } from "@/lib/csv";
@@ -130,6 +130,37 @@ export default function Dashboard() {
         if (!cancelled) {
           setGa4Status("error");
           setGa4Sources(null);
+        }
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Google Places summary (rating and reviews)
+  const [placeSummary, setPlaceSummary] = useState<{ rating?: number; count?: number; url?: string } | null>(null);
+  const [placeSummaryStatus, setPlaceSummaryStatus] = useState<"loading" | "ok" | "not_configured" | "error">("loading");
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/places/summary", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.status === 501 && data?.configured === false) {
+          setPlaceSummaryStatus("not_configured");
+          setPlaceSummary(null);
+        } else if (res.ok) {
+          setPlaceSummaryStatus("ok");
+          setPlaceSummary({ rating: data.rating, count: data.user_ratings_total, url: data.url });
+        } else {
+          setPlaceSummaryStatus("error");
+          setPlaceSummary(null);
+        }
+      } catch {
+        if (!cancelled) {
+          setPlaceSummaryStatus("error");
+          setPlaceSummary(null);
         }
       }
     }
@@ -593,6 +624,20 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
+      {/* GA4 Explainer (plain English) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Understanding the GA4 cards</CardTitle>
+          <CardDescription>Simple help for reading these numbers</CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground space-y-1">
+          <p><strong>Conversions by Source</strong> shows where bookings come from (for example, Google or Instagram).</p>
+          <p><strong>Conversions by Service</strong> shows what people book the most (for example, men’s cut or beard trim).</p>
+          <p>Use this to double down on what works. If a source is strong, post there more. If a service is popular, feature it.</p>
+          <p className="text-xs">If you see “Connect GA4”, add the GA4 credentials in Vercel. We can do this for you.</p>
+        </CardContent>
+      </Card>
+
       {/* Simple Funnel */}
       <Card>
         <CardHeader>
@@ -692,6 +737,38 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
+      {/* Reviews on Google */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Reviews on Google</CardTitle>
+          <CardDescription>Rating and total reviews</CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm">
+          {placeSummaryStatus === "ok" && placeSummary ? (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Star className="h-4 w-4 text-amber-500" />
+                <span>{(placeSummary.rating ?? 0).toFixed(1)} stars</span>
+              </div>
+              <div className="text-muted-foreground">{placeSummary.count ?? 0} reviews</div>
+            </div>
+          ) : placeSummaryStatus === "loading" ? (
+            <div className="text-muted-foreground">Loading…</div>
+          ) : placeSummaryStatus === "not_configured" ? (
+            <div className="text-muted-foreground">Connect Google Maps API to show rating and review count.</div>
+          ) : (
+            <div className="text-muted-foreground">Unable to load reviews right now.</div>
+          )}
+          <div className="flex gap-2 mt-3">
+            <Button asChild size="sm" variant="outline">
+              <a href={(placeSummary?.url || BELMONT_CONSTANTS.REVIEW_GOOGLE_URL)} target="_blank" rel="noopener noreferrer">See on Google</a>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/apps/review-link">Request Reviews</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
       {/* Contact & Location */}
       <Card>
         <CardHeader>

@@ -312,6 +312,12 @@ export default function Home() {
             </Link>
           </Button>
           <Button variant="outline" size="lg" asChild>
+            <Link href="/guide/owners-quick">
+              Owner’s Quick Guide
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" asChild>
             <Link href="#tools">
               Browse All Tools
               <ArrowRight className="h-4 w-4 ml-2" />
