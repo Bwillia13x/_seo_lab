@@ -19,6 +19,8 @@ Set these for production (e.g., in Vercel project settings or your host’s secr
 - `AI_RATE_PER_DAY` (optional): default `100`
 - `UPSTASH_REDIS_REST_URL` (recommended): for durable rate limiting
 - `UPSTASH_REDIS_REST_TOKEN` (recommended): for durable rate limiting
+ - `GA4_MEASUREMENT_ID` (optional/recommended): GA4 Measurement Protocol ID (e.g., G-XXXX)
+ - `GA4_API_SECRET` (optional/recommended): GA4 API Secret for server events
 
 Testing/CI helpers (optional):
 - `PLAYWRIGHT_BASE_URL`: defaults to `http://localhost:3000`
@@ -60,7 +62,15 @@ Run these smoke checks after deployment.
   - If Redis is not configured you may see a warning; configure Upstash vars for durability
 - `GET /api/ai/status` → `{ hasKey: true }` and expected limits
 
-4) Rate Limiting (optional)
+4) GA4 (optional, if configured)
+- `POST /api/ga4/collect` with a minimal payload should return `{ ok: true }`
+  - Example JSON body:
+    ```json
+    {"client_id":"12345.67890","events":[{"name":"book_now","params":{"value":75,"currency":"CAD"}}]}
+    ```
+  - Verify the event arrives in GA4 DebugView
+
+5) Rate Limiting (optional)
 - Hit `/api/ai/chat` repeatedly and verify 429 when limits are exceeded
 
 ## Test Suites

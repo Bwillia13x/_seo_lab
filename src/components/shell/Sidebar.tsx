@@ -22,6 +22,8 @@ import {
   Users,
   Menu,
   X,
+  Wand2,
+  Star,
 } from "lucide-react";
 
 export const navigationGroups = [
@@ -49,6 +51,8 @@ export const navigationGroups = [
       { href: "/apps/utm-qr", label: "QR Code Maker", icon: LinkIcon },
       { href: "/apps/referral-qr", label: "Staff Referral Codes", icon: QrCode },
       { href: "/apps/review-link", label: "Review Request Links", icon: QrCode },
+      { href: "/apps/bookings-roi", label: "Bookings ROI", icon: BarChart3 },
+      { href: "/apps/offers-orchestrator", label: "Offers Orchestrator", icon: Wand2 },
     ],
   },
   {
@@ -83,6 +87,7 @@ export const navigationGroups = [
       { href: "/apps/seo-brief", label: "Website Guide", icon: FileText },
       { href: "/apps/meta-planner", label: "Page Titles & Descriptions", icon: FileText },
       { href: "/apps/citation-tracker", label: "Business Listings Check", icon: Scissors },
+      { href: "/apps/review-spotlight", label: "Review Spotlight", icon: Star },
     ],
   },
   {
