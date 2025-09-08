@@ -43,6 +43,21 @@ export default function OffersOrchestrator() {
 
   const campaignName = useMemo(() => `belmont-${slug(service)}-${slug(season)}-promo`, [service, season]);
 
+  const bannerEmbed = useMemo(() => {
+    const text = (bannerText && bannerText.trim()) || `${discount} ${service.replace(/-/g, " ")} — Book now`;
+    const href = utmUrl || BELMONT_CONSTANTS.BOOK_URL;
+    return `<!-- Belmont seasonal banner -->\n<div id=\"belmont-offer-banner\" style=\"position:sticky;top:0;z-index:9999;background:#111;color:#fff;padding:10px 14px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;\">\n  <div style=\"max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;\">\n    <span style=\"font-weight:600;\">${text}</span>\n    <a href=\"${href}\" style=\"background:#22c55e;color:#111;text-decoration:none;padding:8px 12px;border-radius:6px;font-weight:600;\">Book now</a>\n  </div>\n</div>`;
+  }, [bannerText, discount, service, utmUrl]);
+
+  async function copyBanner() {
+    try {
+      await navigator.clipboard.writeText(bannerEmbed);
+      try { showToast("Copied site banner embed", "success"); } catch {}
+    } catch {
+      try { showToast("Copy failed", "error"); } catch {}
+    }
+  }
+
   async function generatePack() {
     setGenerating(true);
     try {
@@ -170,6 +185,15 @@ export default function OffersOrchestrator() {
               <Label>Email snippet</Label>
               <Textarea rows={6} value={emailSnippet} onChange={(e) => setEmailSnippet(e.target.value)} placeholder="Short blurb to paste into email" />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Site banner embed (copy/paste into WordPress HTML block)</Label>
+            <Textarea readOnly rows={6} value={bannerEmbed} />
+            <div>
+              <Button size="sm" variant="outline" onClick={copyBanner}>Copy Embed</Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Tip: Place near the top of your site layout or homepage. Remove after the promo ends.</p>
           </div>
         </CardContent>
       </Card>

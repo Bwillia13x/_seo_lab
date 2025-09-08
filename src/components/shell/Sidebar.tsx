@@ -24,6 +24,7 @@ import {
   X,
   Wand2,
   Star,
+  Calendar,
 } from "lucide-react";
 
 export const navigationGroups = [
@@ -63,6 +64,7 @@ export const navigationGroups = [
       { href: "/apps/noshow-shield", label: "Appointment Reminders", icon: AlertTriangle },
       { href: "/apps/addon-recommender", label: "Service Suggestions", icon: Plus },
       { href: "/apps/smart-rebooker", label: "Smart Rebooker", icon: Clock },
+      { href: "/apps/groomsmen-planner", label: "Groomsmen Planner", icon: Calendar },
     ],
   },
   {
