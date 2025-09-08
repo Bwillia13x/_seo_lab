@@ -157,6 +157,21 @@ export default function Dashboard() {
       .slice(0, 6);
   }, [last30]);
 
+  // Bookings by Campaign, derived from local booking_created events
+  const bookingsByCampaign = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const e of last30) {
+      if (e.type === "booking_created") {
+        const camp = String(e.meta?.campaign || "other");
+        m[camp] = (m[camp] || 0) + 1;
+      }
+    }
+    return Object.entries(m)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 6);
+  }, [last30]);
+
   const COLORS = ["#6366f1", "#22c55e", "#eab308", "#ef4444", "#06b6d4", "#f97316"]; // brandish palette
 
   // Funnel widths
@@ -313,6 +328,7 @@ export default function Dashboard() {
             </Button>
             <Button onClick={exportEvents} variant="outline" aria-label="Export Events CSV" title="Download recent activity CSV">Export Events CSV</Button>
           </div>
+
         }
       />
 
@@ -377,6 +393,29 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Bookings by Campaign */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Bookings by Campaign (30d)</CardTitle>
+          <CardDescription>From recent activity; use GA4 for exact production data</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {bookingsByCampaign.length ? (
+            bookingsByCampaign.map((c, i) => (
+              <div key={c.name} className="flex items-center justify-between py-1">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                  <span className="truncate max-w-[70%]" title={c.name}>{c.name}</span>
+                </div>
+                <span className="font-medium">{c.value}</span>
+              </div>
+            ))
+          ) : (
+            <div className="text-sm text-muted-foreground">No bookings recorded yet</div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Simple Funnel */}
       <Card>

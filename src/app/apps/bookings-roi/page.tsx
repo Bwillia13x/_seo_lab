@@ -7,6 +7,7 @@ import { KPICard } from "@/components/ui/kpi-card";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { showToast } from "@/lib/toast";
+import { logEvent } from "@/lib/analytics";
 import { BarChart3, Sparkles, Send } from "lucide-react";
 
 // Minimal type to represent campaign performance
@@ -78,6 +79,10 @@ export default function BookingsROI() {
       const data = await res.json().catch(() => ({ ok: false }));
       if (res.ok) {
         try { showToast("Sent test conversion to GA4", "success"); } catch {}
+        // Also log a local booking event so the Dashboard reflects immediately
+        try {
+          logEvent("booking_created", { campaign: "belmont-demo", service: "mens-cut" });
+        } catch {}
       } else {
         console.warn("GA4 test conversion failed", data);
         try { showToast("GA4 test conversion failed", "error"); } catch {}
