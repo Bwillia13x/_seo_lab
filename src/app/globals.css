@@ -51,6 +51,20 @@ html.simple .advanced-only {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    /* Extended design tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--belmont-gold)), hsl(var(--belmont-brown)));
+    --gradient-secondary: radial-gradient(1200px 600px at 10% -10%, hsla(268, 100%, 97%, 1) 0%, transparent 40%),
+      radial-gradient(1200px 600px at 90% -10%, hsla(270, 100%, 98%, 1) 0%, transparent 40%);
+    --shadow-brand: 0 12px 30px -12px rgba(109, 40, 217, 0.35);
+    --shadow-card: 0 8px 25px -12px rgba(0,0,0,0.15);
+    --sidebar-background: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -78,6 +92,20 @@ html.simple .advanced-only {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    /* Extended design tokens (dark) */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--belmont-gold)), hsl(var(--belmont-brown)));
+    --gradient-secondary: radial-gradient(1200px 600px at 10% -10%, hsla(270, 30%, 20%, 0.6) 0%, transparent 40%),
+      radial-gradient(1200px 600px at 90% -10%, hsla(265, 35%, 25%, 0.6) 0%, transparent 40%);
+    --shadow-brand: 0 12px 30px -12px rgba(139, 92, 246, 0.35);
+    --shadow-card: 0 12px 30px -14px rgba(0,0,0,0.40);
+    --sidebar-background: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
   }
 }
 
@@ -143,7 +171,7 @@ html.simple .advanced-only {
   .font-semibold.text-base { @apply tracking-tight leading-snug; }
 
   .elevated-card {
-    @apply bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80 border border-border/50 shadow-[0_8px_25px_-12px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_35px_-12px_rgba(0,0,0,0.2)] transition-shadow duration-300;
+    @apply bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80 border border-border/50 shadow-card hover:shadow-brand transition-shadow duration-300;
   }
   .soft-shadow {
     box-shadow: 0 4px 12px -4px rgba(0,0,0,0.08), 0 2px 8px -2px rgba(0,0,0,0.04);

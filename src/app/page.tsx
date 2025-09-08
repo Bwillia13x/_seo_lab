@@ -264,7 +264,7 @@ const quickStartSteps = [
 
 export default function Home() {
   return (
-    <div className="space-y-8">
+    <div className="container space-y-8">
       {/* Hero Section */}
       <div className="text-center space-y-6 fade-in">
         <div className="flex items-center justify-center gap-3 mb-6">

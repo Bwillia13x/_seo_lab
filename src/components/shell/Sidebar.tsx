@@ -119,12 +119,12 @@ function NavItem({
       key={href}
       href={href}
       onClick={onClick}
-      className="group flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent transition-colors"
+      className="group flex items-center gap-2 px-3 py-2 rounded-md hover:bg-sidebar-accent transition-colors"
     >
       {Icon && (
-        <Icon className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+        <Icon className="h-4 w-4 text-sidebar-foreground/70 group-hover:text-sidebar-accent-foreground transition-colors" />
       )}
-      <span className="text-sm">{label}</span>
+      <span className="text-sm text-sidebar-foreground">{label}</span>
     </Link>
   );
 }
@@ -198,7 +198,7 @@ export function Sidebar({ simple = false }: { readonly simple?: boolean }) {
         {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </button>
 
-      <aside ref={sidebarRef} className={`sidebar-container border-r bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:translate-x-0 transition-transform duration-300 ease-in-out ${
+      <aside ref={sidebarRef} className={`sidebar-container border-r border-sidebar-border bg-sidebar/70 backdrop-blur supports-[backdrop-filter]:bg-sidebar/60 text-sidebar-foreground lg:translate-x-0 transition-transform duration-300 ease-in-out ${
         isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       } fixed lg:static inset-y-0 left-0 z-40 w-72 lg:w-auto`}>
         <div className="p-4 border-b lg:border-b-0">

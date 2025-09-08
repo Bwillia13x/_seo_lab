@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardSkeleton } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { KPICard } from "@/components/ui/kpi-card";
@@ -26,15 +26,22 @@ import {
   Cell,
 } from "recharts";
 
-// Color palettes for legend dots
-const COLORS = ["#6366f1", "#22c55e", "#eab308", "#ef4444", "#06b6d4", "#f97316"]; // brandish palette
+// Color palette from theme tokens (supports light/dark)
+const COLORS = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--primary))",
+];
 const COLOR_CLASSES = [
-  "bg-indigo-500",
-  "bg-emerald-500",
-  "bg-amber-500",
-  "bg-red-500",
-  "bg-cyan-500",
-  "bg-orange-500",
+  "bg-[hsl(var(--chart-1))]",
+  "bg-[hsl(var(--chart-2))]",
+  "bg-[hsl(var(--chart-3))]",
+  "bg-[hsl(var(--chart-4))]",
+  "bg-[hsl(var(--chart-5))]",
+  "bg-[hsl(var(--primary))]",
 ];
 
 // Predeclare width classes at 5% increments to avoid inline styles
@@ -437,7 +444,7 @@ export default function Dashboard() {
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className="space-y-6">
+    <div className="container space-y-6">
       <Tour
         id="dashboard"
         steps={[
@@ -512,9 +519,9 @@ export default function Dashboard() {
                   <XAxis dataKey="day" tickLine={false} />
                   <YAxis allowDecimals={false} tickLine={false} width={30} />
                   <ReTooltip />
-                  <Line type="monotone" dataKey="links" name="Links" stroke="#6366f1" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="bookings" name="Bookings" stroke="#22c55e" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="reviews" name="Reviews" stroke="#f59e0b" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="links" name="Links" stroke="hsl(var(--chart-1))" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="bookings" name="Bookings" stroke="hsl(var(--chart-2))" strokeWidth={2} dot={false} />
+                  <Line type="monotone" dataKey="reviews" name="Reviews" stroke="hsl(var(--chart-4))" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -582,7 +589,11 @@ export default function Dashboard() {
               </div>
             ))
           ) : ga4Status === "loading" ? (
-            <div className="text-sm text-muted-foreground">Loading…</div>
+            <div className="space-y-2">
+              <div className="h-4 bg-muted/60 rounded shimmer" />
+              <div className="h-4 bg-muted/50 rounded shimmer" />
+              <div className="h-4 bg-muted/40 rounded shimmer w-2/3" />
+            </div>
           ) : ga4Status === "not_configured" ? (
             <div className="text-sm text-muted-foreground">
               Connect Google Analytics 4 to see conversions by source.
@@ -612,7 +623,11 @@ export default function Dashboard() {
               </div>
             ))
           ) : ga4ServicesStatus === "loading" ? (
-            <div className="text-sm text-muted-foreground">Loading…</div>
+            <div className="space-y-2">
+              <div className="h-4 bg-muted/60 rounded shimmer" />
+              <div className="h-4 bg-muted/50 rounded shimmer" />
+              <div className="h-4 bg-muted/40 rounded shimmer w-2/3" />
+            </div>
           ) : ga4ServicesStatus === "not_configured" ? (
             <div className="text-sm text-muted-foreground">
               Connect GA4 and set GA4_SERVICE_PARAM_NAME to see conversions by service.
@@ -753,7 +768,10 @@ export default function Dashboard() {
               <div className="text-muted-foreground">{placeSummary.count ?? 0} reviews</div>
             </div>
           ) : placeSummaryStatus === "loading" ? (
-            <div className="text-muted-foreground">Loading…</div>
+            <div className="space-y-2">
+              <div className="h-4 bg-muted/60 rounded shimmer w-1/3" />
+              <div className="h-4 bg-muted/50 rounded shimmer w-1/4" />
+            </div>
           ) : placeSummaryStatus === "not_configured" ? (
             <div className="text-muted-foreground">Connect Google Maps API to show rating and review count.</div>
           ) : (
@@ -789,7 +807,10 @@ export default function Dashboard() {
             {hoursStatus === "ok" && (hours?.open_now === true || hours?.open_now === false) ? (
               <span>{hours.open_now ? "Open now" : "Closed now"}</span>
             ) : hoursStatus === "loading" ? (
-              <span>Loading hours…</span>
+              <span>
+                <span className="inline-block h-3 w-24 bg-muted/60 rounded shimmer align-middle" aria-hidden />
+                <span className="sr-only">Loading hours…</span>
+              </span>
             ) : hoursStatus === "not_configured" ? (
               <span>Hours unavailable (connect Google Maps API)</span>
             ) : (
