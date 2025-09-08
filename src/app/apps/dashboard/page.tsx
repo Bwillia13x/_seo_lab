@@ -105,7 +105,7 @@ export default function Dashboard() {
   }
 
   // Executive overview (last 30 days)
-  const last30 = useMemo(() => (typeof window !== "undefined" ? getEvents(30) : []), []);
+  const last30 = useMemo(() => (typeof window !== "undefined" ? getEvents(30) : []), [now]); // eslint-disable-line react-hooks/exhaustive-deps
   // GA4 conversions by source (30d) via server report API
   const [ga4Sources, setGa4Sources] = useState<{ name: string; value: number }[] | null>(null);
   const [ga4Status, setGa4Status] = useState<"loading" | "ok" | "not_configured" | "error">("loading");
@@ -354,7 +354,7 @@ export default function Dashboard() {
     const curr = byDay(0, 7);
     const change = prev === 0 ? 100 : Math.round(((curr - prev) / Math.max(prev, 1)) * 100);
     return { prev, curr, change };
-  }, []);
+  }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Alerts (simple rules)
   const alerts = useMemo(() => {
@@ -434,7 +434,7 @@ export default function Dashboard() {
       days.push({ day: key.slice(5), count });
     }
     return days;
-  }, []);
+  }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="space-y-6">
