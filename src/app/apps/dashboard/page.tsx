@@ -9,7 +9,7 @@ import { Tour } from "@/components/ui/tour";
 import Link from "next/link";
 import { getEvents, countByType, getOnboardingStatus } from "@/lib/analytics";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
-import { CheckCircle, AlertTriangle, ArrowRight, Link as LinkIcon, MessageSquare, FileText, QrCode, Sparkles, Printer, Download, TrendingUp, TrendingDown, Trash2 } from "lucide-react";
+import { CheckCircle, AlertTriangle, ArrowRight, Link as LinkIcon, MessageSquare, FileText, QrCode, Sparkles, Printer, Download, TrendingUp, TrendingDown, Trash2, MapPin, Phone, Clock } from "lucide-react";
 import { saveBlob } from "@/lib/blob";
 import { showToast } from "@/lib/toast";
 import { toCSV } from "@/lib/csv";
@@ -130,6 +130,68 @@ export default function Dashboard() {
         if (!cancelled) {
           setGa4Status("error");
           setGa4Sources(null);
+        }
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  // GA4 conversions by service (30d)
+  const [ga4Services, setGa4Services] = useState<{ name: string; value: number }[] | null>(null);
+  const [ga4ServicesStatus, setGa4ServicesStatus] = useState<"loading" | "ok" | "not_configured" | "error">("loading");
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/ga4/report/conversions-by-service?days=30", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.status === 501 && data?.configured === false) {
+          setGa4ServicesStatus("not_configured");
+          setGa4Services(null);
+        } else if (res.ok && Array.isArray(data?.rows)) {
+          setGa4ServicesStatus("ok");
+          setGa4Services(data.rows as { name: string; value: number }[]);
+        } else {
+          setGa4ServicesStatus("error");
+          setGa4Services(null);
+        }
+      } catch {
+        if (!cancelled) {
+          setGa4ServicesStatus("error");
+          setGa4Services(null);
+        }
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Google Places hours for Contact & Location card
+  const [hours, setHours] = useState<{ weekday_text: string[]; open_now?: boolean } | null>(null);
+  const [hoursStatus, setHoursStatus] = useState<"loading" | "ok" | "not_configured" | "error">("loading");
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/places/hours", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.status === 501 && data?.configured === false) {
+          setHoursStatus("not_configured");
+          setHours(null);
+        } else if (res.ok) {
+          setHoursStatus("ok");
+          setHours({ weekday_text: Array.isArray(data.weekday_text) ? data.weekday_text : [], open_now: data.open_now });
+        } else {
+          setHoursStatus("error");
+          setHours(null);
+        }
+      } catch {
+        if (!cancelled) {
+          setHoursStatus("error");
+          setHours(null);
         }
       }
     }
@@ -501,6 +563,36 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
+      {/* GA4 Conversions by Service (30d) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Conversions by Service (30d)</CardTitle>
+          <CardDescription>Production data (GA4)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {ga4ServicesStatus === "ok" && ga4Services && ga4Services.length ? (
+            ga4Services.map((s, i) => (
+              <div key={s.name} className="flex items-center justify-between py-1">
+                <div className="flex items-center gap-2">
+                  <span className={`inline-block h-3 w-3 rounded-sm ${COLOR_CLASSES[i % COLOR_CLASSES.length]}`} />
+                  <span className="capitalize">{s.name.replace(/-/g, " ")}</span>
+                </div>
+                <span className="font-medium">{s.value}</span>
+              </div>
+            ))
+          ) : ga4ServicesStatus === "loading" ? (
+            <div className="text-sm text-muted-foreground">Loading…</div>
+          ) : ga4ServicesStatus === "not_configured" ? (
+            <div className="text-sm text-muted-foreground">
+              Connect GA4 and set GA4_SERVICE_PARAM_NAME to see conversions by service.
+              <div className="text-xs mt-2">Tip: Set GA4_PROPERTY_ID, GOOGLE_APPLICATION_CREDENTIALS_JSON, and GA4_SERVICE_PARAM_NAME in Vercel.</div>
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">Unable to load GA4 data right now.</div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Simple Funnel */}
       <Card>
         <CardHeader>
@@ -597,6 +689,47 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent className="text-sm">
           <Button asChild><Link href="/l">Open Link‑in‑Bio</Link></Button>
+        </CardContent>
+      </Card>
+
+      {/* Contact & Location */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Contact & Location</CardTitle>
+          <CardDescription>Call, directions, hours, and booking</CardDescription>
+        </CardHeader>
+        <CardContent className="text-sm space-y-2">
+          <div className="flex items-center gap-2">
+            <Phone className="h-4 w-4" />
+            <a href={BELMONT_CONSTANTS.PHONE_TEL} className="underline underline-offset-2">{BELMONT_CONSTANTS.PHONE_DISPLAY}</a>
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            <a href={BELMONT_CONSTANTS.MAP_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">{BELMONT_CONSTANTS.ADDRESS_STR}</a>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Clock className="h-4 w-4" />
+            {hoursStatus === "ok" && (hours?.open_now === true || hours?.open_now === false) ? (
+              <span>{hours.open_now ? "Open now" : "Closed now"}</span>
+            ) : hoursStatus === "loading" ? (
+              <span>Loading hours…</span>
+            ) : hoursStatus === "not_configured" ? (
+              <span>Hours unavailable (connect Google Maps API)</span>
+            ) : (
+              <span>Hours unavailable</span>
+            )}
+          </div>
+          {hoursStatus === "ok" && hours?.weekday_text?.length ? (
+            <ul className="text-xs text-muted-foreground list-disc pl-5">
+              {hours.weekday_text.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          ) : null}
+          <div className="flex gap-2 pt-2">
+            <Button asChild size="sm"><a href={BELMONT_CONSTANTS.BOOK_URL} target="_blank" rel="noopener noreferrer">Book Now</a></Button>
+            <Button asChild size="sm" variant="outline"><a href={BELMONT_CONSTANTS.MAP_URL} target="_blank" rel="noopener noreferrer">Directions</a></Button>
+          </div>
         </CardContent>
       </Card>
 

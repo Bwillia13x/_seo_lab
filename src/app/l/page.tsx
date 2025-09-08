@@ -42,7 +42,7 @@ export default function LinkInBio() {
       },
       {
         label: "Services",
-        href: buildLink(BELMONT_CONSTANTS.WEBSITE_URL + "/services", { utm_source: source, utm_medium: medium, utm_campaign: campaign, utm_content: "services" }),
+        href: buildLink(BELMONT_CONSTANTS.WEBSITE_URL + "/barbershop-near-me/", { utm_source: source, utm_medium: medium, utm_campaign: campaign, utm_content: "services" }),
       },
       {
         label: "Veterans Discount",
