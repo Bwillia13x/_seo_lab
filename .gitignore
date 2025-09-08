@@ -36,6 +36,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# local sandboxes
+tmp/
+
 # visual and accessibility artifacts
 /test-results/
 /visual-reports/

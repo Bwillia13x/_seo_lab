@@ -1,0 +1,15 @@
+{
+  "replacementPatterns": [
+    {
+      "pattern": "^/(.*)$",
+      "replacement": "http://localhost:3000/$1"
+    }
+  ],
+  "ignorePatterns": [
+    { "pattern": "^mailto:" },
+    { "pattern": "^tel:" },
+    { "pattern": "^#" }
+  ],
+  "timeout": "20000",
+  "aliveStatusCodes": [200, 201, 202, 203, 204, 301, 302, 307, 308]
+}

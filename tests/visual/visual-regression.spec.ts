@@ -132,6 +132,20 @@ test.describe('SEO Lab - Visual Regression Suite', () => {
   test.describe('Interactive States & User Flows', () => {
     test('Dashboard KPI Cards - Data Load Flow', async ({ page }) => {
       await page.setViewportSize({ width: 1920, height: 1080 });
+      // Freeze time and random, and clear any persisted demo data before app code runs
+      await page.addInitScript(() => {
+        const fixed = new Date('2024-01-01T00:00:00Z').valueOf();
+        // @ts-ignore - override Date.now in page context
+        Date.now = () => fixed;
+        // Deterministic PRNG
+        let seed = 20240101;
+        // @ts-ignore - override Math.random in page context
+        Math.random = () => {
+          seed = (seed * 1664525 + 1013904223) % 4294967296;
+          return seed / 4294967296;
+        };
+        try { localStorage.removeItem('belmont_events'); } catch {}
+      });
       await page.goto('/apps/dashboard');
 
       // Initial state: KPI labels visible

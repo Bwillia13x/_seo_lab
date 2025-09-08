@@ -1,0 +1,128 @@
+{
+  "summary": {
+    "baseUrl": "http://localhost:3000",
+    "checked": 28,
+    "failures": 0,
+    "notFoundExpected": true,
+    "failuresList": [],
+    "timestamp": "2025-09-08T19:07:39.961Z"
+  },
+  "results": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/apps/addon-recommender",
+      "status": 200
+    },
+    {
+      "path": "/apps/citation-tracker",
+      "status": 200
+    },
+    {
+      "path": "/apps/dashboard",
+      "status": 200
+    },
+    {
+      "path": "/apps/gbp-composer",
+      "status": 200
+    },
+    {
+      "path": "/apps/gsc-ctr-miner",
+      "status": 200
+    },
+    {
+      "path": "/apps/link-map",
+      "status": 200
+    },
+    {
+      "path": "/apps/link-prospect-kit",
+      "status": 200
+    },
+    {
+      "path": "/apps/meta-planner",
+      "status": 200
+    },
+    {
+      "path": "/apps/neighbor-signal",
+      "status": 200
+    },
+    {
+      "path": "/apps/noshow-shield",
+      "status": 200
+    },
+    {
+      "path": "/apps/onboarding",
+      "status": 200
+    },
+    {
+      "path": "/apps/post-oracle",
+      "status": 200
+    },
+    {
+      "path": "/apps/post-studio",
+      "status": 200
+    },
+    {
+      "path": "/apps/queuetime",
+      "status": 200
+    },
+    {
+      "path": "/apps/rank-grid",
+      "status": 200
+    },
+    {
+      "path": "/apps/rankgrid-watcher",
+      "status": 200
+    },
+    {
+      "path": "/apps/referral-qr",
+      "status": 200
+    },
+    {
+      "path": "/apps/review-composer",
+      "status": 200
+    },
+    {
+      "path": "/apps/review-link",
+      "status": 200
+    },
+    {
+      "path": "/apps/rfm-crm",
+      "status": 200
+    },
+    {
+      "path": "/apps/seo-brief",
+      "status": 200
+    },
+    {
+      "path": "/apps/slot-yield",
+      "status": 200
+    },
+    {
+      "path": "/apps/utm-dashboard",
+      "status": 200
+    },
+    {
+      "path": "/apps/utm-qr",
+      "status": 200
+    },
+    {
+      "path": "/guide/trial",
+      "status": 200
+    },
+    {
+      "path": "/l",
+      "status": 200
+    },
+    {
+      "path": "/status",
+      "status": 200
+    }
+  ],
+  "notFound": {
+    "path": "/does-not-exist",
+    "status": 404
+  }
+}
