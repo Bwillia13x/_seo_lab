@@ -306,6 +306,12 @@ export default function Home() {
             </Link>
           </Button>
           <Button variant="outline" size="lg" asChild>
+            <Link href="/apps/dashboard">
+              Open Dashboard
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
+          <Button variant="outline" size="lg" asChild>
             <Link href="#tools">
               Browse All Tools
               <ArrowRight className="h-4 w-4 ml-2" />
@@ -393,6 +399,31 @@ export default function Home() {
                 </p>
               </div>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* What's New */}
+      <Card className="elevated-card">
+        <CardHeader>
+          <CardTitle>What’s New</CardTitle>
+          <CardDescription>Updates in this build</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+            <li>
+              Dashboard now shows <strong>Conversions by Source (30d)</strong> and
+              <strong> Conversions by Service (30d)</strong> from Google Analytics 4.
+            </li>
+            <li>
+              New <strong>Contact & Location</strong> card with phone, address, hours, and directions.
+            </li>
+            <li>
+              Link‑in‑Bio page updated with the correct Services link.
+            </li>
+          </ul>
+          <div className="mt-3">
+            <Button asChild size="sm"><Link href="/apps/dashboard">Open Dashboard</Link></Button>
           </div>
         </CardContent>
       </Card>
