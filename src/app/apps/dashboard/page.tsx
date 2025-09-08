@@ -26,6 +26,25 @@ import {
   Cell,
 } from "recharts";
 
+// Color palettes for legend dots
+const COLORS = ["#6366f1", "#22c55e", "#eab308", "#ef4444", "#06b6d4", "#f97316"]; // brandish palette
+const COLOR_CLASSES = [
+  "bg-indigo-500",
+  "bg-emerald-500",
+  "bg-amber-500",
+  "bg-red-500",
+  "bg-cyan-500",
+  "bg-orange-500",
+];
+
+// Predeclare width classes at 5% increments to avoid inline styles
+const WIDTH_CLASSES = [
+  "w-[5%]", "w-[10%]", "w-[15%]", "w-[20%]", "w-[25%]",
+  "w-[30%]", "w-[35%]", "w-[40%]", "w-[45%]", "w-[50%]",
+  "w-[55%]", "w-[60%]", "w-[65%]", "w-[70%]", "w-[75%]",
+  "w-[80%]", "w-[85%]", "w-[90%]", "w-[95%]", "w-[100%]",
+];
+
 export default function Dashboard() {
   const [now, setNow] = useState<Date>(new Date());
   useEffect(() => {
@@ -172,14 +191,19 @@ export default function Dashboard() {
       .slice(0, 6);
   }, [last30]);
 
-  const COLORS = ["#6366f1", "#22c55e", "#eab308", "#ef4444", "#06b6d4", "#f97316"]; // brandish palette
+  
 
-  // Funnel widths
-  const funnel = useMemo(() => {
+  // Funnel width classes (5% increments)
+  const funnelW = useMemo(() => {
     const { links, scans, bookings } = kpis;
     const max = Math.max(1, links, scans, bookings);
-    function pct(n: number) { return `${Math.max(5, Math.round((n / max) * 100))}%`; }
-    return { linksW: pct(links), scansW: pct(scans), bookingsW: pct(bookings) };
+    function wClass(n: number) {
+      const pct = Math.max(5, Math.round((n / max) * 100));
+      const bucket = Math.min(100, Math.ceil(pct / 5) * 5); // round up to nearest 5%
+      const idx = Math.max(0, Math.min(WIDTH_CLASSES.length - 1, Math.floor(bucket / 5) - 1));
+      return WIDTH_CLASSES[idx];
+    }
+    return { links: wClass(links), scans: wClass(scans), bookings: wClass(bookings) };
   }, [kpis]);
 
   // Leaderboards
@@ -405,7 +429,7 @@ export default function Dashboard() {
             bookingsByCampaign.map((c, i) => (
               <div key={c.name} className="flex items-center justify-between py-1">
                 <div className="flex items-center gap-2">
-                  <span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                  <span className={`inline-block h-3 w-3 rounded-sm ${COLOR_CLASSES[i % COLOR_CLASSES.length]}`} />
                   <span className="truncate max-w-[70%]" title={c.name}>{c.name}</span>
                 </div>
                 <span className="font-medium">{c.value}</span>
@@ -430,7 +454,7 @@ export default function Dashboard() {
               <span>{kpis.links}</span>
             </div>
             <div className="h-3 bg-muted rounded">
-              <div className="h-3 rounded belmont-accent" style={{ width: funnel.linksW }} />
+              <div className={`h-3 rounded belmont-accent ${funnelW.links}`} />
             </div>
           </div>
           <div className="space-y-2">
@@ -439,7 +463,7 @@ export default function Dashboard() {
               <span>{kpis.scans}</span>
             </div>
             <div className="h-3 bg-muted rounded">
-              <div className="h-3 rounded bg-blue-500" style={{ width: funnel.scansW }} />
+              <div className={`h-3 rounded bg-blue-500 ${funnelW.scans}`} />
             </div>
           </div>
           <div className="space-y-2">
@@ -448,7 +472,7 @@ export default function Dashboard() {
               <span>{kpis.bookings}</span>
             </div>
             <div className="h-3 bg-muted rounded">
-              <div className="h-3 rounded bg-emerald-500" style={{ width: funnel.bookingsW }} />
+              <div className={`h-3 rounded bg-emerald-500 ${funnelW.bookings}`} />
             </div>
           </div>
         </CardContent>
@@ -576,7 +600,7 @@ export default function Dashboard() {
             {sourceAttribution.map((s, i) => (
               <div key={s.name} className="flex items-center justify-between py-1">
                 <div className="flex items-center gap-2">
-                  <span className="inline-block h-3 w-3 rounded-sm" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                  <span className={`inline-block h-3 w-3 rounded-sm ${COLOR_CLASSES[i % COLOR_CLASSES.length]}`} />
                   <span className="capitalize">{s.name}</span>
                 </div>
                 <span className="font-medium">{s.value}</span>

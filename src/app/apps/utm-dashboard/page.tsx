@@ -1594,7 +1594,7 @@ function UTMDashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex gap-4 mb-6">
-                <select className="px-3 py-2 border rounded-md" value="All">
+                <select className="px-3 py-2 border rounded-md" value="All" aria-label="Filter campaign library by category" title="Filter by category">
                   <option value="All">All Categories</option>
                   {campaignLibrary.categories.map((category) => (
                     <option key={category} value={category}>
@@ -1706,11 +1706,15 @@ function UTMDashboard() {
                   <div className="space-y-3">
                     <div>
                       <Label>Select Campaign</Label>
-                      <select className="w-full h-9 border rounded-md px-2">
+                      <select
+                        className="w-full h-9 border rounded-md px-2"
+                        aria-label="Select campaign to schedule"
+                        title="Select campaign"
+                      >
                         <option value="">Choose a campaign...</option>
                         {rows.map((row, index) => (
                           <option key={row.id} value={row.id}>
-                            {row.campaign} ({PRESETS[row.preset].label})
+                            {index + 1}. {row.campaign}
                           </option>
                         ))}
                       </select>
@@ -1986,8 +1990,7 @@ function UTMDashboard() {
                     <img
                       src={qrUrl}
                       alt="QR Code"
-                      className="max-w-full h-auto border rounded"
-                      style={{ maxHeight: "300px" }}
+                      className="max-w-full h-auto border rounded max-h-[300px]"
                     />
                     <p className="text-xs text-muted-foreground mt-2">
                       Scan to open: {builtUrl}
