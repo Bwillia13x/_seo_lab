@@ -11,6 +11,7 @@ import { KPICard } from "@/components/ui/kpi-card";
 import { Download, Sparkles, Wand2, QrCode } from "lucide-react";
 import { showToast } from "@/lib/toast";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
+import Image from "next/image";
 
 function buildUtmUrl(baseUrl: string, utm: Record<string, string>) {
   const url = new URL(baseUrl);
@@ -147,7 +148,7 @@ export default function OffersOrchestrator() {
               <Label>QR Signage</Label>
               {qrUrl ? (
                 <div className="flex items-center gap-2">
-                  <img src={qrUrl} alt="QR" className="h-32 w-32 border rounded" />
+                  <Image src={qrUrl} alt="QR" width={128} height={128} className="border rounded" />
                   <Button onClick={downloadQR} variant="outline"><Download className="h-4 w-4 mr-2"/>Download PNG</Button>
                 </div>
               ) : (
