@@ -1,13 +1,16 @@
 # Belmont SEO Lab — Internal Tool Breakdown Guide
 
 ## Overview
+
 Belmont SEO Lab is a comprehensive digital toolkit designed specifically for local businesses like The Belmont Barbershop. It combines marketing, customer management, and search optimization tools into one platform to help business owners attract more customers, manage their reputation, and grow sustainably. This guide breaks down every tool in detail, assuming no prior knowledge, and explains how to present them effectively to non-technical owners like Lindsey.
 
 ## 1. Dashboard
 ### What It Is
+
 The Dashboard is the main hub of the platform. It's a single-page overview that shows key metrics, quick actions, and insights in a clean, visual format.
 
 ### How It Works
+
 - Displays KPI cards (e.g., website visits, bookings, reviews).
 - Includes charts for trends over time.
 - Provides quick action buttons (e.g., "Create Tracking Link").
@@ -15,205 +18,251 @@ The Dashboard is the main hub of the platform. It's a single-page overview that 
 - Supports exporting metrics to CSV.
 
 ### Why Important for the Client
+
 - Saves time by consolidating information from multiple sources.
 - Helps track progress without technical skills.
 - Identifies "quick wins" like missed opportunities in search.
 - Builds confidence through visible results and trends.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Compare to a car's dashboard: "Just like how you glance at your car's speedometer and fuel gauge, this shows the health of your business at a glance."
 - Demo: Load demo metrics, point out trends, and show how to export a CSV.
 - Emphasize: "No more guessing what's working—this tells you exactly."
 
 ## 2. Onboarding
 ### What It Is
+
 A guided setup wizard that walks users through initial configuration and basic features.
 
 ### How It Works
+
 - Step-by-step screens for entering business details.
 - Sets up API keys and preferences.
 - Includes tutorials and sample data.
 - Tracks completion progress.
 
 ### Why Important for the Client
+
 - Reduces setup friction for non-technical users.
 - Ensures consistent data entry.
 - Builds familiarity with the platform early.
 - Prevents abandonment due to complexity.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Analogize to opening a new bank account: "It's like the guided process when you set up a new business account."
 - Demo: Walk through setting up a sample business profile.
 - Highlight: "We'll handle the tech part—you just fill in your info."
+
 
 ## Content Creation Tools
 
 ### 3. GBP Composer (Google Posts Writer)
 ### What It Is
+
 A tool to create and format posts for Google Business Profile (GBP).
 
 ### How It Works
+
 - AI-assisted content generation based on service inputs.
 - Customizable templates for posts, events, offers.
 - Integration with Google My Business API for direct posting.
 - Preview and scheduling features.
 
 ### Why Important for the Client
+
 - Drives local visibility and engagement.
 - Automates content creation, saving hours.
 - Increases GBP interactions, which boost search rankings.
 - Supports promotions and event announcements.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Example: "Like writing a quick update on your Instagram story, but optimized for Google."
 - Demo: Generate a post about a "Men's Cut Special" and show the preview.
 - Value: "One post a week can bring in extra walk-ins from local searches."
 
+
 ### 4. Post Studio (Social Media Studio)
 ### What It Is
+
 A content creation tool for social media posts across platforms.
 
 ### How It Works
+
 - Templates for different post types (images, carousels, stories).
 - AI suggestions for captions and hashtags.
 - Integration with social APIs for scheduling.
 - Analytics tracking for engagement.
 
 ### Why Important for the Client
+
 - Maintains consistent social presence.
 - Leverages AI to create professional content quickly.
 - Tracks which posts perform best.
 - Supports cross-platform posting.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Analogize to a recipe book: "Pre-made templates like recipes for your posts."
 - Demo: Create a post about a service and add images.
 - Emphasize: "No design skills needed—it handles the pretty part."
 
+
 ### 5. Post Oracle (Content Calendar)
 ### What It Is
+
 A planning tool for organizing and scheduling content across platforms.
 
 ### How It Works
+
 - Calendar view with drag-and-drop scheduling.
 - AI suggestions for content ideas based on trends.
 - Integration with other tools for seamless publishing.
 - Performance tracking per post.
 
 ### Why Important for the Client
+
 - Ensures consistent content output.
 - Reduces planning time and missed opportunities.
 - Aligns marketing with business goals.
 - Provides data on what content resonates.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Compare to a meal planner: "Like planning your meals for the week, but for your marketing."
 - Demo: Add a few posts to the calendar and show scheduling.
 - Value: "Keeps you consistent, which is what builds loyal followers."
 
+
 ### 6. Neighbor Signal (Local Content Ideas)
 ### What It Is
+
 A generator for local, hyper-relevant content ideas.
 
 ### How It Works
+
 - Analyzes local trends and competitors.
 - Suggests topics like "Best haircuts in Bridgeland."
 - Includes SEO-optimized keywords.
 - Ties into other tools for execution.
 
 ### Why Important for the Client
+
 - Creates authentic, location-based content.
 - Improves local search visibility.
 - Sparks creative ideas without brainstorming.
 - Builds community connection.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Example: "Like asking your neighbors for story ideas, but powered by data."
 - Demo: Generate ideas for Belmont-specific content.
 - Highlight: "Helps you talk about what locals care about."
+
 
 ## Marketing & Tracking Tools
 
 ### 7. UTM Dashboard (Campaign Links)
 ### What It Is
+
 A builder for trackable links with UTM parameters.
 
 ### How It Works
+
 - Preset templates for campaigns (e.g., social, email).
 - Generates URLs with tracking codes.
 - Integrates with analytics for attribution.
 - Supports bulk creation.
 
 ### Why Important for the Client
+
 - Measures which marketing efforts drive results.
 - Enables precise ROI tracking.
 - Supports A/B testing of campaigns.
 - Builds data for future decisions.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Analogize to labeled packages: "Like putting tracking numbers on your shipments to see where they go."
 - Demo: Create a link for a Facebook ad and show the analytics.
 - Value: "Know exactly which posts bring in customers."
 
+
 ### 8. UTM QR (QR Code Maker)
 ### What It Is
+
 Generates QR codes linked to trackable URLs.
 
 ### How It Works
+
 - Customizable designs (colors, logos).
 - Links to UTM URLs automatically.
 - Downloadable in multiple formats.
 - Analytics integration.
 
 ### Why Important for the Client
+
 - Easy way to drive traffic from print materials.
 - Tracks scans and conversions.
 - Enhances in-store marketing.
 - Supports contactless interactions.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Example: "Like a mini website on a sticker that people scan with their phones."
 - Demo: Make a QR for a promo and scan it.
 - Emphasize: "Turn flyers and signs into trackable links."
 
+
 ### 9. Referral QR (Staff Referral Codes)
 ### What It Is
+
 Creates personalized referral codes for staff.
 
 ### How It Works
+
 - Generates unique QR codes per employee.
 - Tracks referrals and rewards.
 - Integrates with CRM for follow-up.
 - Customizable rewards system.
 
 ### Why Important for the Client
+
 - Motivates staff to promote the business.
 - Tracks word-of-mouth effectiveness.
 - Builds loyalty among employees.
 - Provides data on referral sources.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Compare to employee incentives: "Like giving staff their own promo codes to share."
 - Demo: Create codes and show tracking.
 - Value: "Turns your team into marketers."
 
+
 ### 10. Review Link (Review Request Links)
 ### What It Is
+
 Generates compliant review request links and templates.
 
 ### How It Works
+
 - Creates direct links to Google, Yelp, etc.
 - Provides email/SMS templates.
 - Tracks review submissions.
 - Ensures CASL compliance.
 
 ### Why Important for the Client
+
 - Increases review volume organically.
 - Improves online reputation.
 - Complies with regulations.
 - Automates the request process.
 
 ### Presentation Tips for Non-Technical Owners
+
 - Analogize to thank-you notes: "Like sending a polite note asking for feedback."
 - Demo: Generate templates and show links.
 - Highlight: "More reviews mean more trust from new customers."

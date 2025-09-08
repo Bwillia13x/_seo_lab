@@ -98,6 +98,7 @@ export const navigationGroups = [
     items: [
       { href: "/status", label: "Status", icon: AlertTriangle },
       { href: "/guide/trial", label: "Trial Guide", icon: FileText },
+      { href: "/guide/wp-banner", label: "WP Banner Guide", icon: FileText },
     ],
   },
 ];

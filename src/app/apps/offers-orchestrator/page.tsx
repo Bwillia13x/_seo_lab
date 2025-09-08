@@ -12,6 +12,7 @@ import { Download, Sparkles, Wand2, QrCode } from "lucide-react";
 import { showToast } from "@/lib/toast";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
 import Image from "next/image";
+import Link from "next/link";
 
 function buildUtmUrl(baseUrl: string, utm: Record<string, string>) {
   const url = new URL(baseUrl);
@@ -194,6 +195,7 @@ export default function OffersOrchestrator() {
               <Button size="sm" variant="outline" onClick={copyBanner}>Copy Embed</Button>
             </div>
             <p className="text-xs text-muted-foreground">Tip: Place near the top of your site layout or homepage. Remove after the promo ends.</p>
+            <p className="text-xs text-muted-foreground">Need help? <Link href="/guide/wp-banner" className="underline">See the WordPress banner guide</Link>.</p>
           </div>
         </CardContent>
       </Card>
