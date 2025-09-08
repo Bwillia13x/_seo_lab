@@ -33,6 +33,7 @@
     "ci:smoke": "npm run -s build && npm run -s e2e:smoke && npm run -s accessibility:quick && npm run -s visual:smoke && npm run -s performance:quick"
   },
   "dependencies": {
+    "@google-analytics/data": "^5.2.0",
     "@playwright/test": "^1.55.0",
     "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-label": "^2.1.7",

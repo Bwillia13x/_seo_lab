@@ -2,22 +2,24 @@
 export const BELMONT_CONSTANTS = {
   // Business Info
   BUSINESS_NAME: "The Belmont Barbershop",
-  BOOK_URL: "https://thebelmontbarber.ca/book",
+  BOOK_URL:
+    "https://www.fresha.com/a/the-belmont-a-barber-collective-calgary-915-general-avenue-northeast-x0ajy4ot/booking?menu=true",
   WEBSITE_URL: "https://thebelmontbarber.ca",
-  PHONE_TEL: "tel:403-457-0420",
+  PHONE_TEL: "tel:4034570420",
   PHONE_DISPLAY: "403-457-0420",
   ADDRESS_STR: "915 General Ave NE, Calgary, Alberta, T2E 9E1",
   MAP_URL: "https://maps.google.com/?q=915+General+Ave+NE,+Calgary,+AB,+T2E+9E1",
+  PLACE_ID: "ChIJM6if2dNlcVMRvq05yS0wfPU",
 
   // Review Links
-  REVIEW_GOOGLE_URL:
-    "https://search.google.com/local/writereview?placeid=ChIJM6if2dNlcVMRvq05yS0wfPU",
+  REVIEW_GOOGLE_URL: "https://g.page/r/Cb6tOcktMHz1EAI/review",
   REVIEW_APPLE_URL:
     "https://maps.apple.com/?q=915+General+Ave+NE,+Calgary,+AB,+T2E+9E1",
 
   // Social & Contact
-  INSTAGRAM_URL: "https://instagram.com/thebelmontbarber",
-  FACEBOOK_URL: "https://facebook.com/thebelmontbarber",
+  INSTAGRAM_URL: "https://www.instagram.com/thebelmont.abarbercollective/",
+  FACEBOOK_URL:
+    "https://www.facebook.com/pages/The-Belmont-Barbershop-Ltd/61271439545",
 
   // Services (for UTM content)
   SERVICES: [
