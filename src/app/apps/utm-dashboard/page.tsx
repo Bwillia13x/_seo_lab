@@ -63,6 +63,7 @@ import {
 } from "lucide-react";
 import { aiChatSafe } from "@/lib/ai";
 import { logEvent } from "@/lib/analytics";
+import { sendGAEvent } from "@/lib/ga4";
 
 import { saveBlob } from "@/lib/blob";
 import { showToast } from "@/lib/toast";
@@ -662,6 +663,16 @@ function UTMDashboard() {
       setBuiltUrl(url);
       try {
         logEvent("utm_link_built", {
+          source: utm_source,
+          medium: utm_medium,
+          campaign: utm_campaign,
+          service,
+          area,
+        });
+      } catch {}
+      try {
+        // Fire GA4 event via server endpoint (if GA4 env is configured)
+        sendGAEvent("utm_link_built", {
           source: utm_source,
           medium: utm_medium,
           campaign: utm_campaign,

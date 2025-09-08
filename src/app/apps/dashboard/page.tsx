@@ -142,6 +142,21 @@ export default function Dashboard() {
         ];
   }, [last30]);
 
+  // Top Campaigns from UTM link creation (proxy for activity per campaign)
+  const campaignAttribution = useMemo(() => {
+    const m: Record<string, number> = {};
+    for (const e of last30) {
+      if (e.type === "utm_link_built") {
+        const camp = String(e.meta?.campaign || "other");
+        m[camp] = (m[camp] || 0) + 1;
+      }
+    }
+    return Object.entries(m)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 6);
+  }, [last30]);
+
   const COLORS = ["#6366f1", "#22c55e", "#eab308", "#ef4444", "#06b6d4", "#f97316"]; // brandish palette
 
   // Funnel widths
@@ -512,7 +527,7 @@ export default function Dashboard() {
       </Card>
 
       {/* Leaderboards */}
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Top Sources (30d)</CardTitle>
@@ -546,6 +561,25 @@ export default function Dashboard() {
             ) : (
               <div className="text-sm text-muted-foreground">No bookings yet</div>
             )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Top Campaigns (30d)</CardTitle>
+            <CardDescription>UTM campaigns by link activity</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {campaignAttribution.length ? (
+              campaignAttribution.map((c) => (
+                <div key={c.name} className="flex items-center justify-between py-1">
+                  <span className="truncate max-w-[70%]" title={c.name}>{c.name}</span>
+                  <span className="font-medium">{c.value}</span>
+                </div>
+              ))
+            ) : (
+              <div className="text-sm text-muted-foreground">No campaign activity yet</div>
+            )}
+            <div className="text-xs text-muted-foreground mt-2">Tip: Enable GA4 in env to see exact bookings by campaign.</div>
           </CardContent>
         </Card>
       </div>

@@ -62,6 +62,7 @@ export const navigationGroups = [
       { href: "/apps/rfm-crm", label: "Customer Analysis", icon: Users },
       { href: "/apps/noshow-shield", label: "Appointment Reminders", icon: AlertTriangle },
       { href: "/apps/addon-recommender", label: "Service Suggestions", icon: Plus },
+      { href: "/apps/smart-rebooker", label: "Smart Rebooker", icon: Clock },
     ],
   },
   {

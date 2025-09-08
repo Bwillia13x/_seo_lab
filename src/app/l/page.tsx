@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BELMONT_CONSTANTS } from "@/lib/constants";
+import { sendGAEvent } from "@/lib/ga4";
 import QRCode from "qrcode";
 import Image from "next/image";
 
@@ -73,7 +74,22 @@ export default function LinkInBio() {
           <div className="grid gap-3">
             {tiles.map((t) => (
               <Button key={t.label} asChild className="w-full">
-                <a href={t.href} target="_blank" rel="noopener noreferrer">{t.label}</a>
+                <a
+                  href={t.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    sendGAEvent("outbound_click", {
+                      label: t.label,
+                      href: t.href,
+                      source: "instagram",
+                      medium: "bio",
+                      campaign,
+                    })
+                  }
+                >
+                  {t.label}
+                </a>
               </Button>
             ))}
           </div>
