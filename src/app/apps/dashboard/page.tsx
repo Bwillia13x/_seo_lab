@@ -106,6 +106,36 @@ export default function Dashboard() {
 
   // Executive overview (last 30 days)
   const last30 = useMemo(() => (typeof window !== "undefined" ? getEvents(30) : []), []);
+  // GA4 conversions by source (30d) via server report API
+  const [ga4Sources, setGa4Sources] = useState<{ name: string; value: number }[] | null>(null);
+  const [ga4Status, setGa4Status] = useState<"loading" | "ok" | "not_configured" | "error">("loading");
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const res = await fetch("/api/ga4/report/conversions-by-source?days=30", { cache: "no-store" });
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.status === 501 && data?.configured === false) {
+          setGa4Status("not_configured");
+          setGa4Sources(null);
+        } else if (res.ok && Array.isArray(data?.rows)) {
+          setGa4Status("ok");
+          setGa4Sources(data.rows as { name: string; value: number }[]);
+        } else {
+          setGa4Status("error");
+          setGa4Sources(null);
+        }
+      } catch {
+        if (!cancelled) {
+          setGa4Status("error");
+          setGa4Sources(null);
+        }
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
   const kpis = useMemo(() => {
     let links = 0, bookings = 0, reviews = 0, ratingSum = 0;
     let scans = 0;
@@ -437,6 +467,36 @@ export default function Dashboard() {
             ))
           ) : (
             <div className="text-sm text-muted-foreground">No bookings recorded yet</div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* GA4 Conversions by Source (30d) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Conversions by Source (30d)</CardTitle>
+          <CardDescription>Production data (GA4)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {ga4Status === "ok" && ga4Sources && ga4Sources.length ? (
+            ga4Sources.map((s, i) => (
+              <div key={s.name} className="flex items-center justify-between py-1">
+                <div className="flex items-center gap-2">
+                  <span className={`inline-block h-3 w-3 rounded-sm ${COLOR_CLASSES[i % COLOR_CLASSES.length]}`} />
+                  <span className="capitalize">{s.name}</span>
+                </div>
+                <span className="font-medium">{s.value}</span>
+              </div>
+            ))
+          ) : ga4Status === "loading" ? (
+            <div className="text-sm text-muted-foreground">Loading…</div>
+          ) : ga4Status === "not_configured" ? (
+            <div className="text-sm text-muted-foreground">
+              Connect Google Analytics 4 to see conversions by source.
+              <div className="text-xs mt-2">Tip: Add GA4 credentials in Vercel and this card will auto‑enable.</div>
+            </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">Unable to load GA4 data right now.</div>
           )}
         </CardContent>
       </Card>
