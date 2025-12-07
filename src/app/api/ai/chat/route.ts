@@ -38,7 +38,7 @@ async function upstashPipeline(cmds: any[]) {
 
 function getClientId(req: NextRequest) {
   const xf = req.headers.get("x-forwarded-for");
-  const ip = (xf?.split(",")[0] || req.ip || "unknown").trim();
+  const ip = (xf?.split(",")[0] || "unknown").trim();
   return ip || "unknown";
 }
 
