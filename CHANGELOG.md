@@ -1,5 +1,20 @@
 # Changelog
 
+## 2025-12-07
+
+### Security
+- **CRITICAL**: Fixed Remote Code Execution (RCE) vulnerability by upgrading Next.js and React
+  - Upgraded Next.js from 14.2.32 to 15.5.7 (addresses RSC Flight endpoint RCE exposure)
+  - Upgraded React from 18.3.1 to 19.2.1 (removes vulnerable RSC libraries)
+  - Upgraded react-dom from 18.3.1 to 19.2.1 (matching React version)
+  - Updated @types/react and @types/react-dom to version 19
+  - Fixed compatibility issue: removed deprecated `req.ip` property in AI chat route (Next.js 15+ uses x-forwarded-for header only)
+
+### Notes
+- This update addresses a critical security vulnerability affecting Next.js 13/14 apps using the App Router
+- All existing functionality has been tested and confirmed working after the upgrade
+- Build and type checking pass successfully
+
 ## 2025-09-05
 
 ### Added
